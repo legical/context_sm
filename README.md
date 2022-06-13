@@ -1,7 +1,9 @@
 # context_sm
 
 ## see all GPUs
+```
 nvidia-smi -L
+```
 
 ## Starting MPS control daemon
 As root, run the commands
