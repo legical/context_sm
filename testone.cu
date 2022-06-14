@@ -7,20 +7,8 @@
 #include <iostream>
 #include <thread>
 #include <utility>
-
+#include "util.cu"
 using namespace std;
-
-__device__ void MySleep(long num) {
-    long count = 0;
-    for (long i = 0; i <= num; i++) {
-        for (long j = 0; j <= num; j++) {
-            count = num;
-            while (count--) {
-                printf("");
-            }
-        }
-    }
-}
 
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
                             int clockRate) {
