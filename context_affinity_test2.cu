@@ -125,7 +125,7 @@ int main(void)
         affinity.param.smCount.val = smCounts[i];
 
         CUresult err2;
-        err2 = cuCtxCreate_v3(&contextPool[i], &affinity, 1, 0, deviceOrdinal);
+        err2 = cuCtxCreate_v3(&contextPool[i], &affinity, 1, 0, device);
 
         if (MyGetdeviceError(err2) != NULL){
             printf("The %d cuCtxCreate_v3 Error:%s\n", i, MyGetdeviceError(err2));
