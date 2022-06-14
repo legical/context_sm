@@ -10,6 +10,13 @@
 #include "util.cu"
 using namespace std;
 
+__device__ void yesleep(float t, int clockRate) {
+    clock_t t0 = clock64();
+    clock_t t1 = t0;
+    while ((t1 - t0) / (clockRate * 1000.0f) < t)
+        t1 = clock64();
+}
+
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
                             int clockRate) {
     clock_t  start_clock = clock();
@@ -17,7 +24,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
-    MySleep(600);
+    yesleep(600.0, clockRate);
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
 
