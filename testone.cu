@@ -52,7 +52,6 @@ int main_test(int threads, int numBlocks, int numSms, int clockRate) {
 int main(void) {
     int            device = 0;
     cudaDeviceProp prop;
-    const int      CONTEXT_POOL_SIZE = 3;
     int            smCounts = 1;
     cudaGetDevice(&device);
     // printf("device:%d\n",device);
@@ -72,7 +71,7 @@ int main(void) {
     err2 = cuCtxCreate_v3(&contextPool, &affinity, 1, 0, device);
 
     if (MyGetdeviceError(err2) != NULL) {
-        printf("The %d cuCtxCreate_v3 Error:%s\n", i, MyGetdeviceError(err2));
+        printf("cuCtxCreate_v3 Error:%s\n", MyGetdeviceError(err2));
     }
 
     int      numSms = 0;
@@ -102,18 +101,6 @@ int main(void) {
         // smCounts[step] << "\tactual:" << numSms << endl;
     }
     // printf("numSms:%d\n",numSms);
-
-    // cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocksPerSm, kernel,
-    // numThreads, 0);
-    //返回 Kernel的占用率
-    cudaError_t error1;
-    error1 = cudaOccupancyMaxActiveBlocksPerMultiprocessor(
-        &numBlocksPerSm, MyKernel, numThreads, 0);
-    if (error1 != cudaSuccess) {
-        printf(
-            "thread cudaOccupancyMaxActiveBlocksPerMultiprocessor Error:%s\n",
-            MyGetRuntimeError(error1));
-    }
     // printf("thread %d  numBlocksPerSm:%d\n",step, numBlocksPerSm);
     // cout << "KernelID\t"<< step << "\tSMnum\t" << numSms << "\tBlocknum\t"
     // << numBlocks << endl;
