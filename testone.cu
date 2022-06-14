@@ -52,6 +52,7 @@ int main_test(int threads, int numBlocks, int numSms, int clockRate) {
 int main(void) {
     int            device = 0;
     cudaDeviceProp prop;
+    CUcontext      contextPool;
     int            smCounts = 1;
     cudaGetDevice(&device);
     // printf("device:%d\n",device);
