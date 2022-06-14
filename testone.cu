@@ -130,10 +130,6 @@ int main(void) {
             MyGetRuntimeError(error1));
     }
     // printf("thread %d  numBlocksPerSm:%d\n",step, numBlocksPerSm);
-
-    numBlocks = 1 + smCounts * 17; // 2个SM，最多同时执行32个Block
-    printf("KernelID\t%d\tSMnum\t%d\tBlocknum\t%d\n", step, numSms,
-           numBlocks);
     // cout << "KernelID\t"<< step << "\tSMnum\t" << numSms << "\tBlocknum\t"
     // << numBlocks << endl;
     // printf("Block nums:%d\n",numBlocks);
@@ -143,6 +139,8 @@ int main(void) {
 
     for (int i = 1; i < 10; i++) {
         numBlocks += 16 * i;
+        printf("KernelID\t%d\tSMnum\t%d\tBlocknum\t%d\n", i, numSms,
+               numBlocks);
         main_test(numThreads, numBlocks, numSms, clockRate);
     }
 
