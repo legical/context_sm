@@ -53,7 +53,6 @@ int main(void) {
     int            device = 0;
     cudaDeviceProp prop;
     const int      CONTEXT_POOL_SIZE = 3;
-    CUcontext      contextPool;
     int            smCounts = 1;
     cudaGetDevice(&device);
     // printf("device:%d\n",device);
@@ -76,12 +75,10 @@ int main(void) {
         printf("The %d cuCtxCreate_v3 Error:%s\n", i, MyGetdeviceError(err2));
     }
 
-    int                 numSms = 0;
-    int                 numBlocks = 0;
-    int                 numBlocksPerSm = 0;
-    int                 numThreads = 1; //每个Block中的Thread数目
-    CUexecAffinityParam affinity;
-
+    int      numSms = 0;
+    int      numBlocks = 0;
+    int      numBlocksPerSm = 0;
+    int      numThreads = 1; //每个Block中的Thread数目
     CUresult err1;
     //将指定的CUDA上下文绑定到调用CPU线程
     err1 = cuCtxSetCurrent(contextPool);
@@ -89,12 +86,12 @@ int main(void) {
         printf("thread cuCtxSetCurrent Error:%s\n", MyGetdeviceError(err1));
     }
 
-    CUresult err2;
+    CUresult err3;
     // Returns the execution affinity setting for the current context
-    err2 = cuCtxGetExecAffinity(&affinity, CU_EXEC_AFFINITY_TYPE_SM_COUNT);
-    if (err2 != CUDA_SUCCESS) {
+    err3 = cuCtxGetExecAffinity(&affinity, CU_EXEC_AFFINITY_TYPE_SM_COUNT);
+    if (err3 != CUDA_SUCCESS) {
         printf("thread cuCtxGetExecAffinity Error:%s\n",
-               MyGetdeviceError(err2));
+               MyGetdeviceError(err3));
     }
 
     //获取当前context对应的线程数目
@@ -123,7 +120,6 @@ int main(void) {
     // printf("Block nums:%d\n",numBlocks);
     // dim3 dimBlock(numThreads, 1, 1); //每个Block中thread数目：numThreads
     // dim3 dimGrid(numBlocks, 1, 1);   //每个Grid中Block数目
-    int numThreads = 1;
 
     for (int i = 1; i < 10; i++) {
         numBlocks += 16 * i;
