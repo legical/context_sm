@@ -53,6 +53,7 @@ char* MyGetdeviceError(CUresult error) {
 
 int main_test(int threads, int numBlocks, int numSms, int clockRate) {
     Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, 0, clockRate);
+    cudaDeviceSynchronize();
     return 0;
 }
 
