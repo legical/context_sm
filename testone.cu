@@ -24,7 +24,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
-    yesleep(600.0, clockRate);
+    yesleep(100.0, clockRate);
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
 
