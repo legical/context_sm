@@ -25,6 +25,11 @@ nvidia-cuda-mps-control -d # Start the daemon.
 
 This will start the MPS control daemon that will spawn a new MPS Server instance for any $UID starting an application and associate it with the GPU visible to the control daemon. Note that CUDA_VISIBLE_DEVICES should not be set in the client process’s environment.
 
+## comfiled order (RTX3090)
+```
+nvcc -arch sm_86 -lcuda -o test testone.cu util.cu
+```
+
 ## Shutting Down MPS control daemon
 
 To shut down the daemon, as root, run
