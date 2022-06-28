@@ -149,6 +149,8 @@ int main(void) {
         printf("Context parititioning SM error!\tPlan:%d\tactual:%d\n", smCounts, numSms);
         // cout<< "Context "<< step << " parititioning SM error!\tPlan:" <<
         // smCounts[step] << "\tactual:" << numSms << endl;
+    }else{
+        printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts, numSms);
     }
     // printf("numSms:%d\n",numSms);
     // printf("thread %d  numBlocksPerSm:%d\n",step, numBlocksPerSm);
@@ -167,6 +169,7 @@ int main(void) {
     }
     fprintf(fp, "KernelID,SMnum,Blocknum,BlockID,SMID,Start_time,End_time\n");
     fclose(fp);
+    printf("write file title success! \n")
 
     for (int i = 1; i < 10; i++) {      
         numBlocks += 16 * i;        
