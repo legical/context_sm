@@ -29,7 +29,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     float   End_time = (float)end_clock / clockRate;
 
     for (int i = 0; i < kernelID; i++) printf("\t");
-    printf("BlockID\t%d\tSMID\t%d\tStart_time\t%.6f\tEnd_time\t%.6f\n", blockid,
+    printf("%d\t%d\t%.6f\t%.6f\n", blockid,
            smid, Start_time, End_time);
 
     return;
@@ -52,6 +52,7 @@ char* MyGetdeviceError(CUresult error) {
 }
 
 int main_test(int threads, int numBlocks, int numSms, int clockRate) {
+    printf("BlockID\tSMID\tStart_time\tEnd_time\n");
     Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, 0, clockRate);
     cudaDeviceSynchronize();
     return 0;
@@ -62,7 +63,8 @@ int main(void) {
     cudaDeviceProp prop;
     CUcontext      contextPool;
     int            smCounts = 1;
-    cudaGetDevice(&device);
+    cudaSetDevice(device);
+    // cudaGetDevice(&device);
     // printf("device:%d\n",device);
     cudaGetDeviceProperties(&prop, device);
     int clockRate = prop.clockRate;
@@ -119,7 +121,7 @@ int main(void) {
 
     for (int i = 1; i < 10; i++) {
         numBlocks += 16 * i;
-        printf("KernelID\t%d\tSMnum\t%d\tBlocknum\t%d\n", i, numSms,
+        printf("\nKernelID\t%d\tSMnum\t%d\tBlocknum\t%d\n", i, numSms,
                numBlocks);
         main_test(numThreads, numBlocks, numSms, clockRate);
         cudaDeviceReset();
