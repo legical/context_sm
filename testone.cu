@@ -171,7 +171,7 @@ int main(void) {
     fclose(fp);
     printf("write file title success! \n");
 
-    for (int i = 1; i < 10; i++) {      
+    for (int i = 1; i < 6; i++) {      
         numBlocks += 16 * i;        
         printf("\nKernelID\t%d\tSMnum\t%d\tBlocknum\t%d\n", i, numSms,
                numBlocks);
@@ -194,7 +194,7 @@ int main(void) {
         for (int j = 0; j < numBlocks; j++)
         {
             int index = j * DATA_OUT_NUM;
-            fprintf(fp,"%d,%d,%d,%.0f,%.0f,%.6f,%.6f,",i,numSms,
+            fprintf(fp,"%d,%d,%d,%.0f,%.0f,%.6f,%.6f\n",i,numSms,
                numBlocks,h_in1[index],h_in1[index + 1],h_in1[index + 2],h_in1[index + 3]) ;
         }
         fclose(fp);
