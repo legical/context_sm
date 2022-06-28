@@ -169,7 +169,7 @@ int main(void) {
     }
     fprintf(fp, "KernelID,SMnum,Blocknum,BlockID,SMID,Start_time,End_time\n");
     fclose(fp);
-    printf("write file title success! \n")
+    printf("write file title success! \n");
 
     for (int i = 1; i < 10; i++) {      
         numBlocks += 16 * i;        
