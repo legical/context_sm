@@ -132,7 +132,7 @@ int main(void) {
     }
 
     CUexecAffinityParam affinity2;
-    CUresult err3;
+    CUresult            err3;
     // Returns the execution affinity setting for the current context
     err3 = cuCtxGetExecAffinity(&affinity2, CU_EXEC_AFFINITY_TYPE_SM_COUNT);
     if (err3 != CUDA_SUCCESS) {
