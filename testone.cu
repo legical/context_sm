@@ -168,7 +168,7 @@ int main(void) {
     fclose(fp);
     printf("write file title success! \n");
 
-    for (int i = 1; i < 6; i++) {
+    for (int i = 1; i < 4; i++) {
         numBlocks += 16 * i;
         printf("\nKernelID\t%d\tSMnum\t%d\tBlocknum\t%d\n", i, numSms,
                numBlocks);
