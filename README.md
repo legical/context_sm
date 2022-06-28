@@ -25,7 +25,7 @@ nvidia-cuda-mps-control -d # Start the daemon.
 
 This will start the MPS control daemon that will spawn a new MPS Server instance for any $UID starting an application and associate it with the GPU visible to the control daemon. Note that CUDA_VISIBLE_DEVICES should not be set in the client process’s environment.
 
-## comfiled order (RTX3090)
+## comfiled order (RTX30 series)
 ```
 nvcc -arch sm_86 -lcuda -o test testone.cu util.cu
 ```
@@ -75,38 +75,25 @@ nvidia-cuda-mps-control -f
 ## -arch=sm_xx
 
 ```
-GeForce RTX 3070, 3080, 3090
-ARCH= -gencode arch=compute_86,code=[sm_86,compute_86]
+Pascal(CUDA 8 and later)：
+SM60 or SM_60, compute_60 – GP100/Tesla P100 – DGX-1 (Generic Pascal)
 
-Kepler GeForce GTX 770, GTX 760, GT 740
-ARCH= -gencode arch=compute_30,code=sm_30
+SM61 or SM_61, compute_61 – GTX 1080, GTX 1070, GTX 1060, GTX 1050, GTX 1030, Titan Xp, Tesla P40, Tesla P4, Discrete GPU on the NVIDIA Drive PX2
 
-Tesla A100 (GA100), DGX-A100, RTX 3080
-ARCH= -gencode arch=compute_80,code=[sm_80,compute_80]
+SM62 or SM_62, compute_62 – Integrated GPU on the NVIDIA Drive PX2, Tegra (Jetson) TX2
 
-Tesla V100
-ARCH= -gencode arch=compute_70,code=[sm_70,compute_70]
+Volta(CUDA 9 and later)：
+SM70 or SM_70, compute_70 – DGX-1 with Volta, Tesla V100, GTX 1180 (GV104), Titan V, Quadro GV100
 
-GeForce RTX 2080 Ti, RTX 2080, RTX 2070, Quadro RTX 8000, Quadro RTX 6000, Quadro RTX 5000, Tesla T4, XNOR Tensor Cores
-ARCH= -gencode arch=compute_75,code=[sm_75,compute_75]
+SM72 or SM_72, compute_72 – Jetson AGX Xavier, Drive AGX Pegasus, Xavier NX
 
-Jetson XAVIER
-ARCH= -gencode arch=compute_72,code=[sm_72,compute_72]
+Turing(CUDA 10 and later)：
+SM75 or SM_75, compute_75 – GTX/RTX Turing – GTX 1660 Ti, RTX 2060, RTX 2070, RTX 2080, Titan RTX, Quadro RTX 4000, Quadro RTX 5000, Quadro RTX 6000, Quadro RTX 8000, Quadro T1000/T2000, Tesla T4
 
-GTX 1080, GTX 1070, GTX 1060, GTX 1050, GTX 1030, Titan Xp, Tesla P40, Tesla P4
-ARCH= -gencode arch=compute_61,code=sm_61 -gencode arch=compute_61,code=compute_61
+Ampere(CUDA 11 and later)：
+SM80 or SM_80, compute_80 – NVIDIA A100 (the name “Tesla” has been dropped – GA100), NVIDIA DGX-A100
 
-GP100/Tesla P100 - DGX-1
-ARCH= -gencode arch=compute_60,code=sm_60
-
-For Jetson TX1, Tegra X1, DRIVE CX, DRIVE PX - uncomment:
-ARCH= -gencode arch=compute_53,code=[sm_53,compute_53]
-
-For Jetson Tx2 or Drive-PX2 uncomment:
-ARCH= -gencode arch=compute_62,code=[sm_62,compute_62]
-
-For Tesla GA10x cards, RTX 3090, RTX 3080, RTX 3070, RTX A6000, RTX A40 uncomment:
-ARCH= -gencode arch=compute_86,code=[sm_86,compute_86]
+SM86 or SM_86, compute_86 – (from CUDA 11.1 onwards) Tesla GA10x cards, RTX Ampere – RTX 3080, GA102 – RTX 3090, RTX A6000, RTX A40, GA106 – RTX 3060, GA104 – RTX 3070, GA107 – RTX 3050
 ```
 
 When used in interactive mode, the available commands are

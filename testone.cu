@@ -122,9 +122,10 @@ int main(void) {
         printf("KernelID\t%d\tSMnum\t%d\tBlocknum\t%d\n", i, numSms,
                numBlocks);
         main_test(numThreads, numBlocks, numSms, clockRate);
+        cudaDeviceReset();
     }
 
-    cudaDeviceReset();
+    // cudaDeviceReset();
 
     return 0;
 }
