@@ -131,16 +131,17 @@ int main(void) {
         printf("thread cuCtxSetCurrent Error:%s\n", MyGetdeviceError(err1));
     }
 
+    CUexecAffinityParam affinity2;
     CUresult err3;
     // Returns the execution affinity setting for the current context
-    err3 = cuCtxGetExecAffinity(&affinity, CU_EXEC_AFFINITY_TYPE_SM_COUNT);
+    err3 = cuCtxGetExecAffinity(&affinity2, CU_EXEC_AFFINITY_TYPE_SM_COUNT);
     if (err3 != CUDA_SUCCESS) {
         printf("thread cuCtxGetExecAffinity Error:%s\n",
                MyGetdeviceError(err3));
     }
 
     //获取当前context对应的线程数目
-    numSms = affinity.param.smCount.val;
+    numSms = affinity2.param.smCount.val;
     if (numSms != smCounts) {
         printf("Context parititioning SM error!\tPlan:%d\tactual:%d\n", smCounts, numSms);
         // cout<< "Context "<< step << " parititioning SM error!\tPlan:" <<
