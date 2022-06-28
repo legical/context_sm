@@ -9,6 +9,9 @@
 #include <utility>
 #include "util.cu"
 using namespace std;
+#define DATATYPE float
+#define SMEMSIZE 1024
+#define DATA_OUT_NUM 4
 
 __device__ void yesleep(float t, int clockRate) {
     clock_t t0 = clock64();
@@ -17,18 +20,43 @@ __device__ void yesleep(float t, int clockRate) {
         t1 = clock64();
 }
 
+__device__ void killtime(DATATYPE *a,int n)
+{
+	for (int i=0;i<n;i++)
+	{
+		a[i]=0.000;
+	}
+}
+
+//初始化数组，a[i]=0
+void init_order(DATATYPE *a,int n)
+{
+	for (int i=0;i<n;i++)
+	{
+		a[i]=0.000;
+	}
+}
+
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
-                            int clockRate) {
+                            int clockRate, DATATYPE *d_out) {
     clock_t  start_clock = clock();
     float    Start_time = (float)start_clock / clockRate;
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
-    yesleep(100.0, clockRate);
+    yesleep(50.0, clockRate);
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
 
-    for (int i = 0; i < kernelID; i++) printf("\t");
+    __syncthreads();
+    
+    //用d_out数组存储输出的数据
+    int index = blockid * DATA_OUT_NUM;
+    d_out[index] = blockid + 0.000;
+    d_out[index + 1] = smid + 0.000;
+    d_out[index + 2] = Start_time;
+    d_out[index + 3] = End_time;
+    // for (int i = 0; i < kernelID; i++) printf("\t");
     printf("%d\t%d\t%.6f\t%.6f\n", blockid,
            smid, Start_time, End_time);
 
@@ -51,10 +79,21 @@ char* MyGetdeviceError(CUresult error) {
         return NULL;
 }
 
-int main_test(int threads, int numBlocks, int numSms, int clockRate) {
+int main_test(int threads, int numBlocks, int numSms, int clockRate, DATATYPE *h_in1) {
+    //在device上创建一个数据存储用的数组，通过copy host的数组进行初始化
+    DATATYPE *d_out;
+    cudaMalloc((void**)&d_out,sizeof(DATATYPE)*DATA_OUT_NUM*numBlocks);
+    cudaMemcpy(d_out,h_in1,sizeof(DATATYPE)*DATA_OUT_NUM*numBlocks,cudaMemcpyHostToDevice);
+
     printf("BlockID\tSMID\tStart_time\tEnd_time\n");
-    Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, 0, clockRate);
+    Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, 0, clockRate, d_out);
+    //等待kernel执行完毕
     cudaDeviceSynchronize();
+
+    //保存输出数据
+    cudaMemcpy(h_in1,d_out,sizeof(DATATYPE)*DATA_OUT_NUM*numBlocks,cudaMemcpyDeviceToHost);
+
+    cudaFree(d_out);
     return 0;
 }
 
@@ -119,12 +158,45 @@ int main(void) {
     // dim3 dimBlock(numThreads, 1, 1); //每个Block中thread数目：numThreads
     // dim3 dimGrid(numBlocks, 1, 1);   //每个Grid中Block数目
 
-    for (int i = 1; i < 10; i++) {
-        numBlocks += 16 * i;
+    //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
+    FILE *fp = NULL;
+    fp = fopen("data.csv","w+");
+    if (fp == NULL) {
+        fprintf(stderr, "fopen() failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(fp, "KernelID,SMnum,Blocknum,BlockID,SMID,Start_time,End_time\n");
+    fclose(fp);
+
+    for (int i = 1; i < 10; i++) {      
+        numBlocks += 16 * i;        
         printf("\nKernelID\t%d\tSMnum\t%d\tBlocknum\t%d\n", i, numSms,
                numBlocks);
-        main_test(numThreads, numBlocks, numSms, clockRate);
+        
+        //先在host上创建一个数据存储用的数组，并初始化
+        DATATYPE *h_in1;
+	    h_in1=(DATATYPE*)malloc(sizeof(DATATYPE)*DATA_OUT_NUM*numBlocks);    
+	    init_order(h_in1,DATA_OUT_NUM*numBlocks);
+
+        main_test(numThreads, numBlocks, numSms, clockRate, h_in1);
         cudaDeviceReset();
+        
+        //读写文件。文件不存在则创建新文件。读取会从文件的开头开始，写入则只能是追加模式
+        fp = fopen("data.csv","a+");
+        if (fp == NULL) {
+            fprintf(stderr, "fopen() failed.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        for (int j = 0; j < numBlocks; j++)
+        {
+            int index = j * DATA_OUT_NUM;
+            fprintf(fp,"%d,%d,%d,%.0f,%.0f,%.6f,%.6f,",i,numSms,
+               numBlocks,h_in1[index],h_in1[index + 1],h_in1[index + 2],h_in1[index + 3]) ;
+        }
+        fclose(fp);
+        //释放h_in1
+        free(h_in1);
     }
 
     // cudaDeviceReset();
