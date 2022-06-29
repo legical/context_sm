@@ -78,11 +78,12 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     for (int i = 0; i < kernelID; i++) {
         index += numBlock[i];
     }
+    const int *h_in1_index = &h_in1[index];
     //在device上创建一个数据存储用的数组，通过copy host的数组进行初始化
     DATATYPE* d_out;
     int       numBlocks = numBlock[kernelID];
     cudaMalloc((void**)&d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks);
-    cudaMemcpy(d_out, &h_in1[index], sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_out, h_in1_index, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
 
     printf("BlockID\tSMID\tStart_time\tEnd_time\n");
     Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
@@ -90,7 +91,7 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     cudaDeviceSynchronize();
 
     //保存输出数据
-    cudaMemcpy(&h_in1[index], d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_in1_index, d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyDeviceToHost);
 
     cudaFree(d_out);
     return 0;
