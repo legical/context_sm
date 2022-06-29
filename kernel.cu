@@ -190,11 +190,11 @@ int main(void) {
             //获取当前context对应的线程数目
             numSms = affinity.param.smCount.val;
             if (numSms != smCounts[step]) {
-                printf("Context parititioning SM error!\tPlan:%d\tactual:%d\n", smCounts, numSms);
+                printf("Context parititioning SM error!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
                 // cout<< "Context "<< step << " parititioning SM error!\tPlan:" <<
                 // smCounts[step] << "\tactual:" << numSms << endl;
             } else {
-                printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts, numSms);
+                printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
             }
             DATATYPE* h_in;
             h_in = (DATATYPE*)malloc(sizeof(DATATYPE) * ThreadnumBlocks[step]);
