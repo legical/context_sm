@@ -110,7 +110,7 @@ int main(void) {
     cudaSetDevice(device);
     // printf("device:%d\n",device);
     cudaGetDeviceProperties(&prop, device);
-    // int clockRate = prop.clockRate;
+    int clockRate = prop.clockRate;
     int sm_number = prop.multiProcessorCount;
     cout << "*********   This GPU has " << sm_number << " SMs   *********" << endl;
     // output GPU prop
