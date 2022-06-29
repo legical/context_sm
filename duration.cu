@@ -14,7 +14,7 @@ unsigned long long dtime_usec(unsigned long long start) {
 }
 
 // #define APPRX_CLKS_PER_SEC 1000000000ULL
-__global__ void delay_kernel(unsigned seconds) {
+__global__ void delay_kernel(unsigned long long seconds) {
     // unsigned long long dt = 0;
 // while (clock64() < (dt + (seconds * APPRX_CLKS_PER_SEC)))
 //     ;
