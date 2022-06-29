@@ -44,6 +44,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
 
+    //block内线程同步
     __syncthreads();
 
     //用d_out数组存储输出的数据
