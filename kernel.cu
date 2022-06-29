@@ -168,6 +168,10 @@ int main(void) {
             int                 numSms = 0;
             int                 numThreads = 1; //每个Block中的Thread数目
             CUexecAffinityParam affinity;
+            int                 ThreadnumBlocks[CONTEXT_POOL_SIZE];
+            for (int j = 0; j < CONTEXT_POOL_SIZE; j++) {
+                ThreadnumBlocks[j] = numBlocks[j];
+            }
 
             CUresult err1;
             //将指定的CUDA上下文绑定到调用CPU线程
@@ -193,16 +197,16 @@ int main(void) {
                 printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts, numSms);
             }
             DATATYPE* h_in;
-            h_in = (DATATYPE*)malloc(sizeof(DATATYPE) * numBlocks[step]);
-            init_order(h_in, numBlocks[step]);
+            h_in = (DATATYPE*)malloc(sizeof(DATATYPE) * ThreadnumBlocks[step]);
+            init_order(h_in, ThreadnumBlocks[step]);
 
-            main_test(step, numThreads, numBlocks, numSms, clockRate, h_in);
+            main_test(step, numThreads, ThreadnumBlocks, numSms, clockRate, h_in);
 
             int dataindex = 0;
             for (int j = 0; j < step; j++) {
-                dataindex += numBlocks[j];
+                dataindex += ThreadnumBlocks[j];
             }
-            memcpy(h_data + dataindex, h_in, sizeof(DATATYPE) * numBlocks[step]);
+            memcpy(h_data + dataindex, h_in, sizeof(DATATYPE) * ThreadnumBlocks[step]);
 
             free(h_in);
         });
