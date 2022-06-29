@@ -78,7 +78,7 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     for (int i = 0; i < kernelID; i++) {
         index += numBlock[i];
     }
-    const int *h_in1_index = &h_in1[index];
+    const float *h_in1_index = &h_in1[index];
     //在device上创建一个数据存储用的数组，通过copy host的数组进行初始化
     DATATYPE* d_out;
     int       numBlocks = numBlock[kernelID];
