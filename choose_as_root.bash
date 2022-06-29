@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Note: This script must be performed with root privilege !"
 echo "Start MPS in Y  or  Stop MPS in N"
-read -p "Please enter your choice" ANSWER
+read -p "Please enter your choice : " ANSWER
 case "$ANSWER" in
   [yY] | [yY][eE][sS])
     echo "Your choice is : Start MPS"
