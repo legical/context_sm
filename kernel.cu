@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <cuda.h>
@@ -7,6 +8,7 @@
 #include <iostream>
 #include <utility>
 #include <thread>
+
 using namespace std;
 
 #define DATATYPE     float
@@ -19,7 +21,6 @@ __device__ void yesleep(float t, int clockRate) {
     while ((t1 - t0) / (clockRate * 1000.0f) < t)
         t1 = clock64();
 }
-
 
 //初始化数组，a[i]=0
 void init_order(DATATYPE* a, int n) {
@@ -74,16 +75,11 @@ char* MyGetdeviceError(CUresult error) {
 }
 
 int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRate, DATATYPE* h_in1) {
-    int index = 0;
-    for (int i = 0; i < kernelID; i++) {
-        index += numBlock[i];
-    }
-    const float *h_in1_index = &h_in1[index];
     //在device上创建一个数据存储用的数组，通过copy host的数组进行初始化
     DATATYPE* d_out;
     int       numBlocks = numBlock[kernelID];
     cudaMalloc((void**)&d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks);
-    cudaMemcpy(d_out, h_in1_index, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_out, h_in1, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
 
     printf("BlockID\tSMID\tStart_time\tEnd_time\n");
     Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
@@ -91,7 +87,7 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     cudaDeviceSynchronize();
 
     //保存输出数据
-    cudaMemcpy(h_in1_index, d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyDeviceToHost);
+    cudaMemcpy(h_in1, d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyDeviceToHost);
 
     cudaFree(d_out);
     return 0;
@@ -152,7 +148,6 @@ int main(void) {
     // save all output data
     DATATYPE* h_data;
     h_data = (DATATYPE*)malloc(sizeof(DATATYPE) * sizecsv);
-    init_order(h_data, sizecsv);
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
     FILE* fp = NULL;
@@ -197,8 +192,19 @@ int main(void) {
             } else {
                 printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts, numSms);
             }
+            DATATYPE* h_in;
+            h_in = (DATATYPE*)malloc(sizeof(DATATYPE) * numBlocks[step]);
+            init_order(h_in, numBlocks[step]);
 
-            main_test(step, numThreads, numBlocks, numSms, clockRate, h_data);
+            main_test(step, numThreads, numBlocks, numSms, clockRate, h_in);
+
+            int dataindex = 0;
+            for (int j = 0; j < step; j++) {
+                dataindex += numBlocks[j];
+            }
+            memcpy(h_data + dataindex, h_in, sizeof(DATATYPE) * numBlocks[step]);
+
+            free(h_in);
         });
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
