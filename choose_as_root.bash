@@ -1,4 +1,8 @@
 #!/bin/bash
+#nvidia-smi -c compute_mode -i target_gpu_id
+#compute_mode  = 0/Default, 1/Exclusive_Thread, 2/Prohibited, 3/Exclusive_Process
+#target_gpu_id = Id number found by running the following command: nvidia-smi -q
+#for my device it would be: nvidia-smi -c 3 -i 00000000:0B:00.0
 echo "Note: This script must be performed with root privilege !"
 echo "Start MPS in Y  or  Stop MPS in N"
 read -p "Please enter your choice : " ANSWER
