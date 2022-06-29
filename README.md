@@ -1,5 +1,5 @@
-# context_sm
-
+# context_sm 环境变量
+输入env检查
 ```
 export PATH=/usr/local/cuda-11.4/bin${PATH:+:${PATH}}
 
@@ -17,10 +17,17 @@ nvidia-smi -L
 
 As root, run the commands
 
+Select GPU 0
 ```
-export CUDA_VISIBLE_DEVICES=0 # Select GPU 0.
-nvidia-smi -i 0 -c EXCLUSIVE_PROCESS # Set GPU 0 to exclusive mode.
-nvidia-cuda-mps-control -d # Start the daemon.
+export CUDA_VISIBLE_DEVICES=0
+```
+Set GPU 0 to exclusive mode
+```
+nvidia-smi -i 0 -c EXCLUSIVE_PROCESS
+```
+Start the daemon
+```
+nvidia-cuda-mps-control -d
 ```
 
 This will start the MPS control daemon that will spawn a new MPS Server instance for any $UID starting an application and associate it with the GPU visible to the control daemon. Note that CUDA_VISIBLE_DEVICES should not be set in the client process’s environment.
