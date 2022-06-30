@@ -165,7 +165,7 @@ int main(void) {
     std::thread mythread[CONTEXT_POOL_SIZE];
     int         step = 0;
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
-        mythread[step] = std::thread([&]() {
+        mythread[step] = std::thread([&,step]() {
             // printf("thread %d start!\n",i);
             int                 numSms = 0;
             int                 numThreads = 1; //每个Block中的Thread数目
