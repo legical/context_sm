@@ -210,6 +210,7 @@ int main(void) {
             printf("kernel %d data copy over!\n", step);
 
             free(h_in);
+            printf("kernel %d exec over!\n", step);
         });
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
