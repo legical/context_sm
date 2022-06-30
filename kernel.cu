@@ -150,8 +150,7 @@ int main(void) {
     h_data = (DATATYPE*)malloc(sizeof(DATATYPE) * sizecsv);
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
-    FILE* fp = NULL;
-    fp = fopen("outdata.csv", "w+");
+    FILE* fp = fopen("outdata.csv", "w+");
     if (fp == NULL) {
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
@@ -217,17 +216,17 @@ int main(void) {
     cudaDeviceReset();
 
     //读写文件。文件不存在则创建新文件。读取会从文件的开头开始，写入则只能是追加模式
-    fp = fopen("outdata.csv", "a+");
-    if (fp == NULL) {
+    FILE* fpdata = fopen("outdata.csv", "a+");
+    if (fpdata == NULL) {
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
     }
 
     for (int j = 0; j < allnumblocks; j++) {
         int index = j * DATA_OUT_NUM;
-        fprintf(fp, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f\n", h_data[index], h_data[index + 1], h_data[index + 2], h_data[index + 3], h_data[index + 4], h_data[index + 5], h_data[index + 6]);
+        fprintf(fpdata, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f\n", h_data[index], h_data[index + 1], h_data[index + 2], h_data[index + 3], h_data[index + 4], h_data[index + 5], h_data[index + 6]);
     }
-    fclose(fp);
+    fclose(fpdata);
 
     free(h_data);
     return 0;
