@@ -135,7 +135,7 @@ int init_para(int argc, char* argv[], int* smCounts, int device_sm_num) {
         }
     }
 
-    printf("each sm_to_kernel: ");
+    printf("\teach sm_to_kernel: ");
     int allsm = 0;
     for (int j = 0; j < kernelnum; j++) {
         allsm += smCounts[j];
