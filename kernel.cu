@@ -226,8 +226,7 @@ int main(int argc, char* argv[]) {
     fprintf(fp, "KernelID,SMnum,Blocknum,BlockID,SMID,Start_time,End_time\n");
     fclose(fp);
     // printf("write file title success! \n");
-    
-    printf("BlockID\tSMID\tStart_time\tEnd_time\n");
+
     std::thread mythread[CONTEXT_POOL_SIZE];
     int         step = 0;
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
@@ -260,6 +259,8 @@ int main(int argc, char* argv[]) {
             } else {
                 printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
             }
+            if (step == 0)
+                printf("BlockID\tSMID\tStart_time\tEnd_time\n");
             DATATYPE temp = 0;
             init_order(h_data[step], numBlocks[step], temp);
 
