@@ -87,8 +87,9 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     cudaDeviceSynchronize();
 
     //保存输出数据
+    printf("kernel %d over, saving data...\n", kernelID);
     cudaMemcpy(h_in1, d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyDeviceToHost);
-
+    printf("kernel %d saving data success!\n", kernelID);
     cudaFree(d_out);
     return 0;
 }
@@ -148,7 +149,7 @@ int main(void) {
         sizecsv += numBlocks[i] * DATA_OUT_NUM;
         allnumblocks += numBlocks[i];
         //为每个线程分配data数组
-        h_data[i] = (DATATYPE*)malloc(sizeof(DATATYPE) * numBlocks[i]);
+        h_data[i] = (DATATYPE*)malloc(sizeof(DATATYPE) * numBlocks[i] * DATA_OUT_NUM);
     }
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
