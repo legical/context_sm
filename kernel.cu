@@ -164,15 +164,11 @@ int main(void) {
     std::thread mythread[CONTEXT_POOL_SIZE];
     int         step = 0;
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
-        mythread[step] = std::thread([=]() {
+        mythread[step] = std::thread([&]() {
             // printf("thread %d start!\n",i);
             int                 numSms = 0;
             int                 numThreads = 1; //每个Block中的Thread数目
             CUexecAffinityParam affinity;
-            int                 ThreadnumBlocks[CONTEXT_POOL_SIZE];
-            for (int j = 0; j < CONTEXT_POOL_SIZE; j++) {
-                ThreadnumBlocks[j] = numBlocks[j];
-            }
 
             CUresult err1;
             //将指定的CUDA上下文绑定到调用CPU线程
@@ -197,9 +193,9 @@ int main(void) {
             } else {
                 printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
             }
-            init_order(h_data[step], ThreadnumBlocks[step]);
+            init_order(h_data[step], numBlocks[step]);
 
-            main_test(step, numThreads, ThreadnumBlocks, numSms, clockRate, h_data[step]);
+            main_test(step, numThreads, numBlocks, numSms, clockRate, h_data[step]);
         });
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
