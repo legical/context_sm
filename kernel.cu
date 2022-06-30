@@ -108,16 +108,11 @@ int str_to_int(char buf[]) {
 int init_para(int argc, char* argv[], int* smCounts, int device_sm_num) {
     init_order(smCounts, device_sm_num, 2);
     int  kernelnum = 0;
-    int  kernel_is_before = 1;
     char kernel_num[] = "-k";
     char sm_num[] = "-s";
     for (int i = 1; i < argc; i++) {
         //如果匹配到输入kernel数量的参数
         if (strcmp(argv[i], kernel_num) == 0) {
-            //如果不是在第1位上匹配到的kernel数量参数，则此参数在sm的后面
-            if (i != 1) {
-                kernel_is_before = 0;
-            }
             kernelnum = str_to_int(argv[i + 1]);
             break;
         }
@@ -142,7 +137,7 @@ int init_para(int argc, char* argv[], int* smCounts, int device_sm_num) {
 
     printf("each sm_to_kernel: ");
     int allsm = 0;
-    for (int i = 0; i < kernelnum; i++) {
+    for (int j = 0; j < kernelnum; j++) {
         allsm += smCounts[j];
         printf("%d  ", smCounts[j]);
     }
@@ -173,7 +168,7 @@ int main(int argc, char* argv[]) {
 
     int* smC;
     smC = (int*)malloc(sizeof(int) * sm_number);
-    const int CONTEXT_POOL_SIZE = init_para(argc, &argv, smC, sm_number);
+    const int CONTEXT_POOL_SIZE = init_para(argc, argv, smC, sm_number);
 
     // const int      CONTEXT_POOL_SIZE = 4;
     CUcontext contextPool[CONTEXT_POOL_SIZE];
@@ -230,7 +225,7 @@ int main(int argc, char* argv[]) {
     }
     fprintf(fp, "KernelID,SMnum,Blocknum,BlockID,SMID,Start_time,End_time\n");
     fclose(fp);
-    printf("write file title success! \n");
+    // printf("write file title success! \n");
 
     std::thread mythread[CONTEXT_POOL_SIZE];
     int         step = 0;
@@ -264,7 +259,7 @@ int main(int argc, char* argv[]) {
             } else {
                 printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
             }
-            init_order(h_data[step], numBlocks[step], 0.000);
+            init_order(h_data[step], numBlocks[step], 0.0);
 
             main_test(step, numThreads, numBlocks, numSms, clockRate, h_data[step]);
         });
