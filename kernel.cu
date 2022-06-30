@@ -205,20 +205,20 @@ int main(void) {
     cudaDeviceReset();
 
     //读写文件。文件不存在则创建新文件。读取会从文件的开头开始，写入则只能是追加模式
-    FILE* fpdata = fopen("outdata.csv", "a+");
-    if (fpdata == NULL) {
+    fp = fopen("outdata.csv", "a+");
+    if (fp == NULL) {
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
     }
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         for (int j = 0; j < numBlocks[step]; j++) {
             int index = j * DATA_OUT_NUM;
-            fprintf(fpdata, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
+            fprintf(fp, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
                     h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5], h_data[step][index + 6]);
         }
     }
 
-    fclose(fpdata);
+    fclose(fp);
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         free(h_data[step]);
@@ -226,103 +226,3 @@ int main(void) {
     free(h_data);
     return 0;
 }
-
-// int main(void)
-// {
-//     //初始化
-//     // cuInit(0);
-//     int device = 0;
-//     cudaDeviceProp prop;
-//     CUcontext contextPool;
-//     int smCounts;
-//     cudaGetDevice(&device);
-//     // printf("device:%d\n",device);
-//     cudaGetDeviceProperties(&prop, device);
-//     int clockRate = prop.clockRate;
-//     smCounts = 2;
-//     std::thread mythread;
-//     int pi = -1;
-
-//     //获取当前设备的 COMPUTE_MODE
-//     CUresult err1;
-//     err1 = cuDeviceGetAttribute(&pi, CU_DEVICE_ATTRIBUTE_COMPUTE_MODE, device);
-//     if (err1 != CUDA_SUCCESS)
-//     {
-//         printf("cuDeviceGetAttribute Error:%s\n", MyGetdeviceError(err1));
-//     }
-//     // printf("cuDeviceGetAttribute:%d\n",pi);
-
-//     //创建Context
-//     CUexecAffinityParam affinity;
-//     affinity.type = CU_EXEC_AFFINITY_TYPE_SM_COUNT;
-//     affinity.param.smCount.val = smCounts;
-//     // cuCtxCreate_v3 创建带有affinity的上下文，并且CU_EXEC_AFFINITY_TYPE_SM_COUNT属性仅在Volta及更新的架构上以及MPS下可用
-//     //链接：https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__CTX.html#group__CUDA__CTX_1g2a5b565b1fb067f319c98787ddfa4016
-//     // cuCtxCreate_v3(&contextPool[i], &affinity, 1, 0, deviceOrdinal);
-
-//     CUresult err2;
-//     err2 = cuCtxCreate_v3(&contextPool, &affinity, 1, 0, device);
-//     if (MyGetdeviceError(err2) != NULL)
-//     {
-//         printf("cuCtxCreate_v3 Error:%s\n", MyGetdeviceError(err2));
-//     }
-
-//     mythread = std::thread([contextPool, clockRate]()
-//     {
-//         // printf("thread %d start!\n",i);
-//         int numSms = 0;
-//         int numBlocks = 0;
-//         int numBlocksPerSm = 0;
-//         int numThreads = 1; //每个Block中的Thread数目
-//         CUexecAffinityParam affinity;
-
-//         CUresult err1;
-//         //将指定的CUDA上下文绑定到调用CPU线程
-//         err1 = cuCtxSetCurrent(contextPool);
-//         if (err1 != CUDA_SUCCESS)
-//         {
-//             printf("thread cuCtxSetCurrent Error:%s\n", MyGetdeviceError(err1));
-//         }
-
-//         CUresult err2;
-//         // Returns the execution affinity setting for the current context
-//         err2 = cuCtxGetExecAffinity(&affinity, CU_EXEC_AFFINITY_TYPE_SM_COUNT);
-//         if (err2 != CUDA_SUCCESS)
-//         {
-//             printf("thread cuCtxGetExecAffinity Error:%s\n", MyGetdeviceError(err2));
-//         }
-
-//         //获取当前context对应的线程数目
-//         numSms = affinity.param.smCount.val;
-//         printf("numSms:%d\n",numSms);
-
-//         // cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocksPerSm, kernel, numThreads, 0);
-//         //返回 Kernel的占用率
-//         cudaError_t error1;
-//         error1 = cudaOccupancyMaxActiveBlocksPerMultiprocessor(&numBlocksPerSm, MyKernel, numThreads, 0);
-//         if (error1 != cudaSuccess)
-//         {
-//             printf("thread cudaOccupancyMaxActiveBlocksPerMultiprocessor Error:%s\n", MyGetRuntimeError(error1));
-//         }
-//         printf("numBlocksPerSm:%d\n",numBlocksPerSm);
-
-//         numBlocks = 33;//2个SM，最多同时执行32个Block
-//         printf("Block nums:%d\n",numBlocks);
-//         dim3 dimBlock(numThreads, 1, 1);//每个Block中thread数目：numThreads
-//         dim3 dimGrid(numBlocks, 1, 1);//每个Grid中Block数目
-//         // void *kernelArgs[] = {(int *)&numSms, (int *)&numBlocks, (int *)&clockRate}; /* add kernel args */
-//         // // Launches a device function where thread blocks can cooperate and synchronize as they execute
-//         // // https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__EXECUTION.html#group__CUDART__EXECUTION_1g504b94170f83285c71031be6d5d15f73
-//         // cudaError_t error2;
-//         // error2 = cudaLaunchCooperativeKernel((void *)MyKernel, dimGrid, dimBlock, kernelArgs);
-//         // if (error2 != cudaSuccess)
-//         // {
-//         //     printf("thread cudaLaunchCooperativeKernel Error:%s\n", MyGetRuntimeError(error2));
-//         // }
-//         MyKernel<<<dimGrid,dimBlock>>>(numSms,numBlocks,clockRate);
-//     });
-//     mythread.join();
-
-//     cudaDeviceReset();
-//     return 0;
-// }
