@@ -205,7 +205,9 @@ int main(void) {
             for (int j = 0; j < step; j++) {
                 dataindex += ThreadnumBlocks[j];
             }
+            printf("kernel %d data start copying!\n", step);
             memcpy(h_data + dataindex, h_in, sizeof(DATATYPE) * ThreadnumBlocks[step]);
+            printf("kernel %d data copy over!\n", step);
 
             free(h_in);
         });
