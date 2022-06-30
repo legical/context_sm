@@ -8,7 +8,7 @@ echo -e "***** \033[32mStart\033[0m MPS in \033[32mY\033[0m  or  \033[34mStop\03
 read -p "***** Please enter your choice : " ANSWER
 case "$ANSWER" in
   [yY] | [yY][eE][sS])
-    echo "***** Your choice is : \033[32mStart MPS\033[0m *****"
+    echo -e "***** Your choice is : \033[32mStart MPS\033[0m *****"
     export CUDA_VISIBLE_DEVICES="0"
     nvidia-smi -i 0 -c EXCLUSIVE_PROCESS
     nvidia-cuda-mps-control -d
