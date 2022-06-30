@@ -259,7 +259,8 @@ int main(int argc, char* argv[]) {
             } else {
                 printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
             }
-            init_order(h_data[step], numBlocks[step], 0.0);
+            DATATYPE temp = 0;
+            init_order(h_data[step], numBlocks[step], temp);
 
             main_test(step, numThreads, numBlocks, numSms, clockRate, h_data[step]);
         });
