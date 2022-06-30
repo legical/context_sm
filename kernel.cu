@@ -82,7 +82,7 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     cudaMalloc((void**)&d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks);
     cudaMemcpy(d_out, h_in1, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
 
-    printf("BlockID\tSMID\tStart_time\tEnd_time\n");
+    // printf("BlockID\tSMID\tStart_time\tEnd_time\n");
     Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
     //等待kernel执行完毕
     cudaDeviceSynchronize();
@@ -226,7 +226,8 @@ int main(int argc, char* argv[]) {
     fprintf(fp, "KernelID,SMnum,Blocknum,BlockID,SMID,Start_time,End_time\n");
     fclose(fp);
     // printf("write file title success! \n");
-
+    
+    printf("BlockID\tSMID\tStart_time\tEnd_time\n");
     std::thread mythread[CONTEXT_POOL_SIZE];
     int         step = 0;
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
