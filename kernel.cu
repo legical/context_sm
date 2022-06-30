@@ -23,9 +23,10 @@ __device__ void yesleep(float t, int clockRate) {
 }
 
 //初始化数组，a[i]=0
-void init_order(DATATYPE* a, int n) {
+template <class T>
+void init_order(T* a, int n, T para) {
     for (int i = 0; i < n; i++) {
-        a[i] = 0.000;
+        a[i] = para;
     }
 }
 
@@ -94,15 +95,72 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     return 0;
 }
 
-int main(void) {
+int str_to_int(char buf[]) {
+    int num = 0;
+    for (int i = 0; i < strlen(buf); i++) {
+        // 通过减去'0'可以将字符转换为int类型的数值
+        num = num * 10 + buf[i] - '0';
+    }
+    return num;
+}
+
+//命令行传参
+int init_para(int argc, char* argv[], int* smCounts, int device_sm_num) {
+    init_order(smCounts, device_sm_num, 2);
+    int  kernelnum = 0;
+    int  kernel_is_before = 1;
+    char kernel_num[] = "-k";
+    char sm_num[] = "-s";
+    for (int i = 1; i < argc; i++) {
+        //如果匹配到输入kernel数量的参数
+        if (strcmp(argv[i], kernel_num) == 0) {
+            //如果不是在第1位上匹配到的kernel数量参数，则此参数在sm的后面
+            if (i != 1) {
+                kernel_is_before = 0;
+            }
+            kernelnum = str_to_int(argv[i + 1]);
+            break;
+        }
+    }
+    printf("kernel number:%d\t", kernelnum);
+
+    for (int i = 1; i < argc; i++) {
+        //如果匹配到每个kernel绑定的sm数量的参数
+        if (strcmp(argv[i], sm_num) == 0) {
+            int smnum = argc - 4;
+            int step = smnum;
+            if (smnum > kernelnum) {
+                printf("sm_to_kernel number > kernel number, the overflow will be discarded!\n");
+                step = kernelnum;
+            }
+            for (int j = 0; j < step; j++) {
+                smCounts[j] = str_to_int(argv[i + 1 + j]);
+            }
+            break;
+        }
+    }
+
+    printf("each sm_to_kernel: ");
+    int allsm = 0;
+    for (int i = 0; i < kernelnum; i++) {
+        allsm += smCounts[j];
+        printf("%d  ", smCounts[j]);
+    }
+    printf("\n");
+
+    if (allsm > device_sm_num) {
+        printf("allocate sm number > device total sm number, exit!\n");
+        exit(-1);
+    }
+
+    return kernelnum;
+}
+
+int main(int argc, char* argv[]) {
     //初始化
     // cuInit(0);
     int            device = 0;
     cudaDeviceProp prop;
-    const int      CONTEXT_POOL_SIZE = 4;
-    CUcontext      contextPool[CONTEXT_POOL_SIZE];
-    int            smCounts[CONTEXT_POOL_SIZE];
-    int            numBlocks[CONTEXT_POOL_SIZE];
     int            sizecsv = 0;
     int            allnumblocks = 0;
     cudaSetDevice(device);
@@ -110,13 +168,25 @@ int main(void) {
     cudaGetDeviceProperties(&prop, device);
     int clockRate = prop.clockRate;
     int sm_number = prop.multiProcessorCount;
-    cout << "*********   This GPU has " << sm_number << " SMs   *********" << endl;
+    printf("*********   This GPU has %d SMs   *********\n", sm_number);
     // output GPU prop
 
-    smCounts[0] = 6;
-    smCounts[1] = 4;
-    smCounts[2] = 4;
-    smCounts[3] = 2;
+    int* smC;
+    smC = (int*)malloc(sizeof(int) * sm_number);
+    const int CONTEXT_POOL_SIZE = init_para(argc, &argv, smC, sm_number);
+
+    // const int      CONTEXT_POOL_SIZE = 4;
+    CUcontext contextPool[CONTEXT_POOL_SIZE];
+    int       smCounts[CONTEXT_POOL_SIZE];
+    int       numBlocks[CONTEXT_POOL_SIZE];
+    for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
+        smCounts[i] = smC[i];
+    }
+    free(smC);
+    // smCounts[0] = 6;
+    // smCounts[1] = 4;
+    // smCounts[2] = 4;
+    // smCounts[3] = 2;
 
     //获取当前设备的 COMPUTE_MODE
     CUresult err1;
@@ -165,7 +235,7 @@ int main(void) {
     std::thread mythread[CONTEXT_POOL_SIZE];
     int         step = 0;
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
-        mythread[step] = std::thread([&,step]() {
+        mythread[step] = std::thread([&, step]() {
             // printf("thread %d start!\n",i);
             int                 numSms = 0;
             int                 numThreads = 1; //每个Block中的Thread数目
@@ -194,7 +264,7 @@ int main(void) {
             } else {
                 printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
             }
-            init_order(h_data[step], numBlocks[step]);
+            init_order(h_data[step], numBlocks[step], 0.000);
 
             main_test(step, numThreads, numBlocks, numSms, clockRate, h_data[step]);
         });
