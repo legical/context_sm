@@ -124,6 +124,10 @@ int main(void) {
         printf("cuDeviceGetAttribute Error:%s\n", MyGetdeviceError(err1));
     }
 
+    // save all output data
+    DATATYPE** h_data;
+    h_data = (DATATYPE**)malloc(sizeof(DATATYPE*) * CONTEXT_POOL_SIZE);
+
     //创建Context
     for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
         CUexecAffinityParam affinity;
@@ -143,11 +147,9 @@ int main(void) {
         numBlocks[i] = 1 + smCounts[i] * 17;
         sizecsv += numBlocks[i] * DATA_OUT_NUM;
         allnumblocks += numBlocks[i];
+        //为每个线程分配data数组
+        h_data[i] = (DATATYPE*)malloc(sizeof(DATATYPE) * numBlocks[i]);
     }
-
-    // save all output data
-    DATATYPE* h_data;
-    h_data = (DATATYPE*)malloc(sizeof(DATATYPE) * sizecsv);
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
     FILE* fp = fopen("outdata.csv", "w+");
@@ -195,22 +197,9 @@ int main(void) {
             } else {
                 printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
             }
-            DATATYPE* h_in;
-            h_in = (DATATYPE*)malloc(sizeof(DATATYPE) * ThreadnumBlocks[step]);
-            init_order(h_in, ThreadnumBlocks[step]);
+            init_order(h_data[step], ThreadnumBlocks[step]);
 
-            main_test(step, numThreads, ThreadnumBlocks, numSms, clockRate, h_in);
-
-            int dataindex = 0;
-            for (int j = 0; j < step; j++) {
-                dataindex += ThreadnumBlocks[j];
-            }
-            printf("kernel %d data start copying!\n", step);
-            memcpy(h_data + dataindex, h_in, sizeof(DATATYPE) * ThreadnumBlocks[step]);
-            printf("kernel %d data copy over!\n", step);
-
-            free(h_in);
-            printf("kernel %d exec over!\n", step);
+            main_test(step, numThreads, ThreadnumBlocks, numSms, clockRate, h_data[step]);
         });
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
@@ -224,13 +213,19 @@ int main(void) {
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
     }
-
-    for (int j = 0; j < allnumblocks; j++) {
-        int index = j * DATA_OUT_NUM;
-        fprintf(fpdata, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f\n", h_data[index], h_data[index + 1], h_data[index + 2], h_data[index + 3], h_data[index + 4], h_data[index + 5], h_data[index + 6]);
+    for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
+        for (int j = 0; j < numBlocks[step]; j++) {
+            int index = j * DATA_OUT_NUM;
+            fprintf(fpdata, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
+                    h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5], h_data[step][index + 6]);
+        }
     }
+
     fclose(fpdata);
 
+    for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
+        free(h_data[step]);
+    }
     free(h_data);
     return 0;
 }
