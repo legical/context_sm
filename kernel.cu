@@ -279,18 +279,7 @@ int main(int argc, char* argv[]) {
     char* filename;
     filename = (char*)malloc(sizeof(char) * (11 + 2 + 2 + sizeof(smCounts) + 2 + 2));
     gene_filename(filename, smCounts, block_per_sm, CONTEXT_POOL_SIZE);
-    // strcat(filename, "outdata-s");
-    // for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
-    //     char smCo[2];
-    //     strcat(filename, int_to_str(smCounts[i], smCo));
-    //     // free(smCo);
-    // }
-    // strcat(filename, "-b");
-    // char block[2];
-    // strcat(filename, int_to_str(block_per_sm, block));
-    // // free(block);
-    // strcat(filename, ".csv");
-    printf("\nfilename:%s\n", filename);
+    // printf("\nfilename:%s\n", filename);
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
     FILE* fp = fopen(filename, "w+");
