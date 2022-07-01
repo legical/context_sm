@@ -104,6 +104,56 @@ int str_to_int(char buf[]) {
     return num;
 }
 
+char* int_to_str(int num, char* str) // 10进制
+{
+    int i = 0;   //指示填充str
+    if (num < 0) //如果num为负数，将num变正
+    {
+        num = -num;
+        str[i++] = '-';
+    }
+    //转换
+    do {
+        str[i++] = num % 10 + 48; //取num最低位 字符0~9的ASCII码是48~57；简单来说数字0+48=48，ASCII码对应字符'0'
+        num /= 10;                //去掉最低位
+    } while (num);                // num不为0继续循环
+
+    str[i] = '\0';
+
+    //确定开始调整的位置
+    int j = 0;
+    if (str[0] == '-') //如果有负号，负号不用调整
+    {
+        j = 1; //从第二位开始调整
+        ++i;   //由于有负号，所以交换的对称轴也要后移1位
+    }
+    //对称交换
+    for (; j < i / 2; j++) {
+        //对称交换两端的值 其实就是省下中间变量交换a+b的值：a=a+b;b=a-b;a=a-b;
+        str[j] = str[j] + str[i - 1 - j];
+        str[i - 1 - j] = str[j] - str[i - 1 - j];
+        str[j] = str[j] - str[i - 1 - j];
+    }
+
+    return str; //返回转换后的值
+}
+
+char* gene_filename(char* filename, int* smCounts, int block_per_sm) {
+    strcat(filename, "outdata-s");
+    for (int i = 0; i < sizeof(smCounts); i++) {
+        char smC[2];
+        strcat(filename, int_to_str(smCounts[i], smC));
+        free(smC);
+    }
+    strcat(filename, "-b");
+    char block[2];
+    strcat(filename, int_to_str(block_per_sm, block));
+    free(block);
+    strcat(filename, ".csv");
+    
+    return filename;
+}
+
 //命令行传参
 int init_para(int argc, char* argv[], int* smCounts, int device_sm_num, int* block_per_sm) {
     init_order(smCounts, device_sm_num, 2);
@@ -182,7 +232,7 @@ int main(int argc, char* argv[]) {
     int* smC;
     smC = (int*)malloc(sizeof(int) * sm_number);
     const int CONTEXT_POOL_SIZE = init_para(argc, argv, smC, sm_number, &block_per_sm);
-
+    
     // const int      CONTEXT_POOL_SIZE = 4;
     CUcontext contextPool[CONTEXT_POOL_SIZE];
     int       smCounts[CONTEXT_POOL_SIZE];
@@ -225,6 +275,12 @@ int main(int argc, char* argv[]) {
         //为每个线程分配data数组
         h_data[i] = (DATATYPE*)malloc(sizeof(DATATYPE) * numBlocks[i] * DATA_OUT_NUM);
     }
+
+    char* filename;
+    filename = (char*)malloc(sizeof(char) * (11+2+2+sizeof(smCounts)+2+2));
+    gene_filename(filename, smCounts, block_per_sm);
+    printf("\nfilename:%s\n",filename);
+    free(filename);
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
     FILE* fp = fopen("outdata.csv", "w+");
