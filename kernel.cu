@@ -268,7 +268,7 @@ int main(int argc, char* argv[]) {
             } else {
                 printf("Context %d parititioning SM success!\tPlan:%d\tactual:%d\n", step, smCounts[step], numSms);
             }
-            if (step == 0)
+            if (step == CONTEXT_POOL_SIZE - 1)
                 printf("BlockID\tSMID\tStart_time\tEnd_time\n");
             DATATYPE temp = 0;
             init_order(h_data[step], numBlocks[step], temp);
