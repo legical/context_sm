@@ -105,11 +105,13 @@ int str_to_int(char buf[]) {
 }
 
 //命令行传参
-int init_para(int argc, char* argv[], int* smCounts, int device_sm_num) {
+int init_para(int argc, char* argv[], int* smCounts, int device_sm_num, int* block_per_sm) {
     init_order(smCounts, device_sm_num, 2);
     int  kernelnum = 0;
     char kernel_num[] = "-k";
     char sm_num[] = "-s";
+    char block_per = "-b";
+    int  block_per_yes = 0;
     for (int i = 1; i < argc; i++) {
         //如果匹配到输入kernel数量的参数
         if (strcmp(argv[i], kernel_num) == 0) {
@@ -120,9 +122,18 @@ int init_para(int argc, char* argv[], int* smCounts, int device_sm_num) {
     printf("kernel number:%d\t", kernelnum);
 
     for (int i = 1; i < argc; i++) {
+        //如果匹配到输入kernel数量的参数
+        if (strcmp(argv[i], block_per) == 0) {
+            *block_per_sm = str_to_int(argv[i + 1]);
+            block_per_yes = 1;
+            break;
+        }
+    }
+
+    for (int i = 1; i < argc; i++) {
         //如果匹配到每个kernel绑定的sm数量的参数
         if (strcmp(argv[i], sm_num) == 0) {
-            int smnum = argc - 4;
+            int smnum = argc - 4 - block_per_yes * 2;
             int step = smnum;
             if (smnum > kernelnum) {
                 printf("sm_to_kernel number > kernel number, the overflow will be discarded!\n");
@@ -158,6 +169,7 @@ int main(int argc, char* argv[]) {
     cudaDeviceProp prop;
     int            sizecsv = 0;
     int            allnumblocks = 0;
+    int            block_per_sm = 17;
     cudaSetDevice(device);
     // printf("device:%d\n",device);
     cudaGetDeviceProperties(&prop, device);
@@ -168,7 +180,7 @@ int main(int argc, char* argv[]) {
 
     int* smC;
     smC = (int*)malloc(sizeof(int) * sm_number);
-    const int CONTEXT_POOL_SIZE = init_para(argc, argv, smC, sm_number);
+    const int CONTEXT_POOL_SIZE = init_para(argc, argv, smC, sm_number, &block_per_sm);
 
     // const int      CONTEXT_POOL_SIZE = 4;
     CUcontext contextPool[CONTEXT_POOL_SIZE];
@@ -210,7 +222,7 @@ int main(int argc, char* argv[]) {
         //链接：https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__CTX.html#group__CUDA__CTX_1g2a5b565b1fb067f319c98787ddfa4016
         // cuCtxCreate_v3(&contextPool[i], &affinity, 1, 0, deviceOrdinal);
 
-        numBlocks[i] = 1 + smCounts[i] * 17;
+        numBlocks[i] = 1 + smCounts[i] * block_per_sm;
         sizecsv += numBlocks[i] * DATA_OUT_NUM;
         allnumblocks += numBlocks[i];
         //为每个线程分配data数组
