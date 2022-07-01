@@ -153,7 +153,7 @@ int init_para(int argc, char* argv[], int* smCounts, int device_sm_num, int* blo
         allsm += smCounts[j];
         printf("%d  ", smCounts[j]);
     }
-    printf("\n");
+    printf("\tblocks_per_sm: %d\n", *block_per_sm);
 
     if (allsm > device_sm_num) {
         printf("allocate sm number > device total sm number, exit!\n");
@@ -191,10 +191,6 @@ int main(int argc, char* argv[]) {
         smCounts[i] = smC[i];
     }
     free(smC);
-    // smCounts[0] = 6;
-    // smCounts[1] = 4;
-    // smCounts[2] = 4;
-    // smCounts[3] = 2;
 
     //获取当前设备的 COMPUTE_MODE
     CUresult err1;
@@ -266,11 +262,11 @@ int main(int argc, char* argv[]) {
             //获取当前context对应的线程数目
             numSms = affinity.param.smCount.val;
             if (numSms != smCounts[step]) {
-                printf("Context parititioning SM error!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
+                printf("Context %d parititioning SM error!\tPlan:%d\tactual:%d\n", step, smCounts[step], numSms);
                 // cout<< "Context "<< step << " parititioning SM error!\tPlan:" <<
                 // smCounts[step] << "\tactual:" << numSms << endl;
             } else {
-                printf("Context parititioning SM success!\tPlan:%d\tactual:%d\n", smCounts[step], numSms);
+                printf("Context %d parititioning SM success!\tPlan:%d\tactual:%d\n", step, smCounts[step], numSms);
             }
             if (step == 0)
                 printf("BlockID\tSMID\tStart_time\tEnd_time\n");
