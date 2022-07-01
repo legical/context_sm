@@ -143,12 +143,12 @@ char* gene_filename(char* filename, int* smCounts, int block_per_sm) {
     for (int i = 0; i < sizeof(smCounts); i++) {
         char smC[2];
         strcat(filename, int_to_str(smCounts[i], smC));
-        free(smC);
+        // free(smC);
     }
     strcat(filename, "-b");
     char block[2];
     strcat(filename, int_to_str(block_per_sm, block));
-    free(block);
+    // free(block);
     strcat(filename, ".csv");
     
     return filename;
