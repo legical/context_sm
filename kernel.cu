@@ -53,7 +53,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     d_out[index + 5] = Start_time;
     d_out[index + 6] = End_time;
     // for (int i = 0; i < kernelID; i++) printf("\t");
-    printf("%d\t%d\t%.6f\t%.6f\n", blockid,
+    printf("%d\t%d\t%d\t%.6f\t%.6f\n", kernelID, blockid,
            smid, Start_time, End_time);
 
     return;
@@ -324,7 +324,7 @@ int main(int argc, char* argv[]) {
                 printf("Context %d parititioning SM success!\tPlan:%d\tactual:%d\n", step, smCounts[step], numSms);
             }
             if (step == CONTEXT_POOL_SIZE - 1)
-                printf("BlockID\tSMID\tStart_time\tEnd_time\n");
+                printf("KernelID\tBlockID\tSMID\tStart_time\tEnd_time\n");
             DATATYPE temp = 0;
             init_order(h_data[step], numBlocks[step], temp);
 
