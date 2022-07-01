@@ -138,9 +138,9 @@ char* int_to_str(int num, char* str) // 10进制
     return str; //返回转换后的值
 }
 
-char* gene_filename(char* filename, int* smCounts, int block_per_sm) {
+char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT_POOL_SIZE) {
     strcat(filename, "outdata-s");
-    for (int i = 0; i < sizeof(smCounts); i++) {
+    for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
         char smC[2];
         strcat(filename, int_to_str(smCounts[i], smC));
         // free(smC);
@@ -150,7 +150,7 @@ char* gene_filename(char* filename, int* smCounts, int block_per_sm) {
     strcat(filename, int_to_str(block_per_sm, block));
     // free(block);
     strcat(filename, ".csv");
-    
+
     return filename;
 }
 
@@ -232,7 +232,7 @@ int main(int argc, char* argv[]) {
     int* smC;
     smC = (int*)malloc(sizeof(int) * sm_number);
     const int CONTEXT_POOL_SIZE = init_para(argc, argv, smC, sm_number, &block_per_sm);
-    
+
     // const int      CONTEXT_POOL_SIZE = 4;
     CUcontext contextPool[CONTEXT_POOL_SIZE];
     int       smCounts[CONTEXT_POOL_SIZE];
@@ -277,23 +277,23 @@ int main(int argc, char* argv[]) {
     }
 
     char* filename;
-    filename = (char*)malloc(sizeof(char) * (11+2+2+sizeof(smCounts)+2+2));
-    strcat(filename, "outdata-s");
-    for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
-        char smCo[2];
-        strcat(filename, int_to_str(smCounts[i], smCo));
-        // free(smCo);
-    }
-    strcat(filename, "-b");
-    char block[2];
-    strcat(filename, int_to_str(block_per_sm, block));
-    // free(block);
-    strcat(filename, ".csv");
-    printf("\nfilename:%s\n",filename);
-    free(filename);
+    filename = (char*)malloc(sizeof(char) * (11 + 2 + 2 + sizeof(smCounts) + 2 + 2));
+    gene_filename(filename, smCounts, block_per_sm, CONTEXT_POOL_SIZE);
+    // strcat(filename, "outdata-s");
+    // for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
+    //     char smCo[2];
+    //     strcat(filename, int_to_str(smCounts[i], smCo));
+    //     // free(smCo);
+    // }
+    // strcat(filename, "-b");
+    // char block[2];
+    // strcat(filename, int_to_str(block_per_sm, block));
+    // // free(block);
+    // strcat(filename, ".csv");
+    printf("\nfilename:%s\n", filename);
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
-    FILE* fp = fopen("outdata.csv", "w+");
+    FILE* fp = fopen(filename, "w+");
     if (fp == NULL) {
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
@@ -348,7 +348,7 @@ int main(int argc, char* argv[]) {
     cudaDeviceReset();
 
     //读写文件。文件不存在则创建新文件。读取会从文件的开头开始，写入则只能是追加模式
-    fp = fopen("outdata.csv", "a+");
+    fp = fopen(filename, "a+");
     if (fp == NULL) {
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
@@ -362,6 +362,7 @@ int main(int argc, char* argv[]) {
     }
 
     fclose(fp);
+    free(filename);
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         free(h_data[step]);
