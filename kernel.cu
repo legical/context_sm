@@ -110,7 +110,8 @@ int init_para(int argc, char* argv[], int* smCounts, int device_sm_num, int* blo
     int  kernelnum = 0;
     char kernel_num[] = "-k";
     char sm_num[] = "-s";
-    char block_per = "-b";
+    //每个sm上启动的block数量
+    char block_per[] = "-b";
     int  block_per_yes = 0;
     for (int i = 1; i < argc; i++) {
         //如果匹配到输入kernel数量的参数
