@@ -279,7 +279,7 @@ int main(int argc, char* argv[]) {
     char* filename;
     filename = (char*)malloc(sizeof(char) * (11+2+2+sizeof(smCounts)+2+2));
     strcat(filename, "outdata-s");
-    for (int i = 0; i < sizeof(smCounts); i++) {
+    for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
         char smCo[2];
         strcat(filename, int_to_str(smCounts[i], smCo));
         // free(smCo);
