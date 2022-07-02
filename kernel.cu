@@ -53,8 +53,8 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     d_out[index + 5] = Start_time;
     d_out[index + 6] = End_time;
     // for (int i = 0; i < kernelID; i++) printf("\t");
-    printf("%d\t%d\t%d\t%.6f\t%.6f\n", kernelID, blockid,
-           smid, Start_time, End_time);
+    printf("%d\t%d\t%d\t%.6f\t%.6f\t%.6f\n", kernelID, blockid,
+           smid, Start_time, End_time, End_time - Start_time);
 
     return;
 }
@@ -287,7 +287,7 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
     }
-    fprintf(fp, "KernelID,SMnum,Blocknum,BlockID,SMID,Start_time,End_time\n");
+    fprintf(fp, "KernelID,SMnum,Blocknum,BlockID,SMID,Start_time,End_time,Exec_time\n");
     fclose(fp);
     // printf("write file title success! \n");
 
@@ -324,7 +324,7 @@ int main(int argc, char* argv[]) {
                 printf("Context %d parititioning SM success!\tPlan:%d\tactual:%d\n", step, smCounts[step], numSms);
             }
             if (step == CONTEXT_POOL_SIZE - 1)
-                printf("KernelID\tBlockID\tSMID\tStart_time\tEnd_time\n");
+                printf("KernelID\tBlockID\tSMID\tStart_time\tEnd_time\tExec_time\n");
             DATATYPE temp = 0;
             init_order(h_data[step], numBlocks[step], temp);
 
@@ -345,8 +345,8 @@ int main(int argc, char* argv[]) {
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         for (int j = 0; j < numBlocks[step]; j++) {
             int index = j * DATA_OUT_NUM;
-            fprintf(fp, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
-                    h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5], h_data[step][index + 6]);
+            fprintf(fp, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f,%.6f\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
+                    h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5], h_data[step][index + 6], h_data[step][index + 6] - h_data[step][index + 5]);
         }
     }
 
