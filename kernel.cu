@@ -139,7 +139,7 @@ char* int_to_str(int num, char* str) // 10进制
 }
 
 char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT_POOL_SIZE) {
-    strcat(filename, "outdata-s");
+    strcat(filename, "./outdata/outdata-s");
     for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
         char smC[2];
         strcat(filename, int_to_str(smCounts[i], smC));
@@ -277,7 +277,7 @@ int main(int argc, char* argv[]) {
     }
 
     char* filename;
-    filename = (char*)malloc(sizeof(char) * (11 + 2 + 2 + sizeof(smCounts) + 2 + 2));
+    filename = (char*)malloc(sizeof(char) * (10 + 11 + 2 + 2 + sizeof(smCounts) + 2 + 2));
     gene_filename(filename, smCounts, block_per_sm, CONTEXT_POOL_SIZE);
     // printf("\nfilename:%s\n", filename);
 
