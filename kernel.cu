@@ -139,6 +139,7 @@ char* int_to_str(int num, char* str) // 10进制
 }
 
 char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT_POOL_SIZE) {
+    filename[0] = '\0';
     strcat(filename, "./outdata/outdata-s");
     for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
         char smC[2];
