@@ -284,6 +284,7 @@ int main(int argc, char* argv[]) {
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
     FILE* fp = fopen(filename, "w+");
     if (fp == NULL) {
+        printf("open fail errno = %d reason = %s \n", errno, strerrno(errno));
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
     }
