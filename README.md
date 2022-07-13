@@ -6,15 +6,16 @@ export PATH=/usr/local/cuda-11.4/bin${PATH:+:${PATH}}
 export LD_LIBRARY_PATH=/usr/local/cuda-11.4/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 
 ```
-# 使用
+# 使用（root）
 ## 编译
 ```
 nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu
 ```
 
-## 开启MPS （root）
+## 开启MPS 
 ```
-chmod +x ./choose_as_root.bash
+chmod +x choose_as_root.bash
+./choose_as_root.bash
 ```
 输入y
 
@@ -27,7 +28,12 @@ chmod +x ./choose_as_root.bash
 * -k kernelnum 并行运行kernelnum个kernel
 * -s sm_num0 sm_num1 ... sm_num_kernelnum-1 分别为每个kernel绑定对应数量的sm，如果没指定数量，则默认绑定2个sm
 * -b block_num 每个kernel启动多少个block,每个kernel启动的block数量一致
-
+## 结束MPS
+```
+chmod +x choose_as_root.bash
+./choose_as_root.bash
+```
+输入n
 ## see all GPUs
 
 ```
