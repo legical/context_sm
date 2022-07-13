@@ -358,6 +358,7 @@ int main(int argc, char* argv[]) {
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         free(h_data[step]);
     }
+    printf("\nAll done.\n");
     free(h_data);
     return 0;
 }
