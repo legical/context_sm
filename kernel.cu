@@ -32,12 +32,22 @@ void init_order(T* a, int n, T para) {
 
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
                             int clockRate, DATATYPE* d_out) {
+    uint32_t         SM_size = 32 * 1024 / sizeof(float);
+    int              i = 0;
+    __shared__ float s_tvalue[SM_size];
+
     clock_t  start_clock = clock();
     float    Start_time = (float)start_clock / clockRate;
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
-    yesleep(50.0, clockRate);
+    // yesleep(50.0, clockRate);
+    for (i = 0; i < SM_size; i++) {
+        s_tvalue[i] = i + 8;
+    }
+    while (i < SM_size) {
+        i = s_tvalue[i];
+    }
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
 
