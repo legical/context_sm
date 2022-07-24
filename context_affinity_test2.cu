@@ -46,17 +46,29 @@ __global__ void MyKernel(int numSms, int numBlocks, int clockRate) {
 
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
                             int clockRate) {
-    clock_t  start_clock = clock();
-    float    Start_time = (float)start_clock / clockRate;
-    uint32_t smid = getSMID();
-    uint32_t blockid = getBlockIDInGrid();
-    uint32_t threadid = getThreadIdInBlock();
-    MySleep(600);
+    // shared memory : 32 KB
+    uint32_t         SM_size = 32 * 1024 / sizeof(float);
+    int              i = 0;
+    __shared__ float s_tvalue[SM_size];
+    clock_t          start_clock = clock();
+    float            Start_time = (float)start_clock / clockRate;
+    uint32_t         smid = getSMID();
+    uint32_t         blockid = getBlockIDInGrid();
+    uint32_t         threadid = getThreadIdInBlock();
+    // MySleep(600);
+    // clock_t end_clock = clock();
+    // float   End_time = (float)end_clock / clockRate;
+
+    for (i = 0; i < SM_size; i++) {
+        s_tvalue[i] = i + 8;
+    }
+    while (i < SM_size) {
+        i = s_tvalue[i];
+    }
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
-
-    for (int i = 0; i < kernelID; i++)
-        printf("\t");
+    // for (int i = 0; i < kernelID; i++)
+    //     printf("\t");
     printf("BlockID\t%d\tSMID\t%d\tStart_time\t%.6f\tEnd_time\t%.6f\n", blockid,
            smid, Start_time, End_time);
 
