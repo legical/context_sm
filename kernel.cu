@@ -32,7 +32,7 @@ void init_order(T* a, int n, T para) {
 
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
                             int clockRate, DATATYPE* d_out) {
-    uint32_t         SM_size = 32 * 1024 / sizeof(float);
+    const uint32_t         SM_size = 32 * 1024 / sizeof(float);
     int              i = 0;
     __shared__ float s_tvalue[SM_size];
 
