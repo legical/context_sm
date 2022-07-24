@@ -21,7 +21,7 @@ chmod +x choose_as_root.bash
 
 ## 运行
 ```
-./test -k 4 -s 4 4 6 2 -b 8
+./test -k 4 -s 4 4 6 2 -b 16
 ```
 
 其中
