@@ -67,8 +67,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     }
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
-    // for (int i = 0; i < kernelID; i++)
-    //     printf("\t");
+    
     printf("%d\t%d\t%d\t%.6f\t%.6f\n",kernelID, blockid,
            smid, Start_time, End_time);           
     return;
