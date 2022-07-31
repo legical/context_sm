@@ -362,13 +362,24 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "fopen() failed.\n");
         exit(EXIT_FAILURE);
     }
+    DATATYPE min_time = 4294967000;
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         for (int j = 0; j < numBlocks[step]; j++) {
             int index = j * DATA_OUT_NUM;
+            if (min_time > h_data[step][index + 5]) {
+                min_time = h_data[step][index + 5];
+            }
+        }
+    }
+
+    for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
+        for (int j = 0; j < numBlocks[step]; j++) {
+            int index = j * DATA_OUT_NUM;
+
             // fprintf(fp, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f,%.6f\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
             //         h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5], h_data[step][index + 6], h_data[step][index + 6] - h_data[step][index + 5]);
             fprintf(fp, "%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
-                    h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5], h_data[step][index + 6], h_data[step][index + 6] - h_data[step][index + 5]);
+                    h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5] - min_time, h_data[step][index + 6] - min_time, h_data[step][index + 6] - h_data[step][index + 5]);
         }
     }
 
