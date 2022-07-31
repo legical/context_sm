@@ -48,7 +48,7 @@ while(kernel_index < kernelnums):
     # 获取每个kernel的数据
     smids, start_times, end_times = [], [], []
     get_data(filename, smids, start_times, end_times, kernel_index, time_limit)
-    print("smids_lenth is",len(smids))
+    # print("smids_lenth is",len(smids))
     # 绘图，只从开始-结束时间绘图
     kernel_data_index = 0
     while(kernel_data_index < len(start_times)):
@@ -70,6 +70,8 @@ plt.ylabel('SMID', fontsize=16)
 plt.tick_params(axis='both', labelsize=16)
 plt.ylim(-1, kernelnums) # 设置y轴范围
 pic_name = filename.replace("csv", "jpg", 1)
-os.remove(pic_name)
+# 如果图片文件已存在，则删除
+if os.path.exists(pic_name):
+    os.remove(pic_name)
 plt.savefig(pic_name)
 plt.show()
