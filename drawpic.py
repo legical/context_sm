@@ -7,7 +7,7 @@ import sys
 # run: python drawpic.py [filename] [kernelnums]
 # example: python drawpic.py ./outdata/outdata-s4462-b8.csv 4
 
-def get_data(filename, smids, start_times, end_times, kerID, min_time, max_time):
+def get_data(filename, smids, start_times, end_times, kerID, time_limit):
     # '''get the highs and lows from a data file'''
     with open(filename) as f:
         reader = csv.reader(f)
@@ -18,10 +18,10 @@ def get_data(filename, smids, start_times, end_times, kerID, min_time, max_time)
                     smid = int(row[1])
                     start_time = float(row[5])
                     end_time = float(row[6])
-                    if min_time == 0 or min_time > start_time :
-                        min_time = start_time
-                    if max_time == 0 or max_time < end_time :
-                        max_time = end_time
+                    if time_limit[0] == 0 or time_limit[0] > start_time :
+                        time_limit[0] = start_time
+                    if time_limit[1] == 0 or time_limit[1] < end_time :
+                        time_limit[1] = end_time
                 except ValueError:
                     print(smid, 'reading data error!\n')
                 else:
@@ -37,13 +37,13 @@ kernelnums = int(sys.argv[2])
 line_style = ['bo','m.','gv','y^','r+','ks','cD','wx']
 # 图片dpi=220，尺寸宽和高，单位为英寸
 fig = plt.figure(dpi=220, figsize=(15,9))
-min_time = 0.0
-max_time = 0.0
+# 获取时间上下限 0-下限 1-上限
+time_limit = [0.0,0.0]
 kernel_index = 0
 while(kernel_index < kernelnums):
     # 获取每个kernel的数据
     smids, start_times, end_times = [], [], []
-    get_data(filename, smids, start_times, end_times, kernel_index, min_time, max_time)
+    get_data(filename, smids, start_times, end_times, kernel_index, time_limit)
     # 绘图，只从开始-结束时间绘图
     kernel_data_index = 0
     while(kernel_data_index < len(start_times)):
@@ -59,7 +59,7 @@ while(kernel_index < kernelnums):
 title = 'Distribution on the SM of each kernel | MPS'
 plt.title(title, fontsize=24)
 plt.xlabel('EXEC_time', fontsize=16)
-plt.xlim(min_time, max_time) # 设置x轴范围
+plt.xlim(time_limit[0], time_limit[1]) # 设置x轴范围
 fig.autofmt_xdate()  # 绘制斜的日期标签
 plt.ylabel('SMID', fontsize=16)
 plt.tick_params(axis='both', labelsize=16)
