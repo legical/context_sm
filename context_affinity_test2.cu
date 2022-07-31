@@ -47,7 +47,7 @@ __global__ void MyKernel(int numSms, int numBlocks, int clockRate) {
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
                             int clockRate) {
     // shared memory : 32 KB
-    uint32_t         SM_size = 32 * 1024 / sizeof(float);
+    const uint32_t   SM_size = 32 * 1024 / sizeof(float);
     int              i = 0;
     __shared__ float s_tvalue[SM_size];
     clock_t          start_clock = clock();
@@ -67,9 +67,9 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     }
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
-    
-    printf("%d\t%d\t%d\t%.6f\t%.6f\n",kernelID, blockid,
-           smid, Start_time, End_time);           
+
+    printf("%d\t%d\t%d\t%.6f\t%.6f\n", kernelID, blockid,
+           smid, Start_time, End_time);
     return;
 }
 
@@ -104,7 +104,6 @@ int main(void) {
     int clockRate = prop.clockRate;
     int sm_number = prop.multiProcessorCount;
     printf("*********   This GPU has %d SMs   *********\n", sm_number);
-    
 
     smCounts[0] = 1;
     smCounts[1] = 2;

@@ -9,18 +9,18 @@ __device__ __inline__ void busySleep(clock_t clock_count) {
     }
 }
 
-// __device__ void MySleep(long num)
-// {
-//     long count = 0;
-//     for(long i = 0;i <= num;i++){
-//         for(long j = 0;j<=num;j++){
-//             count = num;
-//             while(count--){
-//                 printf("");
-//             }
-//         }
-//     }
-// }
+__device__ void MySleep(long num)
+{
+    long count = 0;
+    for(long i = 0;i <= num;i++){
+        for(long j = 0;j<=num;j++){
+            count = num;
+            while(count--){
+                printf("");
+            }
+        }
+    }
+}
 
 static __device__ __inline__ uint32_t getThreadNumPerBlock(void) {
     return blockDim.x * blockDim.y * blockDim.z;
