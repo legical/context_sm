@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
@@ -6,18 +7,21 @@ import sys
 # run: python drawpic.py [filename] [kernelnums]
 # example: python drawpic.py ./outdata/outdata-s4462-b8.csv 4
 
-def get_data(filename, smids, start_times, end_times, kerID):
+def get_data(filename, smids, start_times, end_times, kerID, min_time, max_time):
     # '''get the highs and lows from a data file'''
     with open(filename) as f:
         reader = csv.reader(f)
         header_row = next(reader)
-
         for row in reader:
             if(row[0] == kerID):
                 try:
                     smid = int(row[1])
                     start_time = float(row[5])
                     end_time = float(row[6])
+                    if min_time == 0 or min_time > start_time :
+                        min_time = start_time
+                    if max_time == 0 or max_time < end_time :
+                        max_time = end_time
                 except ValueError:
                     print(smid, 'reading data error!\n')
                 else:
@@ -33,12 +37,12 @@ kernelnums = int(sys.argv[2])
 line_style = ['bo','m.','gv','y^','r+','ks','cD','wx']
 # 图片dpi=220，尺寸宽和高，单位为英寸
 fig = plt.figure(dpi=220, figsize=(15,9))
-
+min_time = max_time = 0
 kernel_index = 0
 while(kernel_index < kernelnums):
     # 获取每个kernel的数据
     smids, start_times, end_times = [], [], []
-    get_data(filename, smids, start_times, end_times, kernel_index)
+    get_data(filename, smids, start_times, end_times, kernel_index, min_time, max_time)
     # 绘图，只从开始-结束时间绘图
     kernel_data_index = 0
     while(kernel_data_index < len(start_times)):
@@ -54,10 +58,12 @@ while(kernel_index < kernelnums):
 title = 'Distribution on the SM of each kernel | MPS'
 plt.title(title, fontsize=24)
 plt.xlabel('EXEC_time', fontsize=16)
+plt.xlim(min_time, max_time) # 设置x轴范围
 fig.autofmt_xdate()  # 绘制斜的日期标签
 plt.ylabel('SMID', fontsize=16)
 plt.tick_params(axis='both', labelsize=16)
 plt.ylim(-1, kernelnums) # 设置y轴范围
 pic_name = filename.replace("csv", "jpg", 1)
+os.remove(pic_name)
 plt.savefig(pic_name)
 plt.show()
