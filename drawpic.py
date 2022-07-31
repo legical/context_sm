@@ -18,10 +18,11 @@ def get_data(filename, smids, start_times, end_times, kerID, time_limit):
                     smid = int(row[1])
                     start_time = float(row[5])
                     end_time = float(row[6])
-                    if time_limit[0] < 1.0 or time_limit[0] > start_time :
+                    if (time_limit[0] == 0.0 or time_limit[0] > start_time) :
                         time_limit[0] = start_time
-                    if time_limit[1] < 1.0 or time_limit[1] < end_time :
+                    if (time_limit[1] == 0.0 or time_limit[1] < end_time) :
                         time_limit[1] = end_time
+                    print("now min_time is : ",time_limit[0],"\tmax_time is: ",time_limit[1])
                 except ValueError:
                     print(smid, 'reading data error!\n')
                 else:
@@ -54,7 +55,7 @@ while(kernel_index < kernelnums):
         kernel_data_index+=1
     # 绘制下一个kernel的数据
     kernel_index += 1
-print("min_time is ",time_limit[0],"max_time is: ",time_limit[1])
+print("min_time is ",time_limit[0],"\tmax_time is: ",time_limit[1])
 # Format plot
 title = 'Distribution on the SM of each kernel | MPS'
 plt.title(title, fontsize=24)
