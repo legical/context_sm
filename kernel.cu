@@ -371,6 +371,7 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+    printf("min_time is %lu\n",min_time);
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         for (int j = 0; j < numBlocks[step]; j++) {
