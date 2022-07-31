@@ -9,7 +9,7 @@ __device__ __inline__ void busySleep(clock_t clock_count) {
     }
 }
 
-__device__ void MySleep(long num)
+static __device__ void MySleep(long num)
 {
     long count = 0;
     for(long i = 0;i <= num;i++){
