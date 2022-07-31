@@ -25,7 +25,7 @@ def get_data(filename, smids, start_times, end_times, kerID, time_limit):
                         time_limit[0] = start_time
                     elif (time_limit[1] < end_time) :
                         time_limit[1] = end_time
-                        print("now min_time is : ",time_limit[0],"\tmax_time is: ",time_limit[1])
+                        # print("now min_time is : ",time_limit[0],"\tmax_time is: ",time_limit[1])
                 except ValueError:
                     print(smid, 'reading data error!\n')
                 else:
@@ -48,6 +48,7 @@ while(kernel_index < kernelnums):
     # 获取每个kernel的数据
     smids, start_times, end_times = [], [], []
     get_data(filename, smids, start_times, end_times, kernel_index, time_limit)
+    print("smids_lenth is",len(smids))
     # 绘图，只从开始-结束时间绘图
     kernel_data_index = 0
     while(kernel_data_index < len(start_times)):
