@@ -11,7 +11,8 @@
 
 using namespace std;
 
-#define DATATYPE     float
+// #define DATATYPE     float
+#define DATATYPE     uint32_t
 #define SMEMSIZE     1024
 #define DATA_OUT_NUM 7
 
@@ -32,7 +33,7 @@ void init_order(T* a, int n, T para) {
 
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
                             int clockRate, DATATYPE* d_out) {
-    const uint32_t         SM_size = 32 * 1024 / sizeof(float);
+    const uint32_t   SM_size = 32 * 1024 / sizeof(float);
     int              i = 0;
     __shared__ float s_tvalue[SM_size];
 
@@ -55,15 +56,22 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
 
     //用d_out数组存储输出的数据
     int index = blockid * DATA_OUT_NUM;
-    d_out[index] = kernelID + 0.000;
-    d_out[index + 1] = numSms + 0.000;
-    d_out[index + 2] = numBlocks + 0.000;
-    d_out[index + 3] = blockid + 0.000;
-    d_out[index + 4] = smid + 0.000;
-    d_out[index + 5] = Start_time;
-    d_out[index + 6] = End_time;
+    // d_out[index] = kernelID + 0.000;
+    // d_out[index + 1] = numSms + 0.000;
+    // d_out[index + 2] = numBlocks + 0.000;
+    // d_out[index + 3] = blockid + 0.000;
+    // d_out[index + 4] = smid + 0.000;
+    // d_out[index + 5] = Start_time;
+    // d_out[index + 6] = End_time;
+    d_out[index] = kernelID
+    d_out[index + 1] = numSms;
+    d_out[index + 2] = numBlocks;
+    d_out[index + 3] = blockid;
+    d_out[index + 4] = smid;
+    d_out[index + 5] = (DATATYPE)(Start_time % 1000 * 1000000 / 1);
+    d_out[index + 6] = (DATATYPE)(End_time % 1000 * 1000000 / 1);
     // for (int i = 0; i < kernelID; i++) printf("\t");
-    printf("%d\t%d\t%d\t%.6f\t%.6f\t%.6f\n", kernelID, blockid,
+    printf("\t%d\t%d\t%d\t%.6f\t%.6f\t%.6f\n", kernelID, blockid,
            smid, Start_time, End_time, End_time - Start_time);
 
     return;
@@ -237,7 +245,7 @@ int main(int argc, char* argv[]) {
     cudaGetDeviceProperties(&prop, device);
     int clockRate = prop.clockRate;
     int sm_number = prop.multiProcessorCount;
-    printf("*********   This GPU has %d SMs, clockRate is %d   *********\n", sm_number,clockRate);
+    printf("*********   This GPU has %d SMs, clockRate is %d   *********\n", sm_number, clockRate);
     // output GPU prop
 
     int* smC;
@@ -357,7 +365,9 @@ int main(int argc, char* argv[]) {
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         for (int j = 0; j < numBlocks[step]; j++) {
             int index = j * DATA_OUT_NUM;
-            fprintf(fp, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f,%.6f\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
+            // fprintf(fp, "%.0f,%.0f,%.0f,%.0f,%.0f,%.6f,%.6f,%.6f\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
+            //         h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5], h_data[step][index + 6], h_data[step][index + 6] - h_data[step][index + 5]);
+            fprintf(fp, "%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu\n", h_data[step][index], h_data[step][index + 1], h_data[step][index + 2],
                     h_data[step][index + 3], h_data[step][index + 4], h_data[step][index + 5], h_data[step][index + 6], h_data[step][index + 6] - h_data[step][index + 5]);
         }
     }
