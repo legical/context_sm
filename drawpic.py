@@ -25,7 +25,7 @@ def get_data(filename, smids, start_times, end_times, kerID, time_limit):
                         time_limit[0] = start_time
                     elif (time_limit[1] < end_time) :
                         time_limit[1] = end_time
-                    print("now min_time is : ",time_limit[0],"\tmax_time is: ",time_limit[1])
+                        print("now min_time is : ",time_limit[0],"\tmax_time is: ",time_limit[1])
                 except ValueError:
                     print(smid, 'reading data error!\n')
                 else:
