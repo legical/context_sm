@@ -237,7 +237,7 @@ int main(int argc, char* argv[]) {
     cudaGetDeviceProperties(&prop, device);
     int clockRate = prop.clockRate;
     int sm_number = prop.multiProcessorCount;
-    printf("*********   This GPU has %d SMs   *********\n", sm_number);
+    printf("*********   This GPU has %d SMs, clockRate is %d   *********\n", sm_number,clockRate);
     // output GPU prop
 
     int* smC;

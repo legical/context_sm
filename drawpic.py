@@ -1,3 +1,4 @@
+import math
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -64,7 +65,7 @@ print("min_time is ",time_limit[0],"\tmax_time is: ",time_limit[1])
 title = 'Distribution on the SM of each kernel | MPS'
 plt.title(title, fontsize=24)
 plt.xlabel('EXEC_time', fontsize=16)
-plt.xlim(time_limit[0], time_limit[1]) # 设置x轴范围
+plt.xlim(math.floor(time_limit[0]), math.ceil(time_limit[1])) # 设置x轴范围
 fig.autofmt_xdate()  # 绘制斜的日期标签
 plt.ylabel('SMID', fontsize=16)
 plt.tick_params(axis='both', labelsize=16)
