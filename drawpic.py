@@ -37,8 +37,8 @@ kernelnums = int(sys.argv[2])
 line_style = ['bo','m.','gv','y^','r+','ks','cD','wx']
 # 图片dpi=220，尺寸宽和高，单位为英寸
 fig = plt.figure(dpi=220, figsize=(15,9))
-min_time = 0 
-max_time = 0
+min_time = 0.0
+max_time = 0.0
 kernel_index = 0
 while(kernel_index < kernelnums):
     # 获取每个kernel的数据
