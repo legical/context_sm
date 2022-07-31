@@ -13,7 +13,7 @@ def get_data(filename, smids, start_times, end_times, kerID, time_limit):
         reader = csv.reader(f)
         header_row = next(reader)
         for row in reader:
-            if(row[0] == kerID):
+            if(int(row[0]) == kerID):
                 try:
                     smid = int(row[1])
                     start_time = float(row[5])
@@ -40,7 +40,7 @@ kernelnums = int(sys.argv[2])
 # 蓝色实心圈,洋红色点标记,绿色倒三角,黄色上三角,红色+,黑色正方形,青绿色菱形,白色x
 line_style = ['bo','m.','gv','y^','r+','ks','cD','wx']
 # 图片dpi=220，尺寸宽和高，单位为英寸
-fig = plt.figure(dpi=220, figsize=(15,9))
+fig = plt.figure(dpi=220, figsize=(16,10))
 # 获取时间上下限 0-下限 1-上限
 time_limit = []
 kernel_index = 0
