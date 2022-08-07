@@ -7,8 +7,8 @@
  * 但可以运行多个kernel的block，启动时间略有差异
  * @copyright Copyright (c) 2022
  * nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu
- * ./test -k 4 -p true -b 3 -s "6,2,4,2"
- * ./test -k 4 -p false -b 16 -s "6,2,4,2"
+ * ./test -k4 -pt -b3 -s"6,2,4,2"
+ * ./test -k4 -pf -b3 -s"6,2,4,2"
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -85,7 +85,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     uint32_t threadid = getThreadIdInBlock();
     // yesleep(50.0, clockRate);
     for (i = 0; i < SM_size; i++) {
-        s_tvalue[i] = i + 1;
+        s_tvalue[i] = i + 2;
     }
     while (i < SM_size) {
         i = s_tvalue[i];
@@ -295,7 +295,7 @@ int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* b
      * -s "6,2,2,4" sm number of each kernel
      * -b int block number of every kernel
      * -k int kernel number
-     * ./test -k=4 -p=true -b=3 -s="6,2,4,2"
+     * ./test -k4 -pt -b3 -s"6,2,4,2"
      */
     const char* optstring = "k::p::b::s::";
 
