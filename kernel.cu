@@ -87,6 +87,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     for (i = 0; i < SM_size; i++) {
         s_tvalue[i] = i + 2;
     }
+    i = 0;
     while (i < SM_size) {
         i = s_tvalue[i];
     }
