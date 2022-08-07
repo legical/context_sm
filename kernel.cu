@@ -6,9 +6,9 @@
  * 单纯sleep时，对于同一个kernel，每个sm最多同时运行其16个block
  * 但可以运行多个kernel的block，启动时间略有差异
  * @copyright Copyright (c) 2022
- * nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu getopt.cuh
- * ./test -k=4 -p=true -b=3 -s0=6 -s1=2 -s2=4 -s3=2
- * ./test -k=4 -p=false -b=16 -s0=6 -s1=2 -s2=4 -s3=2
+ * nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu
+ * ./test -k=4 -p=true -b=3 -s="6,2,4,2"
+ * ./test -k=4 -p=false -b=16 -s="6,2,4,2"
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,15 +17,14 @@
 #include <unistd.h>
 #include <cuda.h>
 #include "util.cu"
-#include "getopt.cuh"
 #include <iostream>
 #include <utility>
 #include <thread>
 
 using namespace std;
 
-// #define DATATYPE     float
 #define DATATYPE     float
+// #define DATATYPE     uint32_t
 #define SMEMSIZE     1024
 #define DATA_OUT_NUM 7
 
@@ -284,6 +283,70 @@ int init_para(int argc, char* argv[], int* smCounts, int device_sm_num, int* blo
     return kernelnum;
 }
 
+//命令行传参
+int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* block_per_sm, bool* patt) {
+    init_order(smCounts, device_sm_num, 2);
+    int kernelnum = 0;
+
+    int para;
+    /**
+     * @brief 4个参数
+     * -p bool true-share fasle-sleep
+     * -s "6,2,2,4" sm number of each kernel
+     * -b int block number of every kernel
+     * -k int kernel number
+     * ./test -k=4 -p=true -b=3 -s="6,2,4,2"
+     */
+    const char* optstring = "k::p::b::s::";
+
+    while ((para = getopt(argc, argv, optstring)) != -1) {
+        switch (para) {
+        case 'k':
+            kernelnum = str_to_int(optarg);
+            break;
+        case 'p':
+            if (optarg[0] == 't' || optarg[0] == 'y') {
+                *patt = true;
+            } else {
+                *patt = false;
+            }
+            break;
+        case 'b':
+            *block_per_sm = str_to_int(optarg);
+            break;
+        case 's':
+            char* temp = strtok(optarg, ",");
+            int   count = 0;
+            while (temp) {
+                smCounts[count++] = str_to_int(temp);
+                temp = strtok(NULL, ",");
+            }
+            break;
+        case '?':
+            printf("error optopt: %c\n", optopt);
+            printf("error opterr: %d\n", opterr);
+            break;
+        }
+    }
+
+    printf("kernel number:%d\t", kernelnum);
+
+    printf("\teach sm_to_kernel: ");
+    int allsm = 0;
+    for (int j = 0; j < kernelnum; j++) {
+        allsm += smCounts[j];
+        printf("%d  ", smCounts[j]);
+    }
+    printf("\tblocks_per_sm: %d\n", *block_per_sm);
+
+    if (allsm > device_sm_num) {
+        printf("allocate sm number > device total sm number, exit!\n");
+        exit(-1);
+    }
+
+    return kernelnum;
+}
+
 int main(int argc, char* argv[]) {
     //初始化
     // cuInit(0);
@@ -291,7 +354,10 @@ int main(int argc, char* argv[]) {
     cudaDeviceProp prop;
     int            sizecsv = 0;
     int            allnumblocks = 0;
-    // int            block_per_sm = 17;
+    int            block_per_sm = 17;
+    int*           smC;
+    smC = (int*)malloc(sizeof(int) * block_per_sm);
+    bool patt = true;
     cudaSetDevice(device);
     // printf("device:%d\n",device);
     cudaGetDeviceProperties(&prop, device);
@@ -299,29 +365,8 @@ int main(int argc, char* argv[]) {
     int sm_number = prop.multiProcessorCount;
     printf("*********   This GPU has %d SMs, clockRate is %d   *********\n", sm_number, clockRate);
     // output GPU prop
-
-    // const int CONTEXT_POOL_SIZE = init_para(argc, argv, smC, sm_number, &block_per_sm);
-    const int CONTEXT_POOL_SIZE = getarg(0, "-k", "--kernel", "--kernelnum", "--kernelnumber", "--kernel-number");
-    bool      patt = getarg(false, "-p", "--pattern");
-    int       block_per_sm = getarg(16, "-b", "--block", "--blocknum", "--blocknumber", "--block-per-sm");
-
-    int* smC;
-    smC = (int*)malloc(sizeof(int) * CONTEXT_POOL_SIZE);
-
-    if (CONTEXT_POOL_SIZE == 0) {
-        printf("Get option error! \n");
-        return -1;
-    } else {
-        for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
-            char sm_str[4];
-            sm_str[0] = '\0';
-            strcat(sm_str, "-s");
-            char smindex[2];
-            strcat(sm_str, int_to_str(i, smindex));
-            smC[i] = getarg(2, sm_str);
-        }
-    }
-
+    const int CONTEXT_POOL_SIZE = init_getopt(argc, argv, smC, sm_number, &block_per_sm, &patt);
+    
     // const int      CONTEXT_POOL_SIZE = 4;
     CUcontext contextPool[CONTEXT_POOL_SIZE];
     int       smCounts[CONTEXT_POOL_SIZE];
@@ -368,7 +413,7 @@ int main(int argc, char* argv[]) {
 
     char* filename;
     filename = (char*)malloc(sizeof(char) * (10 + 6 + 11 + 2 + 2 + sizeof(smCounts) + 2 + 2));
-    gene_filename(filename, smCounts, block_per_sm, CONTEXT_POOL_SIZE,patt);
+    gene_filename(filename, smCounts, block_per_sm, CONTEXT_POOL_SIZE, patt);
     // printf("\nfilename:%s\n", filename);
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
