@@ -7,8 +7,8 @@
  * 但可以运行多个kernel的block，启动时间略有差异
  * @copyright Copyright (c) 2022
  * nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu
- * ./test -k=4 -p=true -b=3 -s="6,2,4,2"
- * ./test -k=4 -p=false -b=16 -s="6,2,4,2"
+ * ./test -k 4 -p true -b 3 -s "6,2,4,2"
+ * ./test -k 4 -p false -b 16 -s "6,2,4,2"
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -303,6 +303,7 @@ int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* b
         switch (para) {
         case 'k':
             kernelnum = str_to_int(optarg);
+            printf("kernelnum succeed!\n");
             break;
         case 'p':
             if (optarg[0] == 't' || optarg[0] == 'y') {
@@ -310,9 +311,11 @@ int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* b
             } else {
                 *patt = false;
             }
+            printf("patt succeed!\n");
             break;
         case 'b':
             *block_per_sm = str_to_int(optarg);
+            printf("block_per_sm succeed!\n");
             break;
         case 's': {
             char* temp = strtok(optarg, ",");
@@ -321,6 +324,7 @@ int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* b
                 smCounts[count++] = str_to_int(temp);
                 temp = strtok(NULL, ",");
             }
+            printf("smCounts succeed!\n");
         } break;
         default:
             printf("error optopt: %c\n", optopt);
