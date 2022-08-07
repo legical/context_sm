@@ -88,7 +88,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
         s_tvalue[i] = i + 2;
     }
 #pragma unroll
-    for (int j = 0; j < 1024; j++) {
+    for (int j = 0; j < SM_size; j++) {
         i = 0;
         while (i < SM_size) {
             i = s_tvalue[i];
