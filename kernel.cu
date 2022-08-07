@@ -23,7 +23,7 @@
 
 using namespace std;
 
-#define DATATYPE     float
+#define DATATYPE float
 // #define DATATYPE     uint32_t
 #define SMEMSIZE     1024
 #define DATA_OUT_NUM 7
@@ -314,15 +314,15 @@ int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* b
         case 'b':
             *block_per_sm = str_to_int(optarg);
             break;
-        case 's':
+        case 's': {
             char* temp = strtok(optarg, ",");
             int   count = 0;
             while (temp) {
                 smCounts[count++] = str_to_int(temp);
                 temp = strtok(NULL, ",");
             }
-            break;
-        case '?':
+        } break;
+        default:
             printf("error optopt: %c\n", optopt);
             printf("error opterr: %d\n", opterr);
             break;
@@ -366,7 +366,7 @@ int main(int argc, char* argv[]) {
     printf("*********   This GPU has %d SMs, clockRate is %d   *********\n", sm_number, clockRate);
     // output GPU prop
     const int CONTEXT_POOL_SIZE = init_getopt(argc, argv, smC, sm_number, &block_per_sm, &patt);
-    
+
     // const int      CONTEXT_POOL_SIZE = 4;
     CUcontext contextPool[CONTEXT_POOL_SIZE];
     int       smCounts[CONTEXT_POOL_SIZE];
