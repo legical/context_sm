@@ -17,7 +17,7 @@
 #include <unistd.h>
 #include <cuda.h>
 #include "util.cu"
-#include "getopt.hpp"
+#include "getopt.h"
 #include <iostream>
 #include <utility>
 #include <thread>
