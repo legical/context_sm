@@ -87,10 +87,14 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     for (i = 0; i < SM_size; i++) {
         s_tvalue[i] = i + 2;
     }
-    i = 0;
-    while (i < SM_size) {
-        i = s_tvalue[i];
+#pragma unroll
+    for (int j = 0; j < 1024; j++) {
+        i = 0;
+        while (i < SM_size) {
+            i = s_tvalue[i];
+        }
     }
+
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
 
