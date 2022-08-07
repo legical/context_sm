@@ -6,7 +6,7 @@
  * 单纯sleep时，对于同一个kernel，每个sm最多同时运行其16个block
  * 但可以运行多个kernel的block，启动时间略有差异
  * @copyright Copyright (c) 2022
- * nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu getopt.hpp
+ * nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu getopt.h
  * ./test -k=4 -p=true -b=3 -s0=6 -s1=2 -s2=4 -s3=2
  * ./test -k=4 -p=false -b=16 -s0=6 -s1=2 -s2=4 -s3=2
  */
