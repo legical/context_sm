@@ -1,3 +1,15 @@
+/**
+ * @file kernel.cu
+ * @author lzh
+ * @version 0.1
+ * 读取共享内存时，每个sm最多同时运行3个block
+ * 单纯sleep时，对于同一个kernel，每个sm最多同时运行其16个block
+ * 但可以运行多个kernel的block，启动时间略有差异
+ * @copyright Copyright (c) 2022
+ * nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu getopt.hpp
+ * ./test -k=4 -p=true -b=3 -s0=6 -s1=2 -s2=4 -s3=2
+ * ./test -k=4 -p=false -b=16 -s0=6 -s1=2 -s2=4 -s3=2
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,6 +17,7 @@
 #include <unistd.h>
 #include <cuda.h>
 #include "util.cu"
+#include "getopt.hpp"
 #include <iostream>
 #include <utility>
 #include <thread>
@@ -31,6 +44,35 @@ void init_order(T* a, int n, T para) {
     }
 }
 
+__global__ void Test_Kernel_sleep(int numBlocks, int numSms, int kernelID,
+                                  int clockRate, DATATYPE* d_out) {
+    clock_t  start_clock = clock();
+    float    Start_time = (float)start_clock / clockRate;
+    uint32_t smid = getSMID();
+    uint32_t blockid = getBlockIDInGrid();
+    uint32_t threadid = getThreadIdInBlock();
+    yesleep(50.0, clockRate);
+    clock_t end_clock = clock();
+    float   End_time = (float)end_clock / clockRate;
+
+    __syncthreads();
+
+    //用d_out数组存储输出的数据
+    int index = blockid * DATA_OUT_NUM;
+    d_out[index] = kernelID + 0.000;
+    d_out[index + 1] = numSms + 0.000;
+    d_out[index + 2] = numBlocks + 0.000;
+    d_out[index + 3] = blockid + 0.000;
+    d_out[index + 4] = smid + 0.000;
+    d_out[index + 5] = Start_time;
+    d_out[index + 6] = End_time;
+    // for (int i = 0; i < kernelID; i++) printf("\t");
+    printf("\t%d\t%d\t%d\t%.6f\t%.6f\t%.6f\n", kernelID, blockid,
+           smid, Start_time, End_time, End_time - Start_time);
+
+    return;
+}
+
 __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
                             int clockRate, DATATYPE* d_out) {
     const uint32_t   SM_size = 32 * 1024 / sizeof(float);
@@ -44,7 +86,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     uint32_t threadid = getThreadIdInBlock();
     // yesleep(50.0, clockRate);
     for (i = 0; i < SM_size; i++) {
-        s_tvalue[i] = i + 8;
+        s_tvalue[i] = i + 1;
     }
     while (i < SM_size) {
         i = s_tvalue[i];
@@ -93,7 +135,7 @@ char* MyGetdeviceError(CUresult error) {
         return NULL;
 }
 
-int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRate, DATATYPE* h_in1) {
+int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRate, DATATYPE* h_in1, bool patt) {
     //在device上创建一个数据存储用的数组，通过copy host的数组进行初始化
     DATATYPE* d_out;
     int       numBlocks = numBlock[kernelID];
@@ -101,7 +143,12 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     cudaMemcpy(d_out, h_in1, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
 
     // printf("BlockID\tSMID\tStart_time\tEnd_time\n");
-    Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
+    if (patt) {
+        // shared memory  3 block - per sm
+        Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
+    } else { // sleep  16 block one kernel - per sm
+        Test_Kernel_sleep<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
+    }
     //等待kernel执行完毕
     cudaDeviceSynchronize();
 
@@ -156,9 +203,14 @@ char* int_to_str(int num, char* str) // 10进制
     return str; //返回转换后的值
 }
 
-char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT_POOL_SIZE) {
+char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT_POOL_SIZE, bool patt) {
     filename[0] = '\0';
-    strcat(filename, "./outdata/outdata-s");
+    if (patt) {
+        strcat(filename, "./outdata/share-");
+    } else {
+        strcat(filename, "./outdata/sleep-");
+    }
+    strcat(filename, "outdata-s");
     for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
         char smC[2];
         strcat(filename, int_to_str(smCounts[i], smC));
@@ -239,7 +291,7 @@ int main(int argc, char* argv[]) {
     cudaDeviceProp prop;
     int            sizecsv = 0;
     int            allnumblocks = 0;
-    int            block_per_sm = 17;
+    // int            block_per_sm = 17;
     cudaSetDevice(device);
     // printf("device:%d\n",device);
     cudaGetDeviceProperties(&prop, device);
@@ -248,9 +300,27 @@ int main(int argc, char* argv[]) {
     printf("*********   This GPU has %d SMs, clockRate is %d   *********\n", sm_number, clockRate);
     // output GPU prop
 
+    // const int CONTEXT_POOL_SIZE = init_para(argc, argv, smC, sm_number, &block_per_sm);
+    const int CONTEXT_POOL_SIZE = getarg(0, "-k", "--kernel", "--kernelnum", "--kernelnumber", "--kernel-number");
+    bool      patt = getarg(false, "-p", "--pattern");
+    int       block_per_sm = getarg(16, "-b", "--block", "--blocknum", "--blocknumber", "--block-per-sm");
+
     int* smC;
-    smC = (int*)malloc(sizeof(int) * sm_number);
-    const int CONTEXT_POOL_SIZE = init_para(argc, argv, smC, sm_number, &block_per_sm);
+    smC = (int*)malloc(sizeof(int) * CONTEXT_POOL_SIZE);
+
+    if (CONTEXT_POOL_SIZE == 0) {
+        printf("Get option error! \n");
+        return -1;
+    } else {
+        for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
+            char sm_str[4];
+            sm_str[0] = '\0';
+            strcat(sm_str, "-s");
+            char smindex[2];
+            strcat(sm_str, int_to_str(i, smindex));
+            smC[i] = getarg(2, sm_str);
+        }
+    }
 
     // const int      CONTEXT_POOL_SIZE = 4;
     CUcontext contextPool[CONTEXT_POOL_SIZE];
@@ -288,7 +358,8 @@ int main(int argc, char* argv[]) {
         //链接：https://docs.nvidia.com/cuda/cuda-driver-api/group__CUDA__CTX.html#group__CUDA__CTX_1g2a5b565b1fb067f319c98787ddfa4016
         // cuCtxCreate_v3(&contextPool[i], &affinity, 1, 0, deviceOrdinal);
 
-        numBlocks[i] = 1 + smCounts[i] * block_per_sm;
+        // numBlocks[i] = 1 + smCounts[i] * block_per_sm;
+        numBlocks[i] = smCounts[i] * block_per_sm;
         sizecsv += numBlocks[i] * DATA_OUT_NUM;
         allnumblocks += numBlocks[i];
         //为每个线程分配data数组
@@ -296,8 +367,8 @@ int main(int argc, char* argv[]) {
     }
 
     char* filename;
-    filename = (char*)malloc(sizeof(char) * (10 + 11 + 2 + 2 + sizeof(smCounts) + 2 + 2));
-    gene_filename(filename, smCounts, block_per_sm, CONTEXT_POOL_SIZE);
+    filename = (char*)malloc(sizeof(char) * (10 + 6 + 11 + 2 + 2 + sizeof(smCounts) + 2 + 2));
+    gene_filename(filename, smCounts, block_per_sm, CONTEXT_POOL_SIZE,patt);
     // printf("\nfilename:%s\n", filename);
 
     //读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
@@ -348,7 +419,7 @@ int main(int argc, char* argv[]) {
             DATATYPE temp = 0;
             init_order(h_data[step], numBlocks[step], temp);
 
-            main_test(step, numThreads, numBlocks, numSms, clockRate, h_data[step]);
+            main_test(step, numThreads, numBlocks, numSms, clockRate, h_data[step], patt);
         });
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
@@ -371,7 +442,7 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-    printf("min_time is %lu\n",min_time);
+    printf("min_time is %lu\n", min_time);
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         for (int j = 0; j < numBlocks[step]; j++) {
