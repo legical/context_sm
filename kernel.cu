@@ -7,8 +7,9 @@
  * 但可以运行多个kernel的block，启动时间略有差异
  * @copyright Copyright (c) 2022
  * nvcc -arch sm_86 -lcuda -o test kernel.cu util.cu
- * ./test -k4 -pt -b3 -s"6,2,4,2"
- * ./test -k4 -pf -b3 -s"6,2,4,2"
+ * ./test -k4 -p1 -b16 -s"6,2,4,2"
+ * ./test -k4 -p0 -b16 -s"6,2,4,2"
+ * ./test -k4 -p2 -b16 -s"6,2,4,2"
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -50,7 +51,45 @@ __global__ void Test_Kernel_sleep(int numBlocks, int numSms, int kernelID,
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
-    yesleep(50.0, clockRate);
+    yesleep(150.0, clockRate);
+    clock_t end_clock = clock();
+    float   End_time = (float)end_clock / clockRate;
+
+    __syncthreads();
+
+    //用d_out数组存储输出的数据
+    int index = blockid * DATA_OUT_NUM;
+    d_out[index] = kernelID + 0.000;
+    d_out[index + 1] = numSms + 0.000;
+    d_out[index + 2] = numBlocks + 0.000;
+    d_out[index + 3] = blockid + 0.000;
+    d_out[index + 4] = smid + 0.000;
+    d_out[index + 5] = Start_time;
+    d_out[index + 6] = End_time;
+    // for (int i = 0; i < kernelID; i++) printf("\t");
+    printf("\t%d\t%d\t%d\t%.6f\t%.6f\t%.6f\n", kernelID, blockid,
+           smid, Start_time, End_time, End_time - Start_time);
+
+    return;
+}
+
+__global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
+                                   int clockRate, DATATYPE* d_out, DATATYPE* d_array) {
+    clock_t  start_clock = clock();
+    float    Start_time = (float)start_clock / clockRate;
+    uint32_t smid = getSMID();
+    uint32_t blockid = getBlockIDInGrid();
+    uint32_t threadid = getThreadIdInBlock();
+
+    const uint32_t d_array_num = sizeof(DATATYPE) * 1024 * 1024;
+
+    for (uint32_t i = 0; i < d_array_num; i++) {
+        d_array[i] = i + 2;
+    }
+    for (uint32_t i = 0; i < d_array_num;) {
+        i = d_array[i];
+    }
+
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
 
@@ -139,19 +178,29 @@ char* MyGetdeviceError(CUresult error) {
         return NULL;
 }
 
-int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRate, DATATYPE* h_in1, bool patt) {
+int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRate, DATATYPE* h_in1, int patt) {
     //在device上创建一个数据存储用的数组，通过copy host的数组进行初始化
     DATATYPE* d_out;
     int       numBlocks = numBlock[kernelID];
     cudaMalloc((void**)&d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks);
     cudaMemcpy(d_out, h_in1, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
-
+    DATATYPE* d_array;
+    // 4MB
+    cudaMalloc((void**)&d_array, sizeof(DATATYPE) * 1024 * 1024);
     // printf("BlockID\tSMID\tStart_time\tEnd_time\n");
-    if (patt) {
-        // shared memory  3 block - per sm
-        Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
-    } else { // sleep  16 block one kernel - per sm
+    switch (patt) {
+    case 0:
+        // 0-使用sleep测试
         Test_Kernel_sleep<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
+        break;
+    case 2:
+        // 2-使用global memory测试
+        Test_Kernel_global<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out, d_array);
+        break;
+    default:
+        //默认使用共享内存测试
+        Test_Kernel<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out);
+        break;
     }
     //等待kernel执行完毕
     cudaDeviceSynchronize();
@@ -161,6 +210,7 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     cudaMemcpy(h_in1, d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyDeviceToHost);
     printf("kernel %d saving data success!\n", kernelID);
     cudaFree(d_out);
+    cudaFree(d_array);
     return 0;
 }
 
@@ -207,12 +257,19 @@ char* int_to_str(int num, char* str) // 10进制
     return str; //返回转换后的值
 }
 
-char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT_POOL_SIZE, bool patt) {
+char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT_POOL_SIZE, int patt) {
     filename[0] = '\0';
-    if (patt) {
-        strcat(filename, "./outdata/share-");
-    } else {
+
+    switch (patt) {
+    case 0:
         strcat(filename, "./outdata/sleep-");
+        break;
+    case 2:
+        strcat(filename, "./outdata/globa-");
+        break;
+    default:
+        strcat(filename, "./outdata/share-");
+        break;
     }
     strcat(filename, "outdata-s");
     for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
@@ -289,18 +346,18 @@ int init_para(int argc, char* argv[], int* smCounts, int device_sm_num, int* blo
 }
 
 //命令行传参
-int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* block_per_sm, bool* patt) {
+int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* block_per_sm, int* patt) {
     init_order(smCounts, device_sm_num, 2);
     int kernelnum = 0;
 
     int para;
     /**
      * @brief 4个参数
-     * -p bool true-share fasle-sleep
+     * -p 0-sleep 1-share 2-GPU global memory
      * -s "6,2,2,4" sm number of each kernel
      * -b int block number of every kernel
      * -k int kernel number
-     * ./test -k4 -pt -b3 -s"6,2,4,2"
+     * ./test -k4 -p1 -b3 -s"6,2,4,2"
      */
     const char* optstring = "k::p::b::s::";
 
@@ -311,11 +368,12 @@ int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* b
             printf("kernelnum succeed!\n");
             break;
         case 'p':
-            if (optarg[0] == 't' || optarg[0] == 'y') {
-                *patt = true;
-            } else {
-                *patt = false;
-            }
+            // if (optarg[0] == 't' || optarg[0] == 'y') {
+            //     *patt = true;
+            // } else {
+            //     *patt = false;
+            // }
+            *patt = str_to_int(optarg);
             printf("patt succeed!\n");
             break;
         case 'b':
@@ -366,7 +424,7 @@ int main(int argc, char* argv[]) {
     int            block_per_sm = 17;
     int*           smC;
     smC = (int*)malloc(sizeof(int) * block_per_sm);
-    bool patt = true;
+    int patt = 1;
     cudaSetDevice(device);
     // printf("device:%d\n",device);
     cudaGetDeviceProperties(&prop, device);

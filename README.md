@@ -21,13 +21,17 @@ chmod +x choose_as_root.bash
 
 ## 运行
 ```
-./test -k 4 -s 6 2 4 2 -b 8
+./test -k4 -p1 -b16 -s"6,2,4,2"
+./test -k4 -p0 -b16 -s"6,2,4,2"
+./test -k4 -p2 -b16 -s"6,2,4,2"
 ```
 
 其中
 * -k kernelnum 并行运行kernelnum个kernel
-* -s sm_num0 sm_num1 ... sm_num_kernelnum-1 分别为每个kernel绑定对应数量的sm，如果没指定数量，则默认绑定2个sm
+* -s sm_num0,sm_num1,...,sm_num_kernelnum-1 分别为每个kernel绑定对应数量的sm，如果没指定数量，则默认绑定2个sm
 * -b block_num 每个kernel启动多少个block,每个kernel启动的block数量一致
+* -p 0-sleep 1-share 2-GPU global memory
+
 ## 结束MPS
 ```
 chmod +x choose_as_root.bash
