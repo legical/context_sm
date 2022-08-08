@@ -77,8 +77,8 @@ __global__ void Test_Kernel_sleep(int numBlocks, int numSms, int kernelID,
 
 __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
                                    int clockRate, DATATYPE* d_out, DATATYPE* d_array) {
-    clock_t  start_clock = clock();
-    float    Start_time = (float)start_clock / clockRate;
+    __shared__ DATATYPE time[2];
+    time[0]=nowTime(clockRate);
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
@@ -92,10 +92,10 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
         }
     }
 
-    float End_time = nowTime(clockRate);
+    time[1] = nowTime(clockRate);
 
     __syncthreads();
-
+    printf("here is global\n");
     //用d_out数组存储输出的数据
     int index = blockid * DATA_OUT_NUM;
     d_out[index] = kernelID + 0.000;
@@ -103,12 +103,12 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
     d_out[index + 2] = numBlocks + 0.000;
     d_out[index + 3] = blockid + 0.000;
     d_out[index + 4] = smid + 0.000;
-    d_out[index + 5] = Start_time;
-    d_out[index + 6] = End_time;
-    printf("here is global\n");
+    d_out[index + 5] = time[0];
+    d_out[index + 6] = time[1];
+    
     // for (int i = 0; i < kernelID; i++) printf("\t");
     printf("\t%d\t%d\t%d\t%.6f\t%.6f\t%.6f\n", kernelID, blockid,
-           smid, Start_time, End_time, End_time - Start_time);
+           smid, time[0], time[1], time[1] - time[0]);
 
     return;
 }
