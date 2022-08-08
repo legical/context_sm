@@ -265,12 +265,15 @@ char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT
     switch (patt) {
     case 0:
         strcat(filename, "./outdata/sleep-");
+        printf("test pattern is : sleep\n");
         break;
     case 2:
         strcat(filename, "./outdata/globa-");
+        printf("test pattern is : load global memory\n");
         break;
     default:
         strcat(filename, "./outdata/share-");
+        printf("test pattern is : reading shared memory many times\n");
         break;
     }
     strcat(filename, "outdata-s");
