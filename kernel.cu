@@ -88,8 +88,12 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
     for (uint32_t i = 0; i < d_array_num; i++) {
         d_array[i] = i + kernelID + 1;
     }
-    for (uint32_t i = 0; i < d_array_num;) {
-        i = d_array[i];
+#pragma unroll
+    for (int j = 0; j < 1024; j++) {
+        int i = 0;
+        while (i < d_array_num) {
+            i = d_array[i];
+        }
     }
 
     clock_t end_clock = clock();
