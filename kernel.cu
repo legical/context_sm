@@ -406,10 +406,10 @@ int init_getopt(int argc, char* argv[], int* smCounts, int device_sm_num, int* b
     }
     printf("\tblocks_per_sm: %d\n", *block_per_sm);
 
-    if (allsm > device_sm_num) {
-        printf("allocate sm number > device total sm number, exit!\n");
-        exit(-1);
-    }
+    // if (allsm > device_sm_num) {
+    //     printf("allocate sm number > device total sm number, exit!\n");
+    //     exit(-1);
+    // }
 
     return kernelnum;
 }
