@@ -82,22 +82,17 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
-    printf("here is global\n");
+    // printf("here is global\n");
     const uint32_t d_array_num = sizeof(DATATYPE) * 1024 * 1024;
 
-    for (uint32_t i = 0; i < d_array_num; i++) {
-        d_array[i] = i + kernelID + 1;
-    }
 #pragma unroll
-    for (int j = 0; j < 1024; j++) {
-        int i = 0;
-        while (i < d_array_num) {
-            i = d_array[i];
+    for (uint32_t j = 0; j < 1024; j++) {
+        for (uint32_t i = 0; i < d_array_num; i++) {
+            d_array[i] = i + kernelID + j;
         }
     }
 
-    clock_t end_clock = clock();
-    float   End_time = (float)end_clock / clockRate;
+    float End_time = nowTime(clockRate);
 
     __syncthreads();
 
