@@ -8,14 +8,25 @@ __device__ __inline__ void busySleep(clock_t clock_count) {
         clock_offset = clock() - start_clock;
     }
 }
+// 获取当前时间
+__device__ __inline__ float nowTime(int clockRate) {
+    return (float)clock() / clockRate;
+}
 
-static __device__ void MySleep(long num)
-{
+// 延时
+__device__ __inline__ void yesleep(float t, int clockRate) {
+    float Start_time = nowTime(clockRate);
+    float clock_offset = 0.0;
+    while (clock_offset < t)
+        clock_offset = nowTime(clockRate) - Start_time;
+}
+
+static __device__ void MySleep(long num) {
     long count = 0;
-    for(long i = 0;i <= num;i++){
-        for(long j = 0;j<=num;j++){
+    for (long i = 0; i <= num; i++) {
+        for (long j = 0; j <= num; j++) {
             count = num;
-            while(count--){
+            while (count--) {
                 printf("");
             }
         }
