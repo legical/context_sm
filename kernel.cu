@@ -51,7 +51,7 @@ __global__ void Test_Kernel_sleep(int numBlocks, int numSms, int kernelID,
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
-    yesleep(150.0, clockRate);
+    yesleep(1000.0, clockRate);
     clock_t end_clock = clock();
     float   End_time = (float)end_clock / clockRate;
 
@@ -84,7 +84,7 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
     const uint32_t d_array_num = sizeof(DATATYPE) * 1024 * 1024;
 
     for (uint32_t i = 0; i < d_array_num; i++) {
-        d_array[i] = i + 2;
+        d_array[i] = i + kernelID + 1;
     }
     for (uint32_t i = 0; i < d_array_num;) {
         i = d_array[i];
@@ -124,7 +124,7 @@ __global__ void Test_Kernel(int numBlocks, int numSms, int kernelID,
     uint32_t threadid = getThreadIdInBlock();
     // yesleep(50.0, clockRate);
     for (i = 0; i < SM_size; i++) {
-        s_tvalue[i] = i + 2;
+        s_tvalue[i] = i + kernelID + 1;
     }
 #pragma unroll
     for (int j = 0; j < SM_size; j++) {
