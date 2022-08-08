@@ -82,7 +82,7 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
-
+    printf("here is global\n");
     const uint32_t d_array_num = sizeof(DATATYPE) * 1024 * 1024;
 
     for (uint32_t i = 0; i < d_array_num; i++) {
