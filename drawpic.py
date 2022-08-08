@@ -45,7 +45,7 @@ max_sm_num = int(sys.argv[3])
 # 蓝色实心圈,洋红色点标记,绿色倒三角,黄色上三角,红色+,黑色正方形,青绿色菱形,白色x
 line_style = ['bo', 'm.', 'gv', 'y^', 'r+', 'ks', 'cD', 'wx']
 # 图片dpi=220，尺寸宽和高，单位为英寸
-fig = plt.figure(dpi=220, figsize=(16, 160))
+fig = plt.figure(dpi=220, figsize=(160, 320))
 
 # 获取时间上下限 0-下限 1-上限
 time_limit = []
