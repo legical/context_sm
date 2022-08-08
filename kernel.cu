@@ -105,6 +105,7 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
     d_out[index + 4] = smid + 0.000;
     d_out[index + 5] = Start_time;
     d_out[index + 6] = End_time;
+    printf("here is global\n");
     // for (int i = 0; i < kernelID; i++) printf("\t");
     printf("\t%d\t%d\t%d\t%.6f\t%.6f\t%.6f\n", kernelID, blockid,
            smid, Start_time, End_time, End_time - Start_time);
