@@ -7,11 +7,9 @@ import csv
 import sys
 
 # run: python drawpic.py [filename] [kernelnums]
-# example: python drawpic.py ./outdata/share-outdata-s16121412-b6.csv 4
+# example: python drawpic.py
 
 # 通过文件名得到kernel总数
-
-
 def find_kernelnum(filename):
     # filename = 'globa-outdata-k42-s162142-b6.csv'
     index = filename.find('-k')+2
@@ -84,7 +82,7 @@ for filename in csvlist:
     line_style = ['b', 'm', 'g', 'y', 'r', 'k', 'c']
     # 图片dpi=220，尺寸宽和高，单位为英寸
     fig = plt.figure(dpi=220, figsize=(48, 32))
-    
+
     # 获取各个kernel的sm数目
     sm_max_list = []
     # 获取时间上下限 0-下限 1-上限
@@ -105,7 +103,7 @@ for filename in csvlist:
                                end_times[kernel_data_index]])
             ypoints = np.array([smids[kernel_data_index]*kernelnums+kernel_index,
                                smids[kernel_data_index]*kernelnums+kernel_index])
-    
+
             # print("xpoints is ", xpoints, "\typoints is: ", ypoints)
             plt.plot(xpoints, ypoints,
                      line_style[kernel_index], label=str(kernel_index)+',sm:'+str(sm_max_list[kernel_index]+1),  marker='o', linewidth=1)
@@ -145,7 +143,7 @@ for filename in csvlist:
         y_index += 1
     plt.yticks(ynum, y_smstr)
     plt.tick_params(axis='both', labelsize=16)
-    
+
     plt.ylim(-1, kernelnums*max_sm_num)  # 设置y轴范围
     filename = filename.replace("./outdata/", "./outdata/pic/", 1)
     pic_name = filename.replace("csv", "jpg", 1)
