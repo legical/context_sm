@@ -33,11 +33,11 @@ def max_sm(sm_max_list):
 
 
 def readname():
-    filePath = './outdata/'
+    filePath = "./outdata/"
     name = os.listdir(filePath)
     csv = []
     for file in name:
-        if '.csv' in str(file):
+        if ".csv" in str(file):
         # if file.find('.csv') != -1:
             csv.append(file)
     return name
