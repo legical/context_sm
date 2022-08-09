@@ -38,7 +38,7 @@ def readname():
     csv = []
     for file in name:
         if file.find('.csv') != -1:
-            csv.append('./outdata/'+file)
+            csv.append(filePath+file)
     return name
 
 
