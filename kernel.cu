@@ -189,7 +189,7 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     // 4MB
     cudaMalloc((void**)&d_global, sizeof(DATATYPE) * 1024 * 1024);
     cudaMemcpy(d_out, h_in1, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_global, d_array, sizeof(DATATYPE) * 1024 * 1024);
+    cudaMemcpy(d_global, d_array, sizeof(DATATYPE) * 1024 * 1024, cudaMemcpyHostToDevice);
     
     // printf("BlockID\tSMID\tStart_time\tEnd_time\n");
     switch (patt) {
