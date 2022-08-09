@@ -78,7 +78,7 @@ __global__ void Test_Kernel_sleep(int numBlocks, int numSms, int kernelID,
 __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
                                    int clockRate, DATATYPE* d_out, DATATYPE* d_array) {
     __shared__ DATATYPE time[2];
-    time[0]=nowTime(clockRate);
+    time[0] = nowTime(clockRate);
     uint32_t smid = getSMID();
     uint32_t blockid = getBlockIDInGrid();
     uint32_t threadid = getThreadIdInBlock();
@@ -105,7 +105,7 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
     d_out[index + 4] = smid + 0.000;
     d_out[index + 5] = time[0];
     d_out[index + 6] = time[1];
-    
+
     // for (int i = 0; i < kernelID; i++) printf("\t");
     printf("\t%d\t%d\t%d\t%.6f\t%.6f\t%.6f\n", kernelID, blockid,
            smid, time[0], time[1], time[1] - time[0]);
@@ -276,7 +276,12 @@ char* gene_filename(char* filename, int* smCounts, int block_per_sm, int CONTEXT
         printf("test pattern is : reading shared memory many times\n");
         break;
     }
-    strcat(filename, "outdata-s");
+    strcat(filename, "outdata-k");
+    {
+        char kernelnum[3];
+        strcat(filename, int_to_str(CONTEXT_POOL_SIZE, kernelnum));
+    }
+    strcat(filename, "-s");
     for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
         char smC[2];
         strcat(filename, int_to_str(smCounts[i], smC));
@@ -484,7 +489,7 @@ int main(int argc, char* argv[]) {
     }
 
     char* filename;
-    filename = (char*)malloc(sizeof(char) * (10 + 6 + 11 + 2 + 2 + sizeof(smCounts) + 2 + 2));
+    filename = (char*)malloc(sizeof(char) * (10 + 6 + 11 + 5 + 2 + 2 + sizeof(smCounts) + 2 + 2));
     gene_filename(filename, smCounts, block_per_sm, CONTEXT_POOL_SIZE, patt);
     // printf("\nfilename:%s\n", filename);
 
