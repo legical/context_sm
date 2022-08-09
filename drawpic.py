@@ -149,7 +149,8 @@ for file in csvlist:
     print("max_sm is ", max_sm_num, "\tmin_time is ",
           time_limit[0], "\tmax_time is: ", time_limit[1])
     # Format plot
-    title = 'Distribution on the SM of each kernel | MPS'
+    # title = 'Distribution on the SM of each kernel | MPS'
+    title = filename.replace("./outdata/", "", 1) + " | MPS"
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0)
     plt.title(title, fontsize=24)
     plt.xlabel('EXEC_time', fontsize=16)
