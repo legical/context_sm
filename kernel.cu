@@ -95,7 +95,7 @@ __global__ void Test_Kernel_global(int numBlocks, int numSms, int kernelID,
     time[1] = nowTime(clockRate);
 
     __syncthreads();
-    printf("here is global\n");
+    // printf("here is global\n");
     //用d_out数组存储输出的数据
     int index = blockid * DATA_OUT_NUM;
     d_out[index] = kernelID + 0.000;
