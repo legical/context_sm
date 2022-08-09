@@ -37,11 +37,9 @@ def readname():
     name = os.listdir(filePath)
     csv = []
     for file in name:
-        # if ".csv" in str(file):
-        if file.find("csv") > 0:
-            print("csv id is",file.find("csv")," in ",file)
+        if ".csv" in file:
             csv.append(file)
-    return name
+    return csv
 
 
 def get_data(filename, smids, start_times, end_times, kerID, time_limit, sm_max_list):
