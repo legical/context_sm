@@ -103,8 +103,8 @@ for file in csvlist:
         while(kernel_data_index < len(start_times)):
             xpoints = np.array([start_times[kernel_data_index]+20,
                                end_times[kernel_data_index]])
-            ypoints = np.array([smids[kernel_data_index]*kernelnums+kernel_index,
-                               smids[kernel_data_index]*kernelnums+kernel_index])
+            ypoints = np.array([smids[kernel_data_index]*(kernelnums+1)+kernel_index,
+                               smids[kernel_data_index]*(kernelnums+1)+kernel_index])
 
             # print("xpoints is ", xpoints, "\typoints is: ", ypoints)
             plt.plot(xpoints, ypoints,
@@ -138,7 +138,7 @@ for file in csvlist:
     y_index = 0
     ynum, y_smstr = [], []
     while y_index < max_sm_num:
-        num = (y_index+1) * kernelnums - 1
+        num = (y_index+1) * (kernelnums+1)
         smstr = 'sm'+str(y_index)
         ynum.append(num)
         y_smstr.append(smstr)
@@ -146,7 +146,7 @@ for file in csvlist:
     plt.yticks(ynum, y_smstr)
     plt.tick_params(axis='both', labelsize=16)
 
-    plt.ylim(-1, kernelnums*max_sm_num)  # 设置y轴范围
+    plt.ylim(-1, (kernelnums+1)*max_sm_num)  # 设置y轴范围
     filename = filename.replace("./outdata/", "./outdata/pic/", 1)
     pic_name = filename.replace("csv", "jpg", 1)
     # 如果图片文件已存在，则删除
