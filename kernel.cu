@@ -180,15 +180,17 @@ char* MyGetdeviceError(CUresult error) {
         return NULL;
 }
 
-int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRate, DATATYPE* h_in1, int patt) {
+int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRate, DATATYPE* h_in1, int patt, DATATYPE* d_array) {
     //在device上创建一个数据存储用的数组，通过copy host的数组进行初始化
     DATATYPE* d_out;
+    DATATYPE* d_global;
     int       numBlocks = numBlock[kernelID];
     cudaMalloc((void**)&d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks);
-    cudaMemcpy(d_out, h_in1, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
-    DATATYPE* d_array;
     // 4MB
-    cudaMalloc((void**)&d_array, sizeof(DATATYPE) * 1024 * 1024);
+    cudaMalloc((void**)&d_global, sizeof(DATATYPE) * 1024 * 1024);
+    cudaMemcpy(d_out, h_in1, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_global, d_array, sizeof(DATATYPE) * 1024 * 1024);
+    
     // printf("BlockID\tSMID\tStart_time\tEnd_time\n");
     switch (patt) {
     case 0:
@@ -197,7 +199,7 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
         break;
     case 2:
         // 2-使用global memory测试
-        Test_Kernel_global<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out, d_array);
+        Test_Kernel_global<<<numBlocks, threads>>>(numBlocks, numSms, kernelID, clockRate, d_out, d_global);
         break;
     default:
         //默认使用共享内存测试
@@ -212,7 +214,7 @@ int main_test(int kernelID, int threads, int* numBlock, int numSms, int clockRat
     cudaMemcpy(h_in1, d_out, sizeof(DATATYPE) * DATA_OUT_NUM * numBlocks, cudaMemcpyDeviceToHost);
     printf("kernel %d saving data success!\n", kernelID);
     cudaFree(d_out);
-    cudaFree(d_array);
+    cudaFree(d_global);
     return 0;
 }
 
@@ -464,6 +466,9 @@ int main(int argc, char* argv[]) {
     DATATYPE** h_data;
     h_data = (DATATYPE**)malloc(sizeof(DATATYPE*) * CONTEXT_POOL_SIZE);
 
+    DATATYPE** d_arr;
+    d_arr = (DATATYPE**)malloc(sizeof(DATATYPE*) * CONTEXT_POOL_SIZE);
+
     //创建Context
     for (int i = 0; i < CONTEXT_POOL_SIZE; i++) {
         CUexecAffinityParam affinity;
@@ -486,6 +491,7 @@ int main(int argc, char* argv[]) {
         allnumblocks += numBlocks[i];
         //为每个线程分配data数组
         h_data[i] = (DATATYPE*)malloc(sizeof(DATATYPE) * numBlocks[i] * DATA_OUT_NUM);
+        d_arr[i] = (DATATYPE*)malloc(sizeof(DATATYPE) * 1024 * 1024);
     }
 
     char* filename;
@@ -541,7 +547,7 @@ int main(int argc, char* argv[]) {
             DATATYPE temp = 0;
             init_order(h_data[step], numBlocks[step], temp);
 
-            main_test(step, numThreads, numBlocks, numSms, clockRate, h_data[step], patt);
+            main_test(step, numThreads, numBlocks, numSms, clockRate, h_data[step], patt,d_arr[step]);
         });
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++)
@@ -582,8 +588,10 @@ int main(int argc, char* argv[]) {
 
     for (step = 0; step < CONTEXT_POOL_SIZE; step++) {
         free(h_data[step]);
+        free(d_arr[step]);
     }
     printf("\nAll done.\n");
     free(h_data);
+    free(d_arr);
     return 0;
 }
