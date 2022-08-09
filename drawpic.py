@@ -39,6 +39,7 @@ def readname():
     for file in name:
         # if ".csv" in str(file):
         if file.find("csv") > 0:
+            print("csv id is",file.find("csv")," in ",file)
             csv.append(file)
     return name
 
