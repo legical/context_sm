@@ -37,7 +37,8 @@ def readname():
     name = os.listdir(filePath)
     csv = []
     for file in name:
-        if file.find('.csv') != -1:
+        if '.csv' in file:
+        # if file.find('.csv') != -1:
             csv.append(file)
     return name
 
