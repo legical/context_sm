@@ -41,6 +41,29 @@ def readname():
             csv.append(file)
     return csv
 
+def list_all_index(list,v):
+    # value所有索引的位置
+    v_list = []
+    # value第一次出现的位置
+    i = list.index(v)+1
+    v_list.append(i-1)
+    while i < len(list):
+        if list[i]==v:
+            v_list.append(i)
+        i+=1
+    return v_list
+#检索列表中的所有元素
+
+def isadd(smid,start_time,smids,start_times):
+    if smids.count(smid) < 1 or start_times.count(start_time) < 1:
+        return True
+    else:
+        sm_list = list_all_index(smids,smid)
+        for i in sm_list:
+            if start_times[i] == start_time:
+                return False            
+        return True
+
 
 def get_data(filename, smids, start_times, end_times, kerID, time_limit, sm_max_list):
     # '''get the highs and lows from a data file'''
@@ -64,7 +87,7 @@ def get_data(filename, smids, start_times, end_times, kerID, time_limit, sm_max_
                 except ValueError:
                     print(smid, 'reading data error!\n')
                 else:
-                    if smids.count(smid) < 1 or start_times.count(start_time) < 1:
+                    if isadd(smid,start_time,smids,start_times):
                         smids.append(smid)
                         start_times.append(start_time)
                         end_times.append(end_time)
