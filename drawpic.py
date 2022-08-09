@@ -75,6 +75,7 @@ def get_data(filename, smids, start_times, end_times, kerID, time_limit, sm_max_
 
 
 csvlist = readname()
+print(csvlist)
 for file in csvlist:
     filename = './outdata/'+file
     print(filename)
