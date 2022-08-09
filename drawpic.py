@@ -115,7 +115,7 @@ for file in csvlist:
             # xytext：描述框相对xy位置
             # textcoords='offset points'，以xy为原点偏移xytext
             # arrowprops = 画弧线箭头，'---->', rad=.2-->0.2弧度
-            plt.annotate('kernel' + str(kernel_index)+', '+str(xpoints[0]-25), xy=(xpoints[0], ypoints[0]), xytext=(+10, +10), textcoords='offset points', fontsize=16,
+            plt.annotate('kernel' + str(kernel_index)+', '+str(xpoints[1]+20-xpoints[0]), xy=(xpoints[0], ypoints[0]), xytext=(+10, +10), textcoords='offset points', fontsize=16,
                          arrowprops=dict(arrowstyle='->', connectionstyle='arc3,rad=.2'))
             # 绘制下一个开始-结束时间线
             kernel_data_index += 1
