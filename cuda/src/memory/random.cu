@@ -1,5 +1,5 @@
 #include "myutil.hpp"
-#include "util.cu"
+#include "util.cuh"
 int getopt(char *argv[], int &EXEC_TIMES, int &ARR_SIZE)
 {
     int para_len = sizeof(argv);
