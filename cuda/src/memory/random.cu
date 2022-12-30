@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     // allocate & copy L2 cache refresh memory
     gpuErrAssert(cudaMalloc((void **)&l2_gpu, L2size * sizeof(int)));
-    gpuErrAssert(cudaMemcpy(l2_gpu, l2, L2size * sizeof(int)), cudaMemcpyHostToDevice));
+    gpuErrAssert(cudaMemcpy(l2_gpu, l2, L2size * sizeof(int), cudaMemcpyHostToDevice));
 
     // random number < 3/4 ARR_SIZE
     // copy array size = 1/4 ARR_SIZE * int
