@@ -1,3 +1,6 @@
+#ifndef __UTIL_CUH__
+#define __UTIL_CUH__
+
 #include <stdio.h>
 #include <stdint.h>
 
@@ -66,3 +69,5 @@ static __device__ __inline__ uint32_t getWarpID(void) {
                  : "=r"(smid));
     return smid;
 }
+
+#endif
