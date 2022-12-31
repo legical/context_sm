@@ -46,7 +46,7 @@ for file in csvlist:
     # 获取ID
     IDlist, EXEClist = [], []
     minax = [99999999.0,0.0]
-    get_data(filename, IDlist, EXEClist, min, max)
+    get_data(filename, IDlist, EXEClist, minax)
 
     plt.plot(IDlist, EXEClist, "g", marker='D', markersize=5, label="执行时间")
 
