@@ -51,7 +51,7 @@ for file in csvlist:
     plt.plot(IDlist, EXEClist, "g", marker='D', markersize=5, label="执行时间")
 
     # y轴刻度值
-    min_y_lable = np.floor(minax[0])-10
+    min_y_lable = np.floor(minax[0])-2
     max_y_lable = np.ceil(minax[1])+2
     # plt.yticks(np.arange(min_y_lable, max_y_lable, 0.2))
     plt.ylim((min_y_lable,max_y_lable))
@@ -61,8 +61,8 @@ for file in csvlist:
     plt.ylabel('EXEC_time', fontsize=16)
     # 设置 y 轴显示网格线
     plt.grid(axis='y')
-    print('min/max/min_y_lable/max_y_lable : ',
-          minax[0], minax[1], min_y_lable, max_y_lable, '\n')
+    # print('min/max/min_y_lable/max_y_lable : ',
+    #       minax[0], minax[1], min_y_lable, max_y_lable, '\n')
     filename = filename.replace("./output/", "./output/pic/", 1)
     pic_name = filename.replace("csv", "jpg", 1)
     # 如果图片文件已存在，则删除
