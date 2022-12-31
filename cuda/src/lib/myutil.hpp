@@ -133,4 +133,14 @@ std::string GetTimeString()
     return oss.str();
 }
 
+void GetTimeFilename(char* filename){
+    time_t timep;
+    struct tm *p;
+
+    time(&timep);//获取从1970至今过了多少秒，存入time_t类型的timep
+    p = localtime(&timep);//用localtime将秒数转化为struct tm结构体
+    //把格式化的时间写入字符数组中
+    sprintf(filename, "./output/Random%d-%d%d%d.csv",p->tm_mday,p->tm_hour,p->tm_min,p->tm_sec);
+}
+
 #endif
