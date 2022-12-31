@@ -120,15 +120,10 @@ int main(int argc, char *argv[])
 
     time_t timep;
     struct tm *p;
-    char* filename;
-    filename = (char*)malloc(sizeof(char) * 64);
+    char *filename;
+    filename = (char *)malloc(sizeof(char) * 128);
 
-    time(&timep);//获取从1970至今过了多少秒，存入time_t类型的timep
-    p = localtime(&timep);//用localtime将秒数转化为struct tm结构体
-
-    sprintf(filename, "./output/Random%d-%d%d%d.csv",p->tm_mday,p->tm_hour,p->tm_min,p->tm_sec);//把格式化的时间写入字符数组中
-    // 用时间生成文件名，避免重复
-    // std::string filename = "./output/Random" + GetTimeString() + ".csv";
+    GetBaseFilename(filename);
     // 读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
     FILE *fp = fopen(filename, "w+");
     // 如果打开文件失败
@@ -162,7 +157,7 @@ int main(int argc, char *argv[])
     fclose(fp);
     // 输出运行时间信息
     printf("min/max/avg = %.6f / %.6f / %.6f ms\n", min, max, avg / (float)EXEC_TIMES);
-    printf("All exection data has stored into %s.\n",filename);
+    printf("All exection data has stored into %s.\n", filename);
 
     free(filename);
 

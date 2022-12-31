@@ -110,9 +110,9 @@ inline int get_random_num(int min, int max)
 
 /**
  * @brief Use Time as filename
- * 
+ *
  * @return std::string
- * @example std::string filename = "Random" + GetTimeString() + ".csv"; 
+ * @example std::string filename = "Random" + GetTimeString() + ".csv";
  */
 std::string GetTimeString()
 {
@@ -133,14 +133,18 @@ std::string GetTimeString()
     return oss.str();
 }
 
-void GetTimeFilename(char* filename){
+void GetBaseFilename(char *filename)
+{
     time_t timep;
     struct tm *p;
 
-    time(&timep);//获取从1970至今过了多少秒，存入time_t类型的timep
-    p = localtime(&timep);//用localtime将秒数转化为struct tm结构体
-    //把格式化的时间写入字符数组中
-    sprintf(filename, "./output/Random%d-%d%d%d.csv",p->tm_mday,p->tm_hour,p->tm_min,p->tm_sec);
+    time(&timep);          // 获取从1970至今过了多少秒，存入time_t类型的timep
+    p = localtime(&timep); // 用localtime将秒数转化为struct tm结构体
+    // 把格式化的时间写入字符数组中
+    char path[96];
+    getcwd(path, sizeof(path));
+    // printf("2.2 dir__FILE__: %s\n", dirname(path));
+    sprintf(filename, "%s/src/memory/output/Random%d-%d%d%d.csv", dirname(path), p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec);
 }
 
 #endif
