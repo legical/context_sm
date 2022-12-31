@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
     int para_num = getopt(argc, argv, EXEC_TIMES, ARR_SIZE);
     printf("You have entered %d parameter.\n", para_num);
     printf("EXEC_TIMES: %d \t ARR_SIZE: %d\n", EXEC_TIMES, ARR_SIZE);
-    cudaEvent_t start, stop;
-    int *arr, *arr_gpu, *l2, *l2_gpu;
+
+    int *arr, *l2, *l2_gpu;
     float elapsedTime[EXEC_TIMES];
 
     // get GPU L2 cache size
@@ -55,10 +55,6 @@ int main(int argc, char *argv[])
     cudaSetDevice(device_id);
     gpuErrAssert(cudaGetDeviceProperties(&prop, device_id));
     size_t L2size = prop.l2CacheSize;
-
-    // end - start = exection time
-    gpuErrAssert(cudaEventCreate(&start));
-    gpuErrAssert(cudaEventCreate(&stop));
 
     // allocate pinned memory in system memory
     gpuErrAssert(cudaHostAlloc((void **)&arr,
@@ -81,6 +77,12 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < EXEC_TIMES; i++)
     {
+        cudaEvent_t start, stop;
+        // end - start = exection time
+        gpuErrAssert(cudaEventCreate(&start));
+        gpuErrAssert(cudaEventCreate(&stop));
+        int *arr_gpu;
+
         gpuErrAssert(cudaMalloc((void **)&arr_gpu, ARR_SIZE));
         // generate random number
         int random_num = get_random_num(0, random_limit);
@@ -102,6 +104,9 @@ int main(int argc, char *argv[])
         // caculate cuda execution time & save it
         gpuErrAssert(cudaEventElapsedTime(&elapsedTime[i],
                                           start, stop));
+        gpuErrAssert(cudaEventDestroy(start));
+        gpuErrAssert(cudaEventDestroy(stop));
+
         printf("Run for the %d time, the execution time is %.6f ms.\n", i + 1, elapsedTime[i]);
         // cudaDeviceSynchronize();
         int random_l2_num = get_random_num(0, 32);
@@ -112,8 +117,41 @@ int main(int argc, char *argv[])
     gpuErrAssert(cudaFreeHost(l2));
     // gpuErrAssert(cudaFree(arr_gpu));
     gpuErrAssert(cudaFree(l2_gpu));
-    gpuErrAssert(cudaEventDestroy(start));
-    gpuErrAssert(cudaEventDestroy(stop));
+
+    // 用时间生成文件名，避免重复
+    std::string filename = "./output/Random" + GetTimeString() + ".csv";
+    // 读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
+    FILE *fp = fopen(filename, "w+");
+    // 如果打开文件失败
+    if (fp == NULL)
+    {
+        std::cout << "Can't open file : " << filename << std::endl;
+        // printf("filename = %s \n", filename);
+        fprintf(stderr, "fopen() failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    // 标题
+    fprintf(fp, "ID,Exec_time\n");
+    // 导入数据
+    float min = elapsedTime[0], max = elapsedTime[0], avg = 0.0;
+    for (int i = 0; i < EXEC_TIMES; i++)
+    {
+        fprintf(fp, "%d,%.6f\n", i + 1, elapsedTime[i]);
+        if (min > elapsedTime[i])
+        {
+            min = elapsedTime[i];
+        }
+
+        if (max < elapsedTime[i])
+        {
+            max = elapsedTime[i];
+        }
+
+        avg += elapsedTime[i];
+    }
+    fclose(fp);
+    // 输出运行时间信息
+    printf("min/max/avg = %.6f / %.6f / %.6f ms\n", min, max, avg / (float)EXEC_TIMES);
 
     return 0;
 }

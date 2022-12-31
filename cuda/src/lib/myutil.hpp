@@ -9,6 +9,10 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <sstream>
+#include <iomanip>
+#include <time.h>
+
 #include <iostream>
 #include <utility>
 #include <thread>
@@ -92,16 +96,41 @@ inline int str_to_int(char buf[])
 #define random(min, max) (gen() * time(NULL) % (max - min + 1)) + min
 /**
  * @brief Get the random num object
- * 
- * @param min 
- * @param max 
- * @return int 
+ *
+ * @param min
+ * @param max
+ * @return int
  */
 inline int get_random_num(int min, int max)
 {
     std::random_device rd;  // 随机数发生器
     std::mt19937 gen(rd()); // 随机数引擎
     return random(min, max);
+}
+
+/**
+ * @brief Use Time as filename
+ * 
+ * @return std::string
+ * @example std::string filename = "Random" + GetTimeString() + ".csv"; 
+ */
+std::string GetTimeString()
+{
+    struct ::tm tm_time;
+    time_t timestamp = time(0);
+    localtime_r(&timestamp, &tm_time);
+
+    std::ostringstream oss;
+
+    oss << std::setfill('0')
+        // << 1900+tm_time.tm_year
+        // << std::setw(2) << 1+tm_time.tm_mon
+        << std::setw(2) << tm_time.tm_mday
+        << '-'
+        << std::setw(2) << tm_time.tm_hour
+        << std::setw(2) << tm_time.tm_min
+        << std::setw(2) << tm_time.tm_sec;
+    return oss.str();
 }
 
 #endif
