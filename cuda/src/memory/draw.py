@@ -22,8 +22,6 @@ def get_data(filename, IDlist, EXEClist, min, max):
     with open(filename) as f:
         reader = csv.reader(f)
         header_row = next(reader)
-        min = reader[0][1]
-        max = reader[0][1]
         for row in reader:
             try:
                 IDlist.append(row[0])
@@ -46,7 +44,8 @@ for file in csvlist:
 
     # 获取ID
     IDlist, EXEClist = [], []
-    min = max = 0
+    min = 99999999
+    max = 0
     get_data(filename, IDlist, EXEClist, min, max)
 
     plt.plot(IDlist, EXEClist, "g", marker='D', markersize=5, label="执行时间")
