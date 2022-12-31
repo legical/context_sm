@@ -1,18 +1,17 @@
 #include "myutil.hpp"
 #include "util.cuh"
-int getopt(char *argv[], int &EXEC_TIMES, int &ARR_SIZE)
+int getopt(int argc, char *argv[], int &EXEC_TIMES, int &ARR_SIZE)
 {
-    int para_len = sizeof(argv);
-    if (para_len > 1)
+    if (argc > 1)
     {
         EXEC_TIMES = str_to_int(argv[1]);
 
-        if (para_len > 2)
+        if (argc > 2)
         {
             ARR_SIZE = str_to_int(argv[2]);
         }
     }
-    return para_len - 1;
+    return argc - 1;
 }
 
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE)
@@ -43,7 +42,7 @@ int main(int argc, char *argv[])
     // Default: execute 1000 times, array size = 1GB
     int EXEC_TIMES = 1000, ARR_SIZE = 1024 * 1024 * 1024;
     // get option
-    int para_num = getopt(argv, EXEC_TIMES, ARR_SIZE);
+    int para_num = getopt(argc, argv, EXEC_TIMES, ARR_SIZE);
     printf("You have entered %d parameter.\n", para_num);
     printf("EXEC_TIMES: %d \t ARR_SIZE: %d\n", EXEC_TIMES, ARR_SIZE);
     cudaEvent_t start, stop;
