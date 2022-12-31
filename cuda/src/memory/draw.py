@@ -53,7 +53,8 @@ for file in csvlist:
     # y轴刻度值
     min_y_lable = np.floor(minax[0])-10
     max_y_lable = np.ceil(minax[1])+2
-    plt.yticks(np.arange(min_y_lable, max_y_lable, 0.2))
+    # plt.yticks(np.arange(min_y_lable, max_y_lable, 0.2))
+    plt.ylim((min_y_lable,max_y_lable))
 
     # plt.title('执行时间折线图')  # 折线图标题
     plt.xlabel('ID', fontsize=16)
