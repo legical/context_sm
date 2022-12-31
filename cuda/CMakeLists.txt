@@ -33,11 +33,5 @@ function(add_my_target target include_dir)
     target_include_directories(${target}  PUBLIC ${include_dir})
 endfunction(add_my_target)
 
-function(add_pure_target target include_dir)
-    add_executable(${target} ${ARGN})
-    target_compile_features(${target} PUBLIC cxx_std_11)
-    target_include_directories(${target}  PUBLIC ${include_dir})
-endfunction(add_pure_target)
-
 add_my_target(cu_ran src/memory src/memory/random.cu)
-add_pure_target(get_file_dir src/filedir src/filedir/dir.c)
+add_my_target(get_file_dir src/filedir src/filedir/dir.cu)
