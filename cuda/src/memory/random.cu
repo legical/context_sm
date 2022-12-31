@@ -137,6 +137,7 @@ int main(int argc, char *argv[])
         // std::cout << "Can't open file : " << filename << std::endl;
         printf("Can't open file : %s \n", filename);
         fprintf(stderr, "fopen() failed.\n");
+        free(filename);
         exit(EXIT_FAILURE);
     }
     // 标题
