@@ -90,12 +90,12 @@ int main(int argc, char *argv[])
         // record cuda start time
         gpuErrAssert(cudaEventRecord(start, 0));
         // copy random memory from host to gpu
-        gpuErrAssert(cudaMemcpy(arr_gpu, arr + random_num * sizeof(int), ARR_SIZE, cudaMemcpyHostToDevice));
+        gpuErrAssert(cudaMemcpy(arr_gpu, arr + random_num, ARR_SIZE, cudaMemcpyHostToDevice));
 
         // run kernel
         read_random_arr<<<1, 32>>>(arr_gpu, ARR_SIZE);
         // copy back random memory from gpu to host
-        gpuErrAssert(cudaMemcpy(arr + random_num * sizeof(int), arr_gpu, ARR_SIZE, cudaMemcpyDeviceToHost));
+        gpuErrAssert(cudaMemcpy(arr + random_num, arr_gpu, ARR_SIZE, cudaMemcpyDeviceToHost));
         gpuErrAssert(cudaFree(arr_gpu));
         // record cuda sop time
         gpuErrAssert(cudaEventRecord(stop, 0));
@@ -164,6 +164,6 @@ int main(int argc, char *argv[])
     printf("All exection data has stored into %s.\n",filename);
 
     free(filename);
-    
+
     return 0;
 }
