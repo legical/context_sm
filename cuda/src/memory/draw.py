@@ -24,12 +24,13 @@ def get_data(filename, IDlist, EXEClist, min, max):
         header_row = next(reader)
         for row in reader:
             try:
-                IDlist.append(row[0])
-                EXEClist.append(row[1])
-                if min > row[1]:
-                    min = row[1]
-                if max < row[1]:
-                    max = row[1]
+                IDlist.append(float(row[0]))
+                time = float(row[1])
+                EXEClist.append(time)
+                if min > time:
+                    min = time
+                if max < time:
+                    max = time
             except ValueError:
                 print(row[0], 'reading data error!\n')
 
