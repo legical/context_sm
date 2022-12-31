@@ -52,14 +52,18 @@ for file in csvlist:
     plt.plot(IDlist, EXEClist, "g", marker='D', markersize=5, label="执行时间")
 
     # y轴刻度值
-    plt.yticks(np.arange(np.floor(min)-10, np.ceil(max)+2, 0.2))
+    min_y_lable = np.floor(min)-10
+    max_y_lable = np.ceil(max)+2
+    plt.yticks(np.arange(min_y_lable, max_y_lable), 0.2)
 
-    plt.title('执行时间折线图')  # 折线图标题
+    # plt.title('执行时间折线图')  # 折线图标题
     plt.xlabel('ID', fontsize=16)
     plt.ylabel('EXEC_time', fontsize=16)
     # 设置 y 轴显示网格线
     plt.grid(axis='y')
-    filename = filename.replace("./outdata/", "./outdata/pic/", 1)
+    print('min/max/min_y_lable/max_y_lable : ',
+          min, max, min_y_lable, max_y_lable, '\n')
+    filename = filename.replace("./output/", "./output/pic/", 1)
     pic_name = filename.replace("csv", "jpg", 1)
     # 如果图片文件已存在，则删除
     if os.path.exists(pic_name):
