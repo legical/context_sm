@@ -19,7 +19,7 @@ function isGoon() {
         exit
         ;;
     *)
-        echo -e "Just enter y or n, please.\n"
+        echo -e "\033[31mJust enter y or n, please.\033[0m\n"
         exit
         ;;
     esac
@@ -30,7 +30,7 @@ function python_model_check() {
     if python3 -c "import $1" >/dev/null 2>&1; then
         echo "$1 has been installed."
     else
-        echo "Installing $1."
+        echo -e "\033[31mInstalling $1.\033[0m"
         python3 -m pip install -U $1
     fi
 }
@@ -41,7 +41,7 @@ if [ -d $script_dir/output ]; then
     echo ".csv file output directory already exists."
 else
     mkdir -m 754 $script_dir/output
-    echo ".csv file output directory successfully created."
+    echo -e "\033[34m.csv file output directory successfully created.\033[0m"
 fi
 # 检查pic输出目录是否存在
 if [ -d $script_dir/output/pic ]; then
@@ -49,7 +49,7 @@ if [ -d $script_dir/output/pic ]; then
     echo ".jpg file output directory already exists."
 else
     mkdir -m 754 $script_dir/output/pic
-    echo ".jpg file output directory successfully created."
+    echo -e "\033[34m.jpg file output directory successfully created.\033[0m"
 fi
 
 # 获取参数
@@ -75,26 +75,26 @@ if [ -d build ]; then
     echo "Cmake build directory already exists."
 else
     mkdir -m 754 build
-    echo "Cmake build directory successfully created."
+    echo -e "\033[34mCmake build directory successfully created.\033[0m"
 fi
 
 # 进入 build, 生成项目
 cd build
-echo -e "\nStart compiling the project......"
+echo -e "\n\033[34mStart compiling the project......"
 cmake .. && make
 
 # 执行项目
-echo -e "\n\nStart running the project......"
+echo -e "\n\n\033[34mStart running the project......"
 ./cu_ran $time $size
 
 # 根据数据画图
-echo -e "\nDraw line charts according to the output data......"
+echo -e "\n\033[34mDraw line charts according to the output data......"
 cd $script_dir
 # 判断是否安装了 numpy matplotlib 模块
 python_model_check numpy
 python_model_check matplotlib
 
 python3 draw.py
-echo -e "\n$script_dir/output to see execution time data."
-echo "$script_dir/output/pic to see line charts."
-echo "ALL done."
+echo -e "\n\033[34m$script_dir/output\033[0m to see execution time data."
+echo -e "\033[34m$script_dir/output/pic\033[0m to see line charts."
+echo -e "\033[33mALL done."
