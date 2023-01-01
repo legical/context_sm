@@ -27,10 +27,11 @@ function isGoon() {
 
 # 判断是否安装了 python 模块
 function python_model_check() {
-    if python -c "import $1" >/dev/null 2>&1; then
-        return 1
+    if python3 -c "import $1" >/dev/null 2>&1; then
+        echo "$1 has been installed."
     else
-        return 0
+        echo "Installing $1."
+        python3 -m pip install -U $1
     fi
 }
 
@@ -89,21 +90,9 @@ echo -e "\n\nStart running the project......"
 # 根据数据画图
 echo -e "\nDraw line charts according to the output data......"
 cd $script_dir
-# 判断是否安装了 matplotlib 模块
-function python_model_check() {
-    if python3 -c "import $1" >/dev/null 2>&1; then
-        return 1
-    else
-        return 0
-    fi
-}
+# 判断是否安装了 numpy matplotlib 模块
+python_model_check numpy
 python_model_check matplotlib
-if [ $? == 1 ]; then
-    echo "Matplotlib has been installed."
-else
-    echo "Installing matplotlib."
-    python3 -m pip install -U matplotlib
-fi
 
 python3 draw.py
 echo -e "\n$script_dir/output to see execution time data."
