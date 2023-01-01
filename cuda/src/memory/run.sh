@@ -26,16 +26,17 @@ else
 fi
 
 # 获取参数
-EXEC_TIMES = 1000
-ARR_SIZE = 1073741824
+time = 1000
+size = 1073741824
+
 if [ $# ] >0; then
-    EXEC_TIMES = $1
+    time = $1
 fi
 if [ $# ] >1; then
-    ARR_SIZE = $2
+    size = $2
 fi
-echo "You have entered $# parameter."
-echo "EXEC_TIMES: $EXEC_TIMES       ARR_SIZE: $ARR_SIZE"
+echo "Shell: You have entered $# parameter."
+echo "EXEC_TIMES: $time       ARR_SIZE: $size "
 
 # /home/bric/Workspace/context_sm/cuda
 cd $(dirname $dir)
@@ -55,7 +56,7 @@ cmake .. && make
 
 # 执行项目
 echo "Start running the project......"
-./cu_ran $EXEC_TIMES $ARR_SIZE
+./cu_ran $time $size
 
 # 根据数据画图
 echo "Draw line charts according to the output data......"
