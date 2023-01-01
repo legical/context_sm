@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     printf("You have entered %d parameter.\n", para_num);
     printf("EXEC_TIMES: %d \t ARR_SIZE: %d\n", EXEC_TIMES, ARR_SIZE);
 
-    int *arr, *l2, *l2_gpu;
+    int *arr, *l2, *l2_gpu, random_num_arr[EXEC_TIMES];
     float elapsedTime[EXEC_TIMES];
 
     // get GPU L2 cache size
@@ -113,8 +113,11 @@ int main(int argc, char *argv[])
         gpuErrAssert(cudaEventDestroy(start));
         gpuErrAssert(cudaEventDestroy(stop));
 
+        // 保存每一次生成的random_num
+        random_num_arr[i] = random_num;
+
         printf("Run for the %d time, the execution time is %.6f ms.\n", i + 1, elapsedTime[i]);
-        // cudaDeviceSynchronize();        
+        // cudaDeviceSynchronize();
     }
 
     gpuErrAssert(cudaFreeHost(arr));
@@ -138,12 +141,12 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     // 标题
-    fprintf(fp, "ID,Exec_time\n");
+    fprintf(fp, "ID,Exec_time,Random_num\n");
     // 导入数据
     float min = elapsedTime[0], max = elapsedTime[0], avg = 0.0;
     for (int i = 0; i < EXEC_TIMES; i++)
     {
-        fprintf(fp, "%d,%.6f\n", i + 1, elapsedTime[i]);
+        fprintf(fp, "%d,%.6f,%d\n", i + 1, elapsedTime[i], random_num_arr[i]);
         if (min > elapsedTime[i])
         {
             min = elapsedTime[i];
