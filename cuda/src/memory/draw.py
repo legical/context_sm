@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from cProfile import label
 import os
 import matplotlib.pyplot as plt

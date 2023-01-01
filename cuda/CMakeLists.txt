@@ -15,7 +15,7 @@ string(APPEND CMAKE_CUDA_FLAGS " -m 64 -arch=${TARGET}")
 
 # add the binary tree to the search path for include files
 include_directories("${CUDA_INCLUDE_DIRS}")
-include_directories(${PROJECT_SOURCE_DIR}/src/lib)
+include_directories(${PROJECT_SOURCE_DIR}/lib)
 
 # 添加所有源文件
 # aux_source_directory(${PROJECT_SOURCE_DIR}/src/lib SRCLIST)
@@ -34,4 +34,4 @@ function(add_my_target target include_dir)
 endfunction(add_my_target)
 
 add_my_target(cu_ran src/memory src/memory/random.cu)
-add_my_target(get_file_dir src/filedir src/filedir/dir.cu)
+# add_my_target(get_file_dir src/filedir src/filedir/dir.cu)
