@@ -37,10 +37,10 @@ function python_model_check() {
 # 检查csv输出目录是否存在
 if [ -d $script_dir/output ]; then
     chmod 754 $script_dir/output
-    echo -e "\n.csv file output directory already exists."
+    echo ".csv file output directory already exists."
 else
     mkdir -m 754 $script_dir/output
-    echo -e "\n.csv file output directory successfully created."
+    echo ".csv file output directory successfully created."
 fi
 # 检查pic输出目录是否存在
 if [ -d $script_dir/output/pic ]; then
@@ -61,10 +61,10 @@ fi
 if [ $# ] >1; then
     size=$2
 fi
-echo -e "\nShell: You have entered $# parameter."
-echo "EXEC_TIMES: $time       ARR_SIZE: $size "
+# echo -e "\nShell: You have entered $# parameter."
+# echo "EXEC_TIMES: $time       ARR_SIZE: $size "
 
-isGoon
+# isGoon
 
 # /home/bric/Workspace/context_sm/cuda
 cd $(dirname $dir)
@@ -79,11 +79,11 @@ fi
 
 # 进入 build, 生成项目
 cd build
-echo "Start compiling the project......"
+echo -e "\nStart compiling the project......"
 cmake .. && make
 
 # 执行项目
-echo -e "\nStart running the project......"
+echo -e "\n\nStart running the project......"
 ./cu_ran $time $size
 
 # 根据数据画图
@@ -106,6 +106,6 @@ else
 fi
 
 python3 draw.py
-echo "$script_dir/output to see execution time data."
+echo -e "\n$script_dir/output to see execution time data."
 echo "$script_dir/output/pic to see line charts."
 echo "ALL done."
