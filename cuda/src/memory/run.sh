@@ -13,8 +13,8 @@ function isGoon() {
     read -p "Are you sure to continue? [y/n] " input
 
     case $input in
-    [yY]*)
-        ;;
+    [yY]*) ;;
+
     [nN]*)
         exit
         ;;
@@ -52,14 +52,14 @@ else
 fi
 
 # 获取参数
-time = 1000
-size = 1073741824
+time=1000
+size=1073741824
 
 if [ $# ] >0; then
-    time = $1
+    time=$1
 fi
 if [ $# ] >1; then
-    size = $2
+    size=$2
 fi
 echo "Shell: You have entered $# parameter."
 echo "EXEC_TIMES: $time       ARR_SIZE: $size "
