@@ -57,19 +57,20 @@ for file in csvlist:
 
     plt.plot(IDlist, EXEClist, "g", marker='D',
              markersize=5, label="Execution time")
-    plt.plot(avg_x, avg_y, label="Avg_time")
+    plt.plot(avg_x, avg_y, color='r', label="Avg_time")
 
     # y轴刻度值
-    min_y_lable = np.floor(minax[0])-2
-    max_y_lable = np.ceil(minax[1])+2
+    min_y_lable = np.floor(minax[0])-1
+    max_y_lable = np.ceil(minax[1])+1
     # plt.yticks(np.arange(min_y_lable, max_y_lable, 0.2))
     plt.ylim((min_y_lable, max_y_lable))
 
     # plt.title('执行时间折线图')  # 折线图标题
     chart_title = 'min={} max={} avg={}'
-    plt.title(chart_title.format(minax[0], minax[1], minax[2]))
-    plt.xlabel('ID', fontsize=16)
-    plt.ylabel('EXEC_time', fontsize=16)
+    plt.title(chart_title.format(minax[0], minax[1], minax[2]), fontsize=36)
+    plt.xlabel('ID', fontsize=32)
+    plt.ylabel('EXEC_time', fontsize=32)
+    plt.tick_params(labelsize=28) #刻度字体大小
     # 设置 y 轴显示网格线
     plt.grid(axis='y')
     # print('min/max/min_y_lable/max_y_lable : ',
