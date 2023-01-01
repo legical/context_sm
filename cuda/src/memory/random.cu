@@ -77,6 +77,10 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < EXEC_TIMES; i++)
     {
+        // refresh L2 cache first
+        int random_l2_num = get_random_num(0, 32);
+        refresh_L2<<<1, 32>>>(l2_gpu, L2size, random_l2_num);
+
         cudaEvent_t start, stop;
         // end - start = exection time
         gpuErrAssert(cudaEventCreate(&start));
@@ -92,11 +96,13 @@ int main(int argc, char *argv[])
         // copy random memory from host to gpu
         gpuErrAssert(cudaMemcpy(arr_gpu, arr + random_num, ARR_SIZE, cudaMemcpyHostToDevice));
 
-        // run kernel
+        // run kernel for random GPU memory access
         read_random_arr<<<1, 32>>>(arr_gpu, ARR_SIZE);
+
         // copy back random memory from gpu to host
         gpuErrAssert(cudaMemcpy(arr + random_num, arr_gpu, ARR_SIZE, cudaMemcpyDeviceToHost));
         gpuErrAssert(cudaFree(arr_gpu));
+
         // record cuda sop time
         gpuErrAssert(cudaEventRecord(stop, 0));
         // Synchronize
@@ -108,9 +114,7 @@ int main(int argc, char *argv[])
         gpuErrAssert(cudaEventDestroy(stop));
 
         printf("Run for the %d time, the execution time is %.6f ms.\n", i + 1, elapsedTime[i]);
-        // cudaDeviceSynchronize();
-        int random_l2_num = get_random_num(0, 32);
-        refresh_L2<<<1, 32>>>(l2_gpu, L2size, random_l2_num);
+        // cudaDeviceSynchronize();        
     }
 
     gpuErrAssert(cudaFreeHost(arr));
@@ -118,8 +122,6 @@ int main(int argc, char *argv[])
     // gpuErrAssert(cudaFree(arr_gpu));
     gpuErrAssert(cudaFree(l2_gpu));
 
-    time_t timep;
-    struct tm *p;
     char *filename;
     filename = (char *)malloc(sizeof(char) * 128);
 

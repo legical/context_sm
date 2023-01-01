@@ -41,7 +41,7 @@ for file in csvlist:
     filename = './output/'+file
     # print("\n",filename)
     # 图片dpi=220，尺寸宽和高，单位为英寸
-    # fig = plt.figure(dpi=220, figsize=(48, 32))
+    fig = plt.figure(dpi=220, figsize=(48, 32))
 
     # 获取ID
     IDlist, EXEClist = [], []
