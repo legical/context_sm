@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 
-# example: python draw.py
+# example: python3 draw.py
 
 
 def readname():
@@ -27,6 +27,7 @@ def get_data(filename, IDlist, EXEClist, minax):
             try:
                 IDlist.append(float(row[0]))
                 time = float(row[1])
+                minax[2] += time
                 EXEClist.append(time)
                 if minax[0] > time:
                     minax[0] = time
@@ -42,22 +43,31 @@ for file in csvlist:
     filename = './output/'+file
     # print("\n",filename)
     # 图片dpi=220，尺寸宽和高，单位为英寸
-    fig = plt.figure(dpi=220, figsize=(48, 32))
+    fig = plt.figure(dpi=220, figsize=(64, 32))
 
     # 获取ID
     IDlist, EXEClist = [], []
-    minax = [99999999.0,0.0]
+    minax = [99999999.0, 0.0, 0.0]
     get_data(filename, IDlist, EXEClist, minax)
 
-    plt.plot(IDlist, EXEClist, "g", marker='D', markersize=5, label="执行时间")
+    # 获取平均值
+    minax[2] /= IDlist[-1]
+    avg_x = [1, IDlist[-1]]
+    avg_y = [minax[2], minax[2]]
+
+    plt.plot(IDlist, EXEClist, "g", marker='D',
+             markersize=5, label="Execution time")
+    plt.plot(avg_x, avg_y, label="Avg_time")
 
     # y轴刻度值
     min_y_lable = np.floor(minax[0])-2
     max_y_lable = np.ceil(minax[1])+2
     # plt.yticks(np.arange(min_y_lable, max_y_lable, 0.2))
-    plt.ylim((min_y_lable,max_y_lable))
+    plt.ylim((min_y_lable, max_y_lable))
 
     # plt.title('执行时间折线图')  # 折线图标题
+    chart_title = 'min={} max={} avg={}'
+    plt.title(chart_title.format(minax[0], minax[1], minax[2]))
     plt.xlabel('ID', fontsize=16)
     plt.ylabel('EXEC_time', fontsize=16)
     # 设置 y 轴显示网格线
