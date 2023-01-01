@@ -66,11 +66,13 @@ for file in csvlist:
     plt.ylim((min_y_lable, max_y_lable))
 
     # plt.title('执行时间折线图')  # 折线图标题
-    chart_title = 'min={} max={} avg={}'
-    plt.title(chart_title.format(minax[0], minax[1], minax[2]), fontsize=36)
+    chart_title = 'min={}    max={}    avg={}'
+    plt.title(chart_title.format(minax[0], minax[1], minax[2]), fontsize=42)
     plt.xlabel('ID', fontsize=32)
     plt.ylabel('EXEC_time', fontsize=32)
     plt.tick_params(labelsize=28) #刻度字体大小
+    // 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
+    plt.legend(fontsize=26, scatterpoints=1)
     # 设置 y 轴显示网格线
     plt.grid(axis='y')
     # print('min/max/min_y_lable/max_y_lable : ',
