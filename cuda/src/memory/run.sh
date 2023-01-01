@@ -80,15 +80,15 @@ fi
 
 # 进入 build, 生成项目
 cd build
-echo -e "\n\033[34mStart compiling the project......"
+echo -e "\n\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
 # 执行项目
-echo -e "\n\n\033[34mStart running the project......"
+echo -e "\n\n\033[34mStart running the project......\033[0m"
 ./cu_ran $time $size
 
 # 根据数据画图
-echo -e "\n\033[34mDraw line charts according to the output data......"
+echo -e "\n\033[34mDraw line charts according to the output data......\033[0m"
 cd $script_dir
 # 判断是否安装了 numpy matplotlib 模块
 python_model_check numpy
@@ -97,4 +97,4 @@ python_model_check matplotlib
 python3 draw.py
 echo -e "\n\033[34m$script_dir/output\033[0m to see execution time data."
 echo -e "\033[34m$script_dir/output/pic\033[0m to see line charts."
-echo -e "\033[33mALL done."
+echo -e "\033[32mALL done."
