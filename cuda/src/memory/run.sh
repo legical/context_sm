@@ -102,7 +102,7 @@ if [ $? == 1 ]; then
     echo "Matplotlib has been installed."
 else
     echo "Installing matplotlib."
-    python3 -m pip install matplotli
+    python3 -m pip install -U matplotlib
 fi
 
 python3 draw.py
