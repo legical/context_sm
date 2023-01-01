@@ -8,6 +8,32 @@ script_dir=$(
 dir=$(dirname $script_dir)
 # /home/bric/Workspace/context_sm/cuda/src
 
+# 是否继续执行脚本
+function isGoon() {
+    read -p "Are you sure to continue? [y/n] " input
+
+    case $input in
+    [yY]*)
+        ;;
+    [nN]*)
+        exit
+        ;;
+    *)
+        echo "Just enter y or n, please."
+        exit
+        ;;
+    esac
+}
+
+# 判断是否安装了 python 模块
+function python_model_check() {
+    if python -c "import $1" >/dev/null 2>&1; then
+        return 1
+    else
+        return 0
+    fi
+}
+
 # 检查csv输出目录是否存在
 if [ -d $script_dir/output ]; then
     chmod 754 $script_dir/output
@@ -37,6 +63,8 @@ if [ $# ] >1; then
 fi
 echo "Shell: You have entered $# parameter."
 echo "EXEC_TIMES: $time       ARR_SIZE: $size "
+
+isGoon
 
 # /home/bric/Workspace/context_sm/cuda
 cd $(dirname $dir)
