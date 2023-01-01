@@ -19,7 +19,7 @@ function isGoon() {
         exit
         ;;
     *)
-        echo "Just enter y or n, please."
+        echo -e "Just enter y or n, please.\n"
         exit
         ;;
     esac
@@ -37,10 +37,10 @@ function python_model_check() {
 # 检查csv输出目录是否存在
 if [ -d $script_dir/output ]; then
     chmod 754 $script_dir/output
-    echo ".csv file output directory already exists."
+    echo -e "\n.csv file output directory already exists."
 else
     mkdir -m 754 $script_dir/output
-    echo ".csv file output directory successfully created."
+    echo -e "\n.csv file output directory successfully created."
 fi
 # 检查pic输出目录是否存在
 if [ -d $script_dir/output/pic ]; then
@@ -52,8 +52,8 @@ else
 fi
 
 # 获取参数
-time=1000
-size=1073741824
+time="1000"
+size="1073741824"
 
 if [ $# ] >0; then
     time=$1
@@ -61,7 +61,7 @@ fi
 if [ $# ] >1; then
     size=$2
 fi
-echo "Shell: You have entered $# parameter."
+echo -e "\nShell: You have entered $# parameter."
 echo "EXEC_TIMES: $time       ARR_SIZE: $size "
 
 isGoon
@@ -83,15 +83,15 @@ echo "Start compiling the project......"
 cmake .. && make
 
 # 执行项目
-echo "Start running the project......"
+echo -e "\nStart running the project......"
 ./cu_ran $time $size
 
 # 根据数据画图
-echo "Draw line charts according to the output data......"
+echo -e "\nDraw line charts according to the output data......"
 cd $script_dir
 # 判断是否安装了 matplotlib 模块
 function python_model_check() {
-    if python -c "import $1" >/dev/null 2>&1; then
+    if python3 -c "import $1" >/dev/null 2>&1; then
         return 1
     else
         return 0
