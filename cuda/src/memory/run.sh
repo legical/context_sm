@@ -80,6 +80,7 @@ fi
 
 # 进入 build, 生成项目
 cd build
+rm -r ./*
 echo -e "\n\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
