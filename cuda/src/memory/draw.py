@@ -43,7 +43,7 @@ for file in csvlist:
     filename = './output/'+file
     # print("\n",filename)
     # 图片dpi=220，尺寸宽和高，单位为英寸
-    fig = plt.figure(dpi=220, figsize=(64, 32))
+    fig = plt.figure(dpi=220, figsize=(80, 32))
 
     # 获取ID
     IDlist, EXEClist = [], []
@@ -66,13 +66,13 @@ for file in csvlist:
     plt.ylim((min_y_lable, max_y_lable))
 
     # plt.title('执行时间折线图')  # 折线图标题
-    chart_title = 'min={}    max={}    avg={}'
-    plt.title(chart_title.format(minax[0], minax[1], minax[2]), fontsize=42)
-    plt.xlabel('ID', fontsize=32)
-    plt.ylabel('EXEC_time', fontsize=32)
-    plt.tick_params(labelsize=28)  # 刻度字体大小
+    chart_title = 'min={}    max={}    avg={}     times={}'
+    plt.title(chart_title.format(minax[0], minax[1], minax[2],IDlist[-1]), fontsize=46)
+    plt.xlabel('ID', fontsize=36)
+    plt.ylabel('EXEC_time', fontsize=36)
+    plt.tick_params(labelsize=32)  # 刻度字体大小
     # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
-    plt.legend(loc=4, fontsize=26, scatterpoints=1)
+    plt.legend(loc=4, fontsize=32, scatterpoints=1)
     # 设置 y 轴显示网格线
     plt.grid(axis='y')
     # print('min/max/min_y_lable/max_y_lable : ',
