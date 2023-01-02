@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     char *filename;
     filename = (char *)malloc(sizeof(char) * 128);
 
-    GetBaseFilename(filename);
+    GetBaseFilename(filename, EXEC_TIMES);
     // 读写文件。文件存在则被截断为零长度，不存在则创建一个新文件
     FILE *fp = fopen(filename, "w+");
     // 如果打开文件失败

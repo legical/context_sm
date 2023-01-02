@@ -134,7 +134,7 @@ std::string GetTimeString()
     return oss.str();
 }
 
-void GetBaseFilename(char *filename)
+void GetBaseFilename(char *filename, const int EXEC_TIMES)
 {
     time_t timep;
     struct tm *p;
@@ -145,7 +145,8 @@ void GetBaseFilename(char *filename)
     char path[96];
     getcwd(path, sizeof(path));
     // printf("2.2 dir__FILE__: %s\n", dirname(path));
-    sprintf(filename, "%s/src/memory/output/Random%d-%d%d%d.csv", dirname(path), p->tm_mday, p->tm_hour, p->tm_min, p->tm_sec);
+    sprintf(filename, "%s/src/memory/output/Ran%d-%d%d%d.csv",
+            dirname(path), EXEC_TIMES, p->tm_hour, p->tm_min, p->tm_sec);
 }
 
 #endif
