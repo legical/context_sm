@@ -1,1 +1,0 @@
-/usr/bin/g++ CMakeFiles/cu_ran.dir/src/memory/random.cu.o -o cu_ran  -lcuda -lcudart -lnvidia-ml -lcudadevrt -lcudart_static -lrt -lpthread -ldl  -L"/usr/local/cuda-11.7/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda-11.7/targets/x86_64-linux/lib"
