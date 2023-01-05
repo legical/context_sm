@@ -153,8 +153,9 @@ int main(int argc, char *argv[])
         free(filename);
         exit(EXIT_FAILURE);
     }
-    fprintf(fp, "%d,%f,%p,%p\n", Index, elapsedTime, arr, arr_gpu);
-    printf("%d. Exec_time: %.6fms \t arr_addr:%p\t GPU_addr:%p\n", Index, elapsedTime, arr, arr_gpu);
+    // elapsedTime 10μS
+    fprintf(fp, "%d,%f,%p,%p\n", Index, elapsedTime*10000, arr, arr_gpu);
+    printf("%d. Exec_time: %.6fμs \t arr_addr:%p\t GPU_addr:%p\n", Index, elapsedTime*1000, arr, arr_gpu);
     fclose(fp);
 
     // 输出运行时间信息
