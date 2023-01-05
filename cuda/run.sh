@@ -120,7 +120,7 @@ else
     echo "filename_date is $filename_date"
     for ((i=1; i<=$time; i++))
     do
-        ./cu_ran_fork $i $time "$filename_date"
+        ./cu_ran_fork $i $time $filename_date
     done
 fi
 
