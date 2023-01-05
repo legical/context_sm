@@ -108,7 +108,7 @@ cd build
 echo -e "\n\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
-isGoon
+# isGoon
 
 # 执行项目
 echo -e "\n\n\033[34mStart running the project for $time times......\033[0m"
@@ -116,10 +116,10 @@ if [ $mode = "1" ]
 then
 	./cu_ran $time $size
 else
-    filename_date = $(date "+%d%H%M")
+    # filename_date = $(date "+%d%H%M")
     for ((i=1; i<=$time; i++))
     do
-        ./cu_ran_fork $i $time $size $filename_date
+        ./cu_ran_fork $i $time $size $(date "+%d%H%M")
     done
 fi
 
