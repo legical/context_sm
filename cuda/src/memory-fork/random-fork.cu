@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     filename = (char *)malloc(sizeof(char) * 128);
     // get option
     int para_num = getopt(argc, argv, Index, EXEC_TIMES, ARR_SIZE, filename);
-    // printf("You have entered %d parameter.\n", para_num);
+    printf("You have entered %d parameter.\n", para_num);
     // printf("ARR_SIZE: %d\n", ARR_SIZE);
 
     int *arr, *arr_gpu, *l2, *l2_gpu;

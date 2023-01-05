@@ -117,9 +117,10 @@ then
 	./cu_ran $time $size
 else
     filename_date=$(date "+%d%H%M")
+    echo "filename_date is $filename_date"
     for ((i=1; i<=$time; i++))
     do
-        ./cu_ran_fork $i $time $size "$filename_date"
+        ./cu_ran_fork $i $time $size ${filename_date}
     done
 fi
 
