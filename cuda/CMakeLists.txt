@@ -34,4 +34,5 @@ function(add_my_target target include_dir)
 endfunction(add_my_target)
 
 add_my_target(cu_ran src/memory src/memory/random.cu)
+add_my_target(cu_ran_fork src/memory-fork src/memory-fork/random-fork.cu)
 # add_my_target(get_file_dir src/filedir src/filedir/dir.cu)

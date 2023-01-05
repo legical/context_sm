@@ -134,7 +134,7 @@ std::string GetTimeString()
     return oss.str();
 }
 
-void GetBaseFilename(char *filename, const int EXEC_TIMES)
+void GetBaseFilename(char *filename, const int EXEC_TIMES, const char *run_dir)
 {
     time_t timep;
     struct tm *p;
@@ -145,8 +145,20 @@ void GetBaseFilename(char *filename, const int EXEC_TIMES)
     char path[96];
     getcwd(path, sizeof(path));
     // printf("2.2 dir__FILE__: %s\n", dirname(path));
-    sprintf(filename, "%s/src/memory/output/Ran%d-%d%d%d.csv",
-            dirname(path), EXEC_TIMES, p->tm_hour, p->tm_min, p->tm_sec);
+    sprintf(filename, "%s/src/%s/output/Ran%d-%d%d%d.csv",
+            dirname(path), run_dir, EXEC_TIMES, p->tm_hour, p->tm_min, p->tm_sec);
+}
+
+/**
+ * @brief 判断文件是否存在
+ *
+ * @param filename
+ * @return true —— 存在
+ * @return false —— 不存在
+ */
+bool isFileExists(char *filename)
+{
+    return access(filename, F_OK) == 0;
 }
 
 #endif
