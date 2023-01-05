@@ -119,7 +119,7 @@ else
     filename_date=$(date "+%d%H%M")
     for ((i=1; i<=$time; i++))
     do
-        ./cu_ran_fork $i $time $size $filename_date
+        ./cu_ran_fork $i $time $size "$filename_date"
     done
 fi
 
