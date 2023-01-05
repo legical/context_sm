@@ -36,7 +36,7 @@ function python_model_check() {
 }
 
 # 获取参数
-time="1000"
+time=1000
 size="1073741824"
 # 1-单词程序多循环 2-多次程序
 mode=1
@@ -104,7 +104,7 @@ if [ $mode = "1" ]
 then
 	./cu_ran $time $size
 else
-    for ((i=1; i<=${{time}}; i++))
+    for ((i=1; i<=$time; i++))
     do
         ./cu_ran_fork $i $time $size
     done
