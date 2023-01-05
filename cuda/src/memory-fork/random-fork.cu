@@ -1,6 +1,6 @@
 #include "myutil.hpp"
 #include "util.cuh"
-int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE)
+int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, char *filename)
 {
     if (argc > 1)
     {
@@ -14,6 +14,18 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE)
                 ARR_SIZE = str_to_int(argv[3]);
             }
         }
+    }
+    char path[96];
+    getcwd(path, sizeof(path));
+    if (argc > 4)
+    {
+        sprintf(filename, "%s/src/memory-fork/output/Ran%s.csv",
+                dirname(path), argv[4]);
+    }
+    else
+    {
+        sprintf(filename, "%s/src/memory-fork/output/Random-%d.csv",
+                dirname(path), EXEC_TIMES);
     }
     return argc - 1;
 }
@@ -45,8 +57,11 @@ int main(int argc, char *argv[])
 {
     // Default: array size = 1GB
     int Index = 0, ARR_SIZE = 1024 * 1024 * 1024, EXEC_TIMES = 1000;
+    // 获取文件名
+    char *filename;
+    filename = (char *)malloc(sizeof(char) * 128);
     // get option
-    int para_num = getopt(argc, argv, Index, EXEC_TIMES, ARR_SIZE);
+    int para_num = getopt(argc, argv, Index, EXEC_TIMES, ARR_SIZE, filename);
     // printf("You have entered %d parameter.\n", para_num);
     // printf("ARR_SIZE: %d\n", ARR_SIZE);
 
@@ -105,11 +120,8 @@ int main(int argc, char *argv[])
     // copy back random memory from gpu to host
     gpuErrAssert(cudaMemcpy(arr, arr_gpu, ARR_SIZE * sizeof(int), cudaMemcpyDeviceToHost));
 
-    // 获取文件名
-    char *filename;
-    filename = (char *)malloc(sizeof(char) * 128);
-    char *run_dir = "memory-fork";
-    GetBaseFilename(filename, EXEC_TIMES, run_dir);
+    // char *run_dir = "memory-fork";
+    // GetBaseFilename(filename, EXEC_TIMES, run_dir);
 
     // 如果输出文件不存在，则创建文件并写入标题
     if (!isFileExists(filename))
