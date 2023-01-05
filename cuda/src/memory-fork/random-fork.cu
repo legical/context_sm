@@ -30,14 +30,6 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
     return argc - 1;
 }
 
-void name(char buf[], char *filename)
-{
-    char path[96];
-    getcwd(path, sizeof(path));
-    sprintf(filename, "%s/src/memory-fork/output/Ran%s.csv",
-                dirname(path), buf);
-}
-
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE)
 {
     uint32_t threadid = getThreadIdInBlock();
@@ -70,7 +62,7 @@ int main(int argc, char *argv[])
     filename = (char *)malloc(sizeof(char) * 128);
     // get option
     int para_num = getopt(argc, argv, Index, EXEC_TIMES, ARR_SIZE, filename);
-    printf("You have entered %d parameter.\n", para_num);
+    // printf("You have entered %d parameter.\n", para_num);
     // printf("ARR_SIZE: %d\n", ARR_SIZE);
 
     int *arr, *arr_gpu, *l2, *l2_gpu;

@@ -40,7 +40,7 @@ function python_model_check() {
 
 # 删除运行过程中生成的0 1 2 文件
 function del_extra_file() {
-    cd $script_dir && rm -rf 0 1 2 build
+    cd $script_dir && rm -rf 0 1 2
     cd $script_dir/src/memory && rm -rf 0 1 2
     cd output && rm -rf 0 1 2
     cd $script_dir/src/memory-fork && rm -rf 0 1 2
@@ -64,7 +64,7 @@ if [ $# ] >2; then
     size=$3
 fi
 echo -e "\nShell: You have entered $# parameter."
-echo "EXEC_TIMES: $time       ARR_SIZE: $size "
+echo "EXEC_TIMES: $time       ARR_SIZE: ${size} "
 
 if [ $mode = "1" ]
 then
@@ -117,7 +117,7 @@ then
 	./cu_ran $time $size
 else
     filename_date=$(date "+%d%H%M")
-    echo "filename_date is $filename_date"
+    # echo "filename_date is $filename_date"
     for ((i=1; i<=$time; i++))
     do
         ./cu_ran_fork $i $time "$filename_date"
