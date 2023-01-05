@@ -9,15 +9,15 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
         if (argc > 2)
         {
             EXEC_TIMES = str_to_int(argv[2]);
-            if (argc > 3)
-            {
-                ARR_SIZE = str_to_int(argv[3]);
-            }
+            // if (argc > 3)
+            // {
+            //     ARR_SIZE = str_to_int(argv[3]);
+            // }
         }
     }
     char path[96];
     getcwd(path, sizeof(path));
-    if (argc > 4)
+    if (argc > 3)
     {
         sprintf(filename, "%s/src/memory-fork/output/Ran%s.csv",
                 dirname(path), argv[4]);
