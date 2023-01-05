@@ -32,13 +32,10 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
 
 void name(char buf[], char *filename)
 {
-    int num = 0;
-    for (int i = 0; i < strlen(buf); i++)
-    {
-        // 通过减去'0'可以将字符转换为int类型的数值
-        num = num * 10 + buf[i] - '0';
-    }
-    return num;
+    char path[96];
+    getcwd(path, sizeof(path));
+    sprintf(filename, "%s/src/memory-fork/output/Ran%s.csv",
+                dirname(path), buf);
 }
 
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE)
