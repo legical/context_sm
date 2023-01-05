@@ -20,7 +20,7 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
     if (argc > 3)
     {
         sprintf(filename, "%s/src/memory-fork/output/Ran%s.csv",
-                dirname(path), argv[4]);
+                dirname(path), &argv[4]);
     }
     else
     {
