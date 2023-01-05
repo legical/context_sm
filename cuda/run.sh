@@ -49,7 +49,7 @@ function del_extra_file() {
 
 # 获取参数
 time=1000
-size="1073741824"
+size=1073741824
 # 1-单词程序多循环 2-多次程序
 mode=1
 run_dir="memory"
