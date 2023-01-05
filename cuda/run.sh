@@ -40,7 +40,7 @@ function python_model_check() {
 
 # 删除运行过程中生成的0 1 2 文件
 function del_extra_file() {
-    cd $script_dir && rm -rf 0 1 2
+    cd $script_dir && rm -rf 0 1 2 build
     cd $script_dir/src/memory && rm -rf 0 1 2
     cd output && rm -rf 0 1 2
     cd $script_dir/src/memory-fork && rm -rf 0 1 2
