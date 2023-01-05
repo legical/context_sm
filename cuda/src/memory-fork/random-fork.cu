@@ -15,8 +15,7 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
             // }
         }
     }
-    char path[96];
-    getcwd(path, sizeof(path));
+
     if (argc > 3)
     {
         sprintf(filename, "%s/src/memory-fork/output/Ran%s.csv",
@@ -24,10 +23,20 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
     }
     else
     {
+        char path[96];
+        getcwd(path, sizeof(path));
         sprintf(filename, "%s/src/memory-fork/output/Random-%d.csv",
                 dirname(path), EXEC_TIMES);
     }
     return argc - 1;
+}
+
+void name(char buf[], char *filename)
+{
+    char path[96];
+    getcwd(path, sizeof(path));
+    sprintf(filename, "%s/src/memory-fork/output/Ran%s.csv",
+            dirname(path), buf);
 }
 
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE)
@@ -154,8 +163,8 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
     // elapsedTime 10μS
-    fprintf(fp, "%d,%f,%p,%p\n", Index, elapsedTime*10000, arr, arr_gpu);
-    printf("%d. Exec_time: %.6fμs \t arr_addr:%p\t GPU_addr:%p\n", Index, elapsedTime*1000, arr, arr_gpu);
+    fprintf(fp, "%d,%f,%p,%p\n", Index, elapsedTime * 10000, arr, arr_gpu);
+    printf("%d. Exec_time: %.6fμs \t arr_addr:%p\t GPU_addr:%p\n", Index, elapsedTime * 1000, arr, arr_gpu);
     fclose(fp);
 
     // 输出运行时间信息
