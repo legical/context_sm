@@ -35,6 +35,15 @@ function python_model_check() {
     fi
 }
 
+# 删除运行过程中生成的0 1 2 文件
+function del_extra_file() {
+    cd $script_dir && rm -rf 0 1 2
+    cd $script_dir/src/memory && rm -rf 0 1 2
+    cd output && rm -rf 0 1 2
+    cd $script_dir/src/memory-fork && rm -rf 0 1 2
+    cd output && rm -rf 0 1 2
+}
+
 # 获取参数
 time=1000
 size="1073741824"
@@ -121,4 +130,5 @@ python_model_check matplotlib
 python3 draw.py
 echo -e "\n\033[34m$dir/$run_dir/output\033[0m to see execution time data."
 echo -e "\033[34m$dir/$run_dir/output/pic\033[0m to see line charts."
+del_extra_file
 echo -e "\033[32mALL done."
