@@ -19,12 +19,12 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
     getcwd(path, sizeof(path));
     if (argc > 3)
     {
-        sprintf(filename, "%s/src/memory-fork/output/Ran%s.csv",
-                dirname(path), argv[3]);
+        sprintf(filename, "%s/src/memory-fork/output/Ran%d-%s.csv",
+                dirname(path), EXEC_TIMES, argv[3]);
     }
     else
     {
-        sprintf(filename, "%s/src/memory-fork/output/Random-%d.csv",
+        sprintf(filename, "%s/src/memory-fork/output/Ran%d.csv",
                 dirname(path), EXEC_TIMES);
     }
     return argc - 1;
