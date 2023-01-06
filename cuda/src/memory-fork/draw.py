@@ -70,9 +70,9 @@ for file in csvlist:
     plt.ylim((min_y_lable, max_y_lable))
 
     # plt.title('执行时间折线图')  # 折线图标题
-    chart_title = 'min={}   max={}   avg={} /10μS   ||  times={}   addr_num={}   GPU_addr_num={}'
+    chart_title = 'min={}   max={}   avg={} μS   ||  times={}   addr_num={}   GPU_addr_num={}'
     plt.title(chart_title.format(
-        minax[0], minax[1], minax[2], IDlist[-1], len(addr), len(GPU_addr)), fontsize=46)
+        minax[0], minax[1], minax[2], int(IDlist[-1]), len(addr), len(GPU_addr)), fontsize=46)
     plt.xlabel('Index', fontsize=36)
     plt.ylabel('EXEC_time', fontsize=36)
     plt.tick_params(labelsize=32)  # 刻度字体大小
