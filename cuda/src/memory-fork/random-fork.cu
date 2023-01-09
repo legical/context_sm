@@ -33,11 +33,15 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE)
 {
     uint32_t threadid = getThreadIdInBlock();
-    int i = threadid;
-#pragma unroll
-    while (i < ARR_SIZE)
+
+    for (int j = 0; j < 4; j++)
     {
-        i = arr_gpu[i] + 31;
+        int i = threadid;
+#pragma unroll
+        while (i < ARR_SIZE)
+        {
+            i = arr_gpu[i] + 31;
+        }
     }
 }
 
