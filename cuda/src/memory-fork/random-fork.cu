@@ -34,7 +34,7 @@ __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE)
 {
     uint32_t threadid = getThreadIdInBlock();
 
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < 16; j++)
     {
         int i = threadid;
 #pragma unroll
