@@ -40,7 +40,8 @@ __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE)
 #pragma unroll
         while (i < ARR_SIZE)
         {
-            i = arr_gpu[i] + 31;
+            arr_gpu[i] |= i & 1;
+            i += 32;
         }
     }
 }
