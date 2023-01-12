@@ -1,6 +1,6 @@
 #include "myutil.hpp"
 #include "util.cuh"
-int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, char *filename)
+int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, char *filename, int inter_cycle)
 {
     if (argc > 1)
     {
@@ -17,15 +17,21 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
     }
     char path[96];
     getcwd(path, sizeof(path));
+    /**
+     * dirname(path): project root path
+     * EXEC_TIMES: totally runing times 本次程序运行次数
+     * inter_cycle: "for" loop times per kernel running 每次程序运行，kernel 中 for 循环（访存、计算）次数
+     * argv[3]: usually date, to distinguish filename 通常是日期，用于区分文件名
+     */
     if (argc > 3)
     {
-        sprintf(filename, "%s/src/memory-fork/output/Ran%d-%s.csv",
-                dirname(path), EXEC_TIMES, argv[3]);
+        sprintf(filename, "%s/src/memory-fork/output/2-Ran%d-%d-%s.csv",
+                dirname(path), EXEC_TIMES, inter_cycle, argv[3]);
     }
     else
     {
-        sprintf(filename, "%s/src/memory-fork/output/Ran%d.csv",
-                dirname(path), EXEC_TIMES);
+        sprintf(filename, "%s/src/memory-fork/output/2-Ran%d-%d.csv",
+                dirname(path), EXEC_TIMES, inter_cycle);
     }
     return argc - 1;
 }
@@ -63,7 +69,7 @@ int main(int argc, char *argv[])
     char *filename;
     filename = (char *)malloc(sizeof(char) * 128);
     // get option
-    int para_num = getopt(argc, argv, Index, EXEC_TIMES, ARR_SIZE, filename);
+    int para_num = getopt(argc, argv, Index, EXEC_TIMES, ARR_SIZE, filename, inter_cycle);
     // printf("You have entered %d parameter.\n", para_num);
     // printf("ARR_SIZE: %d\n", ARR_SIZE);
 
