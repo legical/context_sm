@@ -18,25 +18,17 @@ def readname():
     return csv
 
 
-def get_data(filename, IDlist, EXEClist, minax, addr, GPU_addr):
-    # '''get the highs and lows from a data file'''
-    with open(filename) as f:
-        reader = csv.reader(f)
-        header_row = next(reader)
-        for row in reader:
-            try:
-                IDlist.append(float(row[0]))
-                time = float(row[1])
-                minax[2] += time
-                EXEClist.append(time)
-                addr.add(row[2])
-                GPU_addr.add(row[3])
-                if minax[0] > time:
-                    minax[0] = time
-                if minax[1] < time:
-                    minax[1] = time
-            except ValueError:
-                print(row[0], 'reading data error!\n')
+# def get_data(filename, IDlist, EXEClist, minax, GPU_addr_list):
+#     IDlist, EXEClist = np.loadtxt(
+#         filename, dtype=float, delimiter=',', skiprows=1, usecols=(0, 1), unpack=True)
+#     IDlist = np.array(IDlist)
+#     minax.append(EXEClist.min())
+#     minax.append(EXEClist.max())
+#     minax.append(np.mean(EXEClist))
+#     addr_list, GPU_addr_list = np.loadtxt(
+#         filename, dtype=str, delimiter=',', skiprows=1, usecols=(2, 3), unpack=True)
+#     minax.append(len(set(addr_list)))
+#     minax.append(len(set(GPU_addr_list)))
 
 
 csvlist = readname()
@@ -46,42 +38,56 @@ for file in csvlist:
     # print("\n",filename)
     # 图片dpi=220，尺寸宽和高，单位为英寸
     fig = plt.figure(dpi=220, figsize=(80, 32))
+    ax1 = fig.add_subplot(111)
 
     # 获取ID
-    IDlist, EXEClist = [], []
-    addr = set()
-    GPU_addr = set()
-    minax = [99999999.0, 0.0, 0.0]
-    get_data(filename, IDlist, EXEClist, minax, addr, GPU_addr)
+    minax = []
+    # IDlist, EXEClist, GPU_addr_list, minax = [], [], [], []
+    # minax = [min, max, avg, CPU_addr_num, GPU_addr_num]
+    # get_data(filename, IDlist, EXEClist, minax, GPU_addr_list)
+    IDlist, EXEClist = np.loadtxt(
+        filename, dtype=float, delimiter=',', skiprows=1, usecols=(0, 1), unpack=True)
+    minax.append(EXEClist.min())
+    minax.append(EXEClist.max())
+    minax.append(np.mean(EXEClist))
+    addr_list, GPU_addr_list = np.loadtxt(
+        filename, dtype=str, delimiter=',', skiprows=1, usecols=(2, 3), unpack=True)
+    minax.append(len(set(addr_list)))
+    minax.append(len(set(GPU_addr_list)))
 
     # 获取平均值
-    minax[2] /= IDlist[-1]
     avg_x = [1, IDlist[-1]]
     avg_y = [minax[2], minax[2]]
 
-    plt.plot(IDlist, EXEClist, "g", marker='D',
+    ax1.plot(IDlist, EXEClist, "g", marker='D',
              markersize=5, label="Execution time")
-    plt.plot(avg_x, avg_y, color='r', label="Avg_time")
+    ax1.plot(avg_x, avg_y, color='r', label="Avg_time")
 
     # y轴刻度值
-    min_y_lable = np.floor(minax[0])-1
-    max_y_lable = np.ceil(minax[1])+1
     # plt.yticks(np.arange(min_y_lable, max_y_lable, 0.2))
-    plt.ylim((min_y_lable, max_y_lable))
+    ax1.set_ylim((np.floor(minax[0]), np.ceil(minax[1])))
+    ax1.set_xlabel('Index', fontsize=36)
+    ax1.set_ylabel('EXEC_time', fontsize=36)
+    # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
+    ax1.legend(loc=4, fontsize=32, scatterpoints=1)
+    # 设置 y 轴显示网格线
+    ax1.grid(axis='y')
 
+    ax2 = ax1.twinx()  # 创建第二个坐标轴，GPU 地址
+    ax2.plot(IDlist, GPU_addr_list, 'o-', c='blue',
+             markersize=5, label="GPU address", linewidth=0.4)
+    ax2.set_ylabel('GPU_addr', fontsize=36)
+    ax2.set_yticks([GPU_addr_list[0], GPU_addr_list[-1]])
+    # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
+    ax2.legend(loc=1, fontsize=32, scatterpoints=1)
+    ax2.grid(visible=False)
+
+    plt.tick_params(labelsize=32)  # 刻度字体大小
     # plt.title('执行时间折线图')  # 折线图标题
     chart_title = 'min={}   max={}   avg={} mS   ||  times={}   addr_num={}   GPU_addr_num={}'
     plt.title(chart_title.format(
-        minax[0], minax[1], minax[2], int(IDlist[-1]), len(addr), len(GPU_addr)), fontsize=46)
-    plt.xlabel('Index', fontsize=36)
-    plt.ylabel('EXEC_time', fontsize=36)
-    plt.tick_params(labelsize=32)  # 刻度字体大小
-    # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
-    plt.legend(loc=4, fontsize=32, scatterpoints=1)
-    # 设置 y 轴显示网格线
-    plt.grid(axis='y')
-    # print('min/max/min_y_lable/max_y_lable : ',
-    #       minax[0], minax[1], min_y_lable, max_y_lable, '\n')
+        minax[0], minax[1], minax[2], int(IDlist[-1]), minax[3], minax[4]), fontsize=46)
+    # plt.gcf().autofmt_xdate()
     filename = filename.replace("./output/", "./output/pic/", 1)
     pic_name = filename.replace("csv", "jpg", 1)
     # 如果图片文件已存在，则删除
