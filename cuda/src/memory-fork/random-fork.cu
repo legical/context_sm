@@ -30,10 +30,10 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
     return argc - 1;
 }
 
-__global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE)
+__global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE, const int inter_cycle)
 {
     uint32_t threadid = getThreadIdInBlock();
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < inter_cycle; j++)
     {
 #pragma unroll
         for (int i = threadid; i < ARR_SIZE; i += 32)
@@ -58,7 +58,7 @@ __global__ void refresh_L2(int *l2_gpu, const int L2size, const int random_l2_nu
 int main(int argc, char *argv[])
 {
     // Default: array size = 1GB
-    int Index = 0, ARR_SIZE = 1024 * 1024 * 256, EXEC_TIMES = 1000;
+    int Index = 0, ARR_SIZE = 1024 * 1024 * 256, EXEC_TIMES = 1000, inter_cycle = 8;
     // 获取文件名
     char *filename;
     filename = (char *)malloc(sizeof(char) * 128);
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     // record cuda start time
     gpuErrAssert(cudaEventRecord(start, 0));
     // run kernel for random GPU memory access
-    read_random_arr<<<1, 32>>>(arr_gpu, ARR_SIZE);
+    read_random_arr<<<1, 32>>>(arr_gpu, ARR_SIZE, inter_cycle);
     // record cuda sop time
     gpuErrAssert(cudaEventRecord(stop, 0));
     // Synchronize
@@ -155,9 +155,9 @@ int main(int argc, char *argv[])
         free(filename);
         exit(EXIT_FAILURE);
     }
-    // elapsedTime μS
-    fprintf(fp, "%d,%f,%p,%p\n", Index, elapsedTime * 1000, arr, arr_gpu);
-    printf("%d. Exec_time: %.6fμs \t arr_addr:%p\t GPU_addr:%p\n", Index, elapsedTime * 1000, arr, arr_gpu);
+    // elapsedTime ms; elapsedTime*1000 μS
+    fprintf(fp, "%d,%f,%p,%p\n", Index, elapsedTime, arr, arr_gpu);
+    printf("%d. Exec_time: %.6fms \t arr_addr:%p\t GPU_addr:%p\n", Index, elapsedTime, arr, arr_gpu);
     fclose(fp);
 
     // 输出运行时间信息
