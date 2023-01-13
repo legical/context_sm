@@ -24,9 +24,9 @@ cd build
 echo -e "\n\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
-cfg="cfg-c.png"
-bbcfg="bbcfg-c.png"
-line="line-c.txt"
+cfg="cfg-cv.png"
+bbcfg="bbcfg-cv.png"
+line="line-cv.txt"
 
 cuobjdump cu_ran_test -xelf cu_ran_test.1.sm_86.cubin
 nvdisasm -cfg cu_ran_test.1.sm_86.cubin | dot -o$cfg -Tpng
