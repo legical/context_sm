@@ -1,10 +1,10 @@
 #include "myutil.hpp"
 #include "util.cuh"
 
-__global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE, const int inter_cycle)
+__global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE /*, const int inter_cycle */)
 {
     uint32_t threadid = getThreadIdInBlock();
-    for (int j = 0; j < inter_cycle; j++)
+    for (int j = 0; j < 8; j++)
     {
         int i = threadid;
 #pragma unroll
@@ -22,7 +22,7 @@ __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE, const int inte
 int main(int argc, char *argv[])
 {
     // Default: array size = 1GB
-    int ARR_SIZE = 1024 * 1024 * 256, inter_cycle = 8;
+    int ARR_SIZE = 1024 * 1024 * 256 /*, inter_cycle = 8 */;
 
     int *arr, *arr_gpu;
 
@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
 
     // copy random memory from host to gpu
     gpuErrAssert(cudaMemcpy(arr_gpu, arr, ARR_SIZE * sizeof(int), cudaMemcpyHostToDevice));
-    
+
     // run kernel for random GPU memory access
-    read_random_arr<<<1, 32>>>(arr_gpu, ARR_SIZE, inter_cycle);
+    read_random_arr<<<1, 32>>>(arr_gpu, ARR_SIZE /*, inter_cycle */);
 
     // copy back random memory from gpu to host
     gpuErrAssert(cudaMemcpy(arr, arr_gpu, ARR_SIZE * sizeof(int), cudaMemcpyDeviceToHost));
