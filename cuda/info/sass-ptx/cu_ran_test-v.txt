@@ -56,7 +56,13 @@ compressed
 
 
 
-
+Meaning	Signed Operator	Unsigned Operator	Bit-Size Operator
+a == b	eq	eq	eq
+a != b	ne	ne	ne
+a < b	lt	lo	n/a
+a <= b	le	ls	n/a
+a > b	gt	hi	n/a
+a >= b	ge	hs	n/a
 
 
 
@@ -86,30 +92,30 @@ mov.u32 %r10, %tid.y;
 mad.lo.s32 %r11, %r8, %r9, %r10;
 mov.u32 %r12, %ntid.x;
 mov.u32 %r13, %tid.x;
-mad.lo.s32 %r1, %r11, %r12, %r13;
-setp.lt.s32 %p1, %r7, 1;
+mad.lo.s32 %r1, %r11, %r12, %r13; //getThreadId in %r1
+setp.lt.s32 %p1, %r7, 1; // p1 = (%r7 < 1) line8
 @%p1 bra $L__BB0_6;
 
 cvta.to.global.u64 %rd1, %rd2;
-mov.u32 %r16, 0;
-setp.ge.s32 %p2, %r1, %r6;
+mov.u32 %r16, 0; // j=r16=0
+setp.ge.s32 %p2, %r1, %r6; // if threadid >= ARR_SIZE
 
 $L__BB0_2:
 @%p2 bra $L__BB0_5;
 
-mov.u32 %r17, %r1;
+mov.u32 %r17, %r1; // i = threadid;
 
 $L__BB0_4:
 mul.wide.s32 %rd3, %r17, 4;
 add.s64 %rd4, %rd1, %rd3;
 ld.global.nc.u32 %r15, [%rd4];
 add.s32 %r17, %r15, 31;
-setp.lt.s32 %p3, %r17, %r6;
+setp.lt.s32 %p3, %r17, %r6; // if i < ARR_SIZE
 @%p3 bra $L__BB0_4;
 
 $L__BB0_5:
-add.s32 %r16, %r16, 1;
-setp.lt.s32 %p4, %r16, %r7;
+add.s32 %r16, %r16, 1; //j++
+setp.lt.s32 %p4, %r16, %r7; //j<r7?
 @%p4 bra $L__BB0_2;
 
 $L__BB0_6:
