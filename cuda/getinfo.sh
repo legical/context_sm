@@ -33,9 +33,9 @@ for name in ${pro_name[@]}; do
     mv -f ${name}.txt $script_dir/info/sass-ptx
 done
 
-cfg="cfg-v.png"
-bbcfg="bbcfg-v.png"
-line="line-v.txt"
+cfg="cfg.png"
+bbcfg="bbcfg.png"
+line="line.txt"
 proname="cu_ran_test"
 # proname="vector_add"
 
