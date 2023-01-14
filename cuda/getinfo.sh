@@ -24,14 +24,16 @@ cd build
 echo -e "\n\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
-cfg="cfg-cv.png"
-bbcfg="bbcfg-cv.png"
-line="line-cv.txt"
+cfg="add-cfg-cv.png"
+bbcfg="add-bbcfg-cv.png"
+line="add-line-cv.txt"
+# proname="cu_ran_test"
+proname="vector_add"
 
-cuobjdump cu_ran_test -xelf cu_ran_test.1.sm_86.cubin
-nvdisasm -cfg cu_ran_test.1.sm_86.cubin | dot -o$cfg -Tpng
-nvdisasm -bbcfg cu_ran_test.1.sm_86.cubin | dot -o$bbcfg -Tpng
-nvdisasm -gi cu_ran_test.1.sm_86.cubin > $line 2>&1
+cuobjdump $proname -xelf ${proname}.1.sm_86.cubin
+nvdisasm -cfg ${proname}.1.sm_86.cubin | dot -o$cfg -Tpng
+nvdisasm -bbcfg ${proname}.1.sm_86.cubin | dot -o$bbcfg -Tpng
+nvdisasm -gi ${proname}.1.sm_86.cubin > $line 2>&1
 
 mv $cfg $bbcfg $line $script_dir/info
 cd $script_dir && rm -rf build
