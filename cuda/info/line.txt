@@ -11,8 +11,8 @@
         /*0030*/ 	.byte	0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         /*0040*/ 	.byte	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         /*0048*/ 	.dword	_Z15read_random_arrPii
-        /*0050*/ 	.byte	0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x00, 0x00, 0x00, 0x04, 0x04, 0x00
-        /*0060*/ 	.byte	0x00, 0x00, 0x0c, 0x81, 0x80, 0x80, 0x28, 0x00, 0x04, 0xfc, 0xff, 0xff, 0x3f, 0x00, 0x00, 0x00
+        /*0050*/ 	.byte	0x70, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x00, 0x00, 0x00, 0x04, 0x1c, 0x00
+        /*0060*/ 	.byte	0x00, 0x00, 0x0c, 0x81, 0x80, 0x80, 0x28, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 
 //--------------------- .nv.info                  --------------------------
@@ -27,7 +27,7 @@
 	.align		4
 .L_1:
         /*0004*/ 	.word	index@(_Z15read_random_arrPii)
-        /*0008*/ 	.word	0x00000004
+        /*0008*/ 	.word	0x00000008
 
 
 	//----- nvinfo : EIATTR_MAX_STACK_SIZE
@@ -140,7 +140,11 @@
 
 	//   ....[0]....
 .L_17:
-        /*0044*/ 	.word	0x00000010
+        /*0044*/ 	.word	0x00000070
+
+
+	//   ....[1]....
+        /*0048*/ 	.word	0x00000080
 .L_18:
 
 
@@ -173,7 +177,7 @@
 
 //--------------------- .text._Z15read_random_arrPii --------------------------
 	.section	.text._Z15read_random_arrPii,"ax",@progbits
-	.sectioninfo	@"SHI_REGISTERS=4"
+	.sectioninfo	@"SHI_REGISTERS=8"
 	.align	128
         .global         _Z15read_random_arrPii
         .type           _Z15read_random_arrPii,@function
@@ -182,20 +186,28 @@
 _Z15read_random_arrPii:
 .text._Z15read_random_arrPii:
         /*0000*/                   MOV R1, c[0x0][0x28] ;
-        /*0010*/                   EXIT ;
+        /*0010*/                   S2R R0, SR_TID.Z ;
+        /*0020*/                   S2R R3, SR_TID.Y ;
+        /*0030*/                   S2R R5, SR_TID.X ;
+        /*0040*/                   IMAD R0, R0, c[0x0][0x4], R3 ;
+        /*0050*/                   IMAD R0, R0, c[0x0][0x0], R5 ;
+        /*0060*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
+        /*0070*/               @P0 EXIT ;
+        /*0080*/                   EXIT ;
 .L_x_0:
-        /*0020*/                   BRA `(.L_x_0);
-        /*0030*/                   NOP;
-        /*0040*/                   NOP;
-        /*0050*/                   NOP;
-        /*0060*/                   NOP;
-        /*0070*/                   NOP;
-        /*0080*/                   NOP;
-        /*0090*/                   NOP;
+        /*0090*/                   BRA `(.L_x_0);
         /*00a0*/                   NOP;
         /*00b0*/                   NOP;
         /*00c0*/                   NOP;
         /*00d0*/                   NOP;
         /*00e0*/                   NOP;
         /*00f0*/                   NOP;
+        /*0100*/                   NOP;
+        /*0110*/                   NOP;
+        /*0120*/                   NOP;
+        /*0130*/                   NOP;
+        /*0140*/                   NOP;
+        /*0150*/                   NOP;
+        /*0160*/                   NOP;
+        /*0170*/                   NOP;
 .L_x_1:
