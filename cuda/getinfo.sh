@@ -37,3 +37,8 @@ nvdisasm -gi ${proname}.1.sm_86.cubin > $line 2>&1
 
 mv $cfg $bbcfg $line $script_dir/info
 cd $script_dir && rm -rf build
+
+# git
+cd ..
+git add .
+git commit -a -m "get info of $proname"
