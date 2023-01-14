@@ -25,7 +25,7 @@ echo -e "\n\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
 # 输出每个项目的汇编代码
-pro_name=('cu_ran_test' 'cu_ran_fork' 'vector_add')
+pro_name=("cu_ran_test" "cu_ran_fork" "vector_add")
 mkdir $script_dir/info/sass-ptx
 for name in ${pro_name[@]}; do
     cuobjdump ${name} -sass -ptx >${name}.txt 2>&1
