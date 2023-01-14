@@ -4,18 +4,19 @@
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE, const int inter_cycle)
 {
     uint32_t threadid = getThreadIdInBlock();
+#pragma unroll
     for (int j = 0; j < inter_cycle; j++)
     {
-        // int i = threadid;
+        int i = threadid;
 #pragma unroll
-        // while (i < ARR_SIZE)
-        // {
-        //     i = arr_gpu[i] + 31;
-        // }
-        for (int i = threadid; i < ARR_SIZE; i += 32)
+        while (i < ARR_SIZE)
         {
-            arr_gpu[i] |= i & 1;
+            i = arr_gpu[i] + 31;
         }
+        // for (int i = threadid; i < ARR_SIZE; i += 32)
+        // {
+        //     arr_gpu[i] |= i & 1;
+        // }
     }
 }
 
