@@ -85,7 +85,6 @@ compressed
 .visible .entry _Z15read_random_arrPii(
 .param .u64 _Z15read_random_arrPii_param_0,
 .param .u32 _Z15read_random_arrPii_param_1
-
 )
 {
 .reg .pred %p<5>;
@@ -181,17 +180,17 @@ mad.lo.s32 %r12, %r9, %r10, %r11;
 mov.u32 %r13, %ntid.x;
 mov.u32 %r14, %tid.x;
 mad.lo.s32 %r20, %r12, %r13, %r14;
-setp.ge.s32 %p1, %r20, %r8;// if threadid >= ARR_SIZE
+setp.ge.s32 %p1, %r20, %r8;
 @%p1 bra $L__BB0_7;
 
-mov.u32 %r18, %r20; // i = threadid;
+mov.u32 %r18, %r20;
 
 $L__BB0_2:
 mul.wide.s32 %rd3, %r18, 4;
 add.s64 %rd4, %rd1, %rd3;
 ld.global.nc.u32 %r15, [%rd4];
-add.s32 %r18, %r15, 31; // i = a[i]+31;
-setp.lt.s32 %p2, %r18, %r8; // if i < ARR_SIZE
+add.s32 %r18, %r15, 31;
+setp.lt.s32 %p2, %r18, %r8;
 @%p2 bra $L__BB0_2;
 
 mov.u32 %r19, %r20;
