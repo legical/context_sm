@@ -108,7 +108,7 @@ cd build
 echo -e "\n\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
-isGoon
+# isGoon
 
 # 执行项目
 echo -e "\n\n\033[34mStart running the project for $time times......\033[0m"
