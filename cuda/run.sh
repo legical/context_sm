@@ -136,3 +136,9 @@ echo -e "\n\033[34m$dir/$run_dir/output\033[0m to see execution time data."
 echo -e "\033[34m$dir/$run_dir/output/pic\033[0m to see line charts."
 del_extra_file
 echo -e "\033[32mALL done."
+
+# git
+cd $script_dir && cd ..
+git add .
+git commit -a -m "get data of ${proname}- ${time}-${filename_date}"
+git push
