@@ -4,6 +4,7 @@
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE/*, const int inter_cycle*/)
 {
     uint32_t threadid = getThreadIdInBlock();
+    int num = threadid;
 // #pragma unroll
     for (int j = 0; j < 2; j++)
     {
@@ -11,7 +12,8 @@ __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE/*, const int in
 #pragma unroll
         while (i < ARR_SIZE)
         {
-            i = arr_gpu[i] + 31;
+            arr_gpu[i] += ++num;
+            i+=32;
         }
         // if(threadid == 0)
         // printf("i=%d\n",i);
