@@ -39,18 +39,17 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE, const int inter_cycle)
 {
     uint32_t threadid = getThreadIdInBlock();
-    for (int j = 0; j < inter_cycle; j++)
+    long long num = threadid;
+#pragma unroll
+    for (int j = 0; j < 2; j++)
     {
         int i = threadid;
-#pragma unroll
+        // #pragma unroll
         while (i < ARR_SIZE)
         {
-            i = arr_gpu[i] + 31;
+            arr_gpu[i] += ++num;
+            i += 32;
         }
-        // for (int i = threadid; i < ARR_SIZE; i += 32)
-        // {
-        //     arr_gpu[i] |= i & 1;
-        // }
     }
 }
 
@@ -69,7 +68,7 @@ __global__ void refresh_L2(int *l2_gpu, const int L2size, const int random_l2_nu
 int main(int argc, char *argv[])
 {
     // Default: array size = 1GB
-    int Index = 0, ARR_SIZE = 1024 * 1024 * 256, EXEC_TIMES = 1000, inter_cycle = 8;
+    int Index = 0, ARR_SIZE = 1024 * 1024 * 1024, EXEC_TIMES = 1000, inter_cycle = 8;
     // 获取文件名
     char *filename;
     filename = (char *)malloc(sizeof(char) * 128);
