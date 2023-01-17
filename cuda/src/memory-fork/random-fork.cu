@@ -67,10 +67,9 @@ int main(int argc, char *argv[])
     // 获取文件名
     char *filename;
     filename = (char *)malloc(sizeof(char) * 256);
-    printf("filename\n");
     // get option
     int para_num = getopt(argc, argv, Index, EXEC_TIMES, ARR_SIZE, filename, inter_cycle);
-    printf("You have entered %d parameter.\n", para_num);
+    // printf("You have entered %d parameter.\n", para_num);
     // printf("ARR_SIZE: %d\n", ARR_SIZE);
 
     int *arr, *arr_gpu, *l2, *l2_gpu;
@@ -93,8 +92,10 @@ int main(int argc, char *argv[])
     gpuErrAssert(cudaHostAlloc((void **)&l2,
                                L2size * sizeof(int),
                                cudaHostAllocDefault));
+    printf("allocate\n");
     init_chase_arr<int>(arr, ARR_SIZE, 1);
     init_arr<int>(l2, L2size, 0);
+    printf("init\n");
 
     // allocate & copy L2 cache refresh memory
     gpuErrAssert(cudaMalloc((void **)&l2_gpu, L2size * sizeof(int)));
