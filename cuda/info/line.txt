@@ -11,8 +11,8 @@
         /*0030*/ 	.byte	0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         /*0040*/ 	.byte	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         /*0048*/ 	.dword	_Z15read_random_arrPii
-        /*0050*/ 	.byte	0x70, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x00, 0x00, 0x00, 0x04, 0x08, 0x00
-        /*0060*/ 	.byte	0x00, 0x00, 0x0c, 0x81, 0x80, 0x80, 0x28, 0x08, 0x04, 0xe8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        /*0050*/ 	.byte	0x70, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x00, 0x00, 0x00, 0x04, 0x1c, 0x00
+        /*0060*/ 	.byte	0x00, 0x00, 0x0c, 0x81, 0x80, 0x80, 0x28, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 
 //--------------------- .nv.info                  --------------------------
@@ -23,45 +23,45 @@
 	//----- nvinfo : EIATTR_REGCOUNT
 	.align		4
         /*0000*/ 	.byte	0x04, 0x2f
-        /*0002*/ 	.short	(.L_3 - .L_2)
+        /*0002*/ 	.short	(.L_2 - .L_1)
 	.align		4
-.L_2:
+.L_1:
         /*0004*/ 	.word	index@(_Z15read_random_arrPii)
-        /*0008*/ 	.word	0x00000018
+        /*0008*/ 	.word	0x00000008
 
 
 	//----- nvinfo : EIATTR_MAX_STACK_SIZE
 	.align		4
-.L_3:
+.L_2:
         /*000c*/ 	.byte	0x04, 0x23
-        /*000e*/ 	.short	(.L_5 - .L_4)
+        /*000e*/ 	.short	(.L_4 - .L_3)
 	.align		4
-.L_4:
+.L_3:
         /*0010*/ 	.word	index@(_Z15read_random_arrPii)
         /*0014*/ 	.word	0x00000000
 
 
 	//----- nvinfo : EIATTR_MIN_STACK_SIZE
 	.align		4
-.L_5:
+.L_4:
         /*0018*/ 	.byte	0x04, 0x12
-        /*001a*/ 	.short	(.L_7 - .L_6)
+        /*001a*/ 	.short	(.L_6 - .L_5)
 	.align		4
-.L_6:
+.L_5:
         /*001c*/ 	.word	index@(_Z15read_random_arrPii)
-        /*0020*/ 	.word	0x00000008
+        /*0020*/ 	.word	0x00000000
 
 
 	//----- nvinfo : EIATTR_FRAME_SIZE
 	.align		4
-.L_7:
+.L_6:
         /*0024*/ 	.byte	0x04, 0x11
-        /*0026*/ 	.short	(.L_9 - .L_8)
+        /*0026*/ 	.short	(.L_8 - .L_7)
 	.align		4
-.L_8:
+.L_7:
         /*0028*/ 	.word	index@(_Z15read_random_arrPii)
-        /*002c*/ 	.word	0x00000008
-.L_9:
+        /*002c*/ 	.word	0x00000000
+.L_8:
 
 
 //--------------------- .nv.info._Z15read_random_arrPii --------------------------
@@ -72,14 +72,14 @@
 	//----- nvinfo : EIATTR_CUDA_API_VERSION
 	.align		4
         /*0000*/ 	.byte	0x04, 0x37
-        /*0002*/ 	.short	(.L_11 - .L_10)
-.L_10:
+        /*0002*/ 	.short	(.L_10 - .L_9)
+.L_9:
         /*0004*/ 	.word	0x00000075
 
 
 	//----- nvinfo : EIATTR_SW2861232_WAR
 	.align		4
-.L_11:
+.L_10:
         /*0008*/ 	.byte	0x01, 0x35
 	.zero		2
 
@@ -87,9 +87,9 @@
 	//----- nvinfo : EIATTR_PARAM_CBANK
 	.align		4
         /*000c*/ 	.byte	0x04, 0x0a
-        /*000e*/ 	.short	(.L_13 - .L_12)
+        /*000e*/ 	.short	(.L_12 - .L_11)
 	.align		4
-.L_12:
+.L_11:
         /*0010*/ 	.word	index@(.nv.constant0._Z15read_random_arrPii)
         /*0014*/ 	.short	0x0160
         /*0016*/ 	.short	0x000c
@@ -97,7 +97,7 @@
 
 	//----- nvinfo : EIATTR_CBANK_PARAM_SIZE
 	.align		4
-.L_13:
+.L_12:
         /*0018*/ 	.byte	0x03, 0x19
         /*001a*/ 	.short	0x000c
 
@@ -105,8 +105,8 @@
 	//----- nvinfo : EIATTR_KPARAM_INFO
 	.align		4
         /*001c*/ 	.byte	0x04, 0x17
-        /*001e*/ 	.short	(.L_15 - .L_14)
-.L_14:
+        /*001e*/ 	.short	(.L_14 - .L_13)
+.L_13:
         /*0020*/ 	.word	0x00000000
         /*0024*/ 	.short	0x0001
         /*0026*/ 	.short	0x0008
@@ -115,10 +115,10 @@
 
 	//----- nvinfo : EIATTR_KPARAM_INFO
 	.align		4
-.L_15:
+.L_14:
         /*002c*/ 	.byte	0x04, 0x17
-        /*002e*/ 	.short	(.L_17 - .L_16)
-.L_16:
+        /*002e*/ 	.short	(.L_16 - .L_15)
+.L_15:
         /*0030*/ 	.word	0x00000000
         /*0034*/ 	.short	0x0000
         /*0036*/ 	.short	0x0000
@@ -127,47 +127,25 @@
 
 	//----- nvinfo : EIATTR_MAXREG_COUNT
 	.align		4
-.L_17:
+.L_16:
         /*003c*/ 	.byte	0x03, 0x1b
         /*003e*/ 	.short	0x00ff
 
 
-	//----- nvinfo : EIATTR_EXTERNS
-	.align		4
-        /*0040*/ 	.byte	0x04, 0x0f
-        /*0042*/ 	.short	(.L_19 - .L_18)
-
-
-	//   ....[0]....
-	.align		4
-.L_18:
-        /*0044*/ 	.word	index@(vprintf)
-
-
 	//----- nvinfo : EIATTR_EXIT_INSTR_OFFSETS
 	.align		4
-.L_19:
-        /*0048*/ 	.byte	0x04, 0x1c
-        /*004a*/ 	.short	(.L_21 - .L_20)
+        /*0040*/ 	.byte	0x04, 0x1c
+        /*0042*/ 	.short	(.L_18 - .L_17)
 
 
 	//   ....[0]....
-.L_20:
-        /*004c*/ 	.word	0x00000320
+.L_17:
+        /*0044*/ 	.word	0x00000070
 
 
 	//   ....[1]....
-        /*0050*/ 	.word	0x000003d0
-
-
-	//----- nvinfo : EIATTR_CRS_STACK_SIZE
-	.align		4
-.L_21:
-        /*0054*/ 	.byte	0x04, 0x1e
-        /*0056*/ 	.short	(.L_23 - .L_22)
-.L_22:
-        /*0058*/ 	.word	0x00000000
-.L_23:
+        /*0048*/ 	.word	0x00000080
+.L_18:
 
 
 //--------------------- .nv.rel.action            --------------------------
@@ -199,109 +177,37 @@
 
 //--------------------- .text._Z15read_random_arrPii --------------------------
 	.section	.text._Z15read_random_arrPii,"ax",@progbits
-	.sectioninfo	@"SHI_REGISTERS=24"
+	.sectioninfo	@"SHI_REGISTERS=8"
 	.align	128
         .global         _Z15read_random_arrPii
         .type           _Z15read_random_arrPii,@function
-        .size           _Z15read_random_arrPii,(.L_x_10 - _Z15read_random_arrPii)
+        .size           _Z15read_random_arrPii,(.L_x_1 - _Z15read_random_arrPii)
         .other          _Z15read_random_arrPii,@"STO_CUDA_ENTRY STV_DEFAULT"
 _Z15read_random_arrPii:
 .text._Z15read_random_arrPii:
-        /*0000*/                   IMAD.MOV.U32 R1, RZ, RZ, c[0x0][0x28] ;
+        /*0000*/                   MOV R1, c[0x0][0x28] ;
         /*0010*/                   S2R R0, SR_TID.Z ;
-        /*0020*/                   IADD3 R1, R1, -0x8, RZ ;
-        /*0030*/                   ULDC.64 UR36, c[0x0][0x118] ;
-        /*0040*/                   BSSY B0, `(.L_x_2) ;
-        /*0050*/                   S2R R3, SR_TID.Y ;
-        /*0060*/                   IADD3 R16, P1, R1, c[0x0][0x20], RZ ;
-        /*0070*/                   S2R R5, SR_TID.X ;
-        /*0080*/                   IMAD R0, R0, c[0x0][0x4], R3 ;
-        /*0090*/                   IMAD R0, R0, c[0x0][0x0], R5 ;
-        /*00a0*/                   IMAD.MOV.U32 R18, RZ, RZ, R0 ;
-        /*00b0*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
-        /*00c0*/                   ISETP.NE.AND P2, PT, R18, RZ, PT ;
-        /*00d0*/                   P2R R19, PR, RZ, 0x1 ;
-        /*00e0*/                   P2R R17, PR, RZ, 0x4 ;
-        /*00f0*/               @P0 BRA `(.L_x_3) ;
-        /*0100*/                   IMAD.MOV.U32 R0, RZ, RZ, R18 ;
-.L_x_4:
-        /*0110*/                   IMAD.MOV.U32 R3, RZ, RZ, 0x4 ;
-        /*0120*/                   IMAD.WIDE R2, R0, R3, c[0x0][0x160] ;
-        /*0130*/                   LDG.E R2, [R2.64] ;
-        /*0140*/                   IADD3 R0, R2, 0x1f, RZ ;
-        /*0150*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
-        /*0160*/              @!P0 BRA `(.L_x_4) ;
-.L_x_3:
-        /*0170*/                   BSYNC B0 ;
-.L_x_2:
-        /*0180*/                   ISETP.NE.AND P0, PT, R17, RZ, PT ;
-        /*0190*/                   BSSY B6, `(.L_x_5) ;
-        /*01a0*/                   IMAD.X R2, RZ, RZ, c[0x0][0x24], P1 ;
-        /*01b0*/               @P0 BRA `(.L_x_0) ;
-        /*01c0*/                   STL [R1], R0 ;
-        /*01d0*/                   UMOV UR4, 32@lo($str) ;
-        /*01e0*/                   IMAD.MOV.U32 R6, RZ, RZ, R16 ;
-        /*01f0*/                   UMOV UR5, 32@hi($str) ;
-        /*0200*/                   IMAD.MOV.U32 R7, RZ, RZ, R2 ;
-        /*0210*/                   MOV R4, UR4 ;
-        /*0220*/                   IMAD.U32 R5, RZ, RZ, UR5 ;
-        /*0230*/                   MOV R20, 32@lo((_Z15read_random_arrPii + .L_x_0@srel)) ;
-        /*0240*/                   MOV R21, 32@hi((_Z15read_random_arrPii + .L_x_0@srel)) ;
-        /*0250*/                   CALL.ABS.NOINC `(vprintf) ;
+        /*0020*/                   S2R R3, SR_TID.Y ;
+        /*0030*/                   S2R R5, SR_TID.X ;
+        /*0040*/                   IMAD R0, R0, c[0x0][0x4], R3 ;
+        /*0050*/                   IMAD R0, R0, c[0x0][0x0], R5 ;
+        /*0060*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
+        /*0070*/               @P0 EXIT ;
+        /*0080*/                   EXIT ;
 .L_x_0:
-        /*0260*/                   BSYNC B6 ;
-.L_x_5:
-        /*0270*/                   ISETP.NE.AND P6, PT, R19, RZ, PT ;
-        /*0280*/                   BSSY B0, `(.L_x_6) ;
-        /*0290*/               @P6 BRA `(.L_x_7) ;
-.L_x_8:
-        /*02a0*/                   IMAD.MOV.U32 R5, RZ, RZ, 0x4 ;
-        /*02b0*/                   IMAD.WIDE R4, R18, R5, c[0x0][0x160] ;
-        /*02c0*/                   LDG.E R4, [R4.64] ;
-        /*02d0*/                   IADD3 R18, R4, 0x1f, RZ ;
-        /*02e0*/                   ISETP.GE.AND P0, PT, R18, c[0x0][0x168], PT ;
-        /*02f0*/              @!P0 BRA `(.L_x_8) ;
-.L_x_7:
-        /*0300*/                   BSYNC B0 ;
-.L_x_6:
-        /*0310*/                   ISETP.NE.AND P0, PT, R17, RZ, PT ;
-        /*0320*/               @P0 EXIT ;
-        /*0330*/                   STL [R1], R18 ;
-        /*0340*/                   UMOV UR4, 32@lo($str) ;
-        /*0350*/                   IMAD.MOV.U32 R6, RZ, RZ, R16 ;
-        /*0360*/                   UMOV UR5, 32@hi($str) ;
-        /*0370*/                   MOV R7, R2 ;
-        /*0380*/                   IMAD.U32 R4, RZ, RZ, UR4 ;
-        /*0390*/                   MOV R20, 32@lo((_Z15read_random_arrPii + .L_x_1@srel)) ;
-        /*03a0*/                   IMAD.U32 R5, RZ, RZ, UR5 ;
-        /*03b0*/                   MOV R21, 32@hi((_Z15read_random_arrPii + .L_x_1@srel)) ;
-        /*03c0*/                   CALL.ABS.NOINC `(vprintf) ;
+        /*0090*/                   BRA `(.L_x_0);
+        /*00a0*/                   NOP;
+        /*00b0*/                   NOP;
+        /*00c0*/                   NOP;
+        /*00d0*/                   NOP;
+        /*00e0*/                   NOP;
+        /*00f0*/                   NOP;
+        /*0100*/                   NOP;
+        /*0110*/                   NOP;
+        /*0120*/                   NOP;
+        /*0130*/                   NOP;
+        /*0140*/                   NOP;
+        /*0150*/                   NOP;
+        /*0160*/                   NOP;
+        /*0170*/                   NOP;
 .L_x_1:
-        /*03d0*/                   EXIT ;
-.L_x_9:
-        /*03e0*/                   BRA `(.L_x_9);
-        /*03f0*/                   NOP;
-        /*0400*/                   NOP;
-        /*0410*/                   NOP;
-        /*0420*/                   NOP;
-        /*0430*/                   NOP;
-        /*0440*/                   NOP;
-        /*0450*/                   NOP;
-        /*0460*/                   NOP;
-        /*0470*/                   NOP;
-.L_x_10:
-
-
-//--------------------- .nv.global.init           --------------------------
-	.section	.nv.global.init,"aw",@progbits
-.nv.global.init:
-	.type		$str,@object
-	.size		$str,(.L_1 - $str)
-$str:
-        /*0000*/ 	.byte	0x69, 0x3d, 0x25, 0x64, 0x0a, 0x00
-.L_1:
-
-
-//--------------------- SYMBOLS --------------------------
-
-	.type		vprintf,@function
