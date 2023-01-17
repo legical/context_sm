@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     int Index = 0, ARR_SIZE = 1024 * 1024 * 1024, EXEC_TIMES = 1000, inter_cycle = 8;
     // 获取文件名
     char *filename;
-    filename = (char *)malloc(sizeof(char) * 128);
+    filename = (char *)malloc(sizeof(char) * 256);
     // get option
     int para_num = getopt(argc, argv, Index, EXEC_TIMES, ARR_SIZE, filename, inter_cycle);
     // printf("You have entered %d parameter.\n", para_num);
