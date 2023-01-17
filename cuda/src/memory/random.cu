@@ -116,7 +116,8 @@ int main(int argc, char *argv[])
         // 保存每一次生成的random_num
         random_num_arr[i] = random_num;
 
-        printf("Run for the %d time, the execution time is %.6f ms.\n", i + 1, elapsedTime[i]);
+        // printf("Run for the %d time, the execution time is %.6f ms.\n", i + 1, elapsedTime[i]);
+        printf("%5d.\t%.6f\t%p\t%p\n", i + 1, elapsedTime[i], arr + random_num, arr_gpu);
         // cudaDeviceSynchronize();
     }
 

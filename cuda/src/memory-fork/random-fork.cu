@@ -1,6 +1,6 @@
 #include "myutil.hpp"
 #include "util.cuh"
-int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, char *filename, int inter_cycle)
+int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, char *filename, int &inter_cycle)
 {
     if (argc > 1)
     {
@@ -8,11 +8,9 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
 
         if (argc > 2)
         {
-            EXEC_TIMES = str_to_int(argv[2]);
-            // if (argc > 3)
-            // {
-            //     ARR_SIZE = str_to_int(argv[3]);
-            // }
+            int times = str_to_int(argv[2]);
+            EXEC_TIMES = (times / 20) * 20;
+            inter_cycle = times % 20;
         }
     }
     char path[96];
@@ -25,12 +23,12 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
      */
     if (argc > 3)
     {
-        sprintf(filename, "%s/src/memory-fork/output/2-Ran%d-%d-%s.csv",
+        sprintf(filename, "%s/src/memory-fork/output/2-Ran%d-inner%d-%s.csv",
                 dirname(path), EXEC_TIMES, inter_cycle, argv[3]);
     }
     else
     {
-        sprintf(filename, "%s/src/memory-fork/output/2-Ran%d-%d.csv",
+        sprintf(filename, "%s/src/memory-fork/output/2-Ran%d-inner%d.csv",
                 dirname(path), EXEC_TIMES, inter_cycle);
     }
     return argc - 1;
@@ -39,16 +37,13 @@ int getopt(int argc, char *argv[], int &Index, int &EXEC_TIMES, int &ARR_SIZE, c
 __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE, const int inter_cycle)
 {
     uint32_t threadid = getThreadIdInBlock();
-    long long num = threadid;
+    uint32_t num = threadid;
 #pragma unroll
-    for (int j = 0; j < 2; j++)
+    for (int j = 0; j < inter_cycle; j++)
     {
-        int i = threadid;
-        // #pragma unroll
-        while (i < ARR_SIZE)
+        for (int i = threadid; i < ARR_SIZE; i += 32)
         {
             arr_gpu[i] += ++num;
-            i += 32;
         }
     }
 }
@@ -167,7 +162,8 @@ int main(int argc, char *argv[])
     }
     // elapsedTime ms; elapsedTime*1000 μS
     fprintf(fp, "%d,%f,%p,%p\n", Index, elapsedTime, arr, arr_gpu);
-    printf("%d. Exec_time: %.6fms \t arr_addr:%p\t GPU_addr:%p\n", Index, elapsedTime, arr, arr_gpu);
+    // printf("%5d. Exec_time: %.6fms \t arr_addr:%p\t GPU_addr:%p\n", Index, elapsedTime, arr, arr_gpu);
+    printf("%5d.\t%.6f\t%p\t%p\n", Index, elapsedTime, arr, arr_gpu);
     fclose(fp);
 
     // 输出运行时间信息

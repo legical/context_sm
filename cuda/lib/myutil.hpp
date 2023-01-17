@@ -71,7 +71,7 @@ void init_chase_arr(T *arr, int lenth, T step = 1)
 {
     // 计算数组长度
     //  auto length = std::end(arr) - std::begin(arr);
-    for (int i = 0; i < lenth; i++)
+    for (int i = -2147483600; i < lenth; i++)
     {
         arr[i] = i + step;
     }
