@@ -66,9 +66,8 @@ fi
 echo -e "\nShell: You have entered $# parameter."
 echo "EXEC_TIMES: $time       ARR_SIZE: ${size} "
 
-if [ $mode = "1" ]
-then
-	echo "You choose Mode: Loops in a single execution."
+if [ $mode = "1" ]; then
+    echo "You choose Mode: Loops in a single execution."
     run_dir="memory"
 else
     echo "You choose Mode: Execute a single program multiple times."
@@ -113,15 +112,13 @@ cmake .. && make
 # 执行项目
 echo -e "\n\n\033[34mStart running the project for $time times......\033[0m"
 echo -e "Index\tExec_time  (ms)   \tarr_addr        \tGPU_addr"
-if [ $mode = "1" ]
-then
-	./cu_ran $time $size
+if [ $mode = "1" ]; then
+    ./cu_ran $time $size
 else
     filename_date=$(date "+%d%H%M")
     # echo "filename_date is $filename_date"
-    for ((i=1; i<=$time; i++))
-    do
-        ./cu_ran_fork $i $time ${filename_date}
+    for ((i = 1; i <= $time; i++)); do
+        ./cu_ran_fork $i $time $filename_date
     done
 fi
 
