@@ -13,6 +13,7 @@ __global__ void read_random_arr(int *arr_gpu, const int ARR_SIZE/*, const int in
         {
             i = arr_gpu[i] + 31;
         }
+        printf("i=%d\n",i);
         // for (int i = threadid; i < ARR_SIZE; i += 32)
         // {
         //     arr_gpu[i] |= i & 1;
