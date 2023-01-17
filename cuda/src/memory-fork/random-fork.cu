@@ -92,10 +92,8 @@ int main(int argc, char *argv[])
     gpuErrAssert(cudaHostAlloc((void **)&l2,
                                L2size * sizeof(int),
                                cudaHostAllocDefault));
-    printf("allocate\n");
     init_chase_arr<int>(arr, ARR_SIZE, 1);
     init_arr<int>(l2, L2size, 0);
-    printf("init\n");
 
     // allocate & copy L2 cache refresh memory
     gpuErrAssert(cudaMalloc((void **)&l2_gpu, L2size * sizeof(int)));
