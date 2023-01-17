@@ -11,8 +11,8 @@
         /*0030*/ 	.byte	0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         /*0040*/ 	.byte	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         /*0048*/ 	.dword	_Z15read_random_arrPii
-        /*0050*/ 	.byte	0x70, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x00, 0x00, 0x00, 0x04, 0x10, 0x00
-        /*0060*/ 	.byte	0x00, 0x00, 0x0c, 0x81, 0x80, 0x80, 0x28, 0x08, 0x04, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00
+        /*0050*/ 	.byte	0x70, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x04, 0x00, 0x00, 0x00, 0x04, 0x08, 0x00
+        /*0060*/ 	.byte	0x00, 0x00, 0x0c, 0x81, 0x80, 0x80, 0x28, 0x08, 0x04, 0x50, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00
 
 
 //--------------------- .nv.info                  --------------------------
@@ -153,16 +153,20 @@
 
 	//   ....[0]....
 .L_20:
-        /*004c*/ 	.word	0x00000470
+        /*004c*/ 	.word	0x000004c0
+
+
+	//   ....[1]....
+        /*0050*/ 	.word	0x00000570
 
 
 	//----- nvinfo : EIATTR_CRS_STACK_SIZE
 	.align		4
 .L_21:
-        /*0050*/ 	.byte	0x04, 0x1e
-        /*0052*/ 	.short	(.L_23 - .L_22)
+        /*0054*/ 	.byte	0x04, 0x1e
+        /*0056*/ 	.short	(.L_23 - .L_22)
 .L_22:
-        /*0054*/ 	.word	0x00000000
+        /*0058*/ 	.word	0x00000000
 .L_23:
 
 
@@ -199,112 +203,130 @@
 	.align	128
         .global         _Z15read_random_arrPii
         .type           _Z15read_random_arrPii,@function
-        .size           _Z15read_random_arrPii,(.L_x_13 - _Z15read_random_arrPii)
+        .size           _Z15read_random_arrPii,(.L_x_15 - _Z15read_random_arrPii)
         .other          _Z15read_random_arrPii,@"STO_CUDA_ENTRY STV_DEFAULT"
 _Z15read_random_arrPii:
 .text._Z15read_random_arrPii:
         /*0000*/                   IMAD.MOV.U32 R1, RZ, RZ, c[0x0][0x28] ;
         /*0010*/                   S2R R0, SR_TID.Z ;
-        /*0020*/                   ULDC.64 UR36, c[0x0][0x118] ;
-        /*0030*/                   BSSY B0, `(.L_x_3) ;
-        /*0040*/                   IADD3 R1, R1, -0x8, RZ ;
+        /*0020*/                   IADD3 R1, R1, -0x8, RZ ;
+        /*0030*/                   ULDC.64 UR36, c[0x0][0x118] ;
+        /*0040*/                   BSSY B0, `(.L_x_3) ;
         /*0050*/                   S2R R3, SR_TID.Y ;
-        /*0060*/                   S2R R5, SR_TID.X ;
-        /*0070*/                   IMAD R0, R0, c[0x0][0x4], R3 ;
-        /*0080*/                   IMAD R0, R0, c[0x0][0x0], R5 ;
-        /*0090*/                   IMAD.MOV.U32 R18, RZ, RZ, R0 ;
-        /*00a0*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
-        /*00b0*/                   P2R R17, PR, RZ, 0x1 ;
-        /*00c0*/               @P0 BRA `(.L_x_4) ;
-        /*00d0*/                   IMAD.MOV.U32 R0, RZ, RZ, R18 ;
+        /*0060*/                   IADD3 R16, P1, R1, c[0x0][0x20], RZ ;
+        /*0070*/                   S2R R5, SR_TID.X ;
+        /*0080*/                   IMAD R0, R0, c[0x0][0x4], R3 ;
+        /*0090*/                   IMAD R0, R0, c[0x0][0x0], R5 ;
+        /*00a0*/                   IMAD.MOV.U32 R18, RZ, RZ, R0 ;
+        /*00b0*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
+        /*00c0*/                   ISETP.NE.AND P2, PT, R18, RZ, PT ;
+        /*00d0*/                   P2R R19, PR, RZ, 0x1 ;
+        /*00e0*/                   P2R R17, PR, RZ, 0x4 ;
+        /*00f0*/               @P0 BRA `(.L_x_4) ;
+        /*0100*/                   IMAD.MOV.U32 R0, RZ, RZ, R18 ;
 .L_x_5:
-        /*00e0*/                   IMAD.MOV.U32 R3, RZ, RZ, 0x4 ;
-        /*00f0*/                   IMAD.WIDE R2, R0, R3, c[0x0][0x160] ;
-        /*0100*/                   LDG.E R2, [R2.64] ;
-        /*0110*/                   IADD3 R0, R2, 0x1f, RZ ;
-        /*0120*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
-        /*0130*/              @!P0 BRA `(.L_x_5) ;
+        /*0110*/                   IMAD.MOV.U32 R3, RZ, RZ, 0x4 ;
+        /*0120*/                   IMAD.WIDE R2, R0, R3, c[0x0][0x160] ;
+        /*0130*/                   LDG.E R2, [R2.64] ;
+        /*0140*/                   IADD3 R0, R2, 0x1f, RZ ;
+        /*0150*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
+        /*0160*/              @!P0 BRA `(.L_x_5) ;
 .L_x_4:
-        /*0140*/                   BSYNC B0 ;
+        /*0170*/                   BSYNC B0 ;
 .L_x_3:
-        /*0150*/                   STL [R1], R0 ;
-        /*0160*/                   IADD3 R16, P0, R1, c[0x0][0x20], RZ ;
-        /*0170*/                   UMOV UR38, 32@lo($str) ;
-        /*0180*/                   MOV R20, 32@lo((_Z15read_random_arrPii + .L_x_0@srel)) ;
-        /*0190*/                   UMOV UR39, 32@hi($str) ;
-        /*01a0*/                   IADD3.X R2, RZ, c[0x0][0x24], RZ, P0, !PT ;
-        /*01b0*/                   IMAD.U32 R4, RZ, RZ, UR38 ;
-        /*01c0*/                   MOV R21, 32@hi((_Z15read_random_arrPii + .L_x_0@srel)) ;
-        /*01d0*/                   IMAD.U32 R5, RZ, RZ, UR39 ;
-        /*01e0*/                   MOV R7, R2 ;
-        /*01f0*/                   IMAD.MOV.U32 R6, RZ, RZ, R16 ;
-        /*0200*/                   CALL.ABS.NOINC `(vprintf) ;
+        /*0180*/                   ISETP.NE.AND P0, PT, R17, RZ, PT ;
+        /*0190*/                   BSSY B6, `(.L_x_6) ;
+        /*01a0*/                   IMAD.X R2, RZ, RZ, c[0x0][0x24], P1 ;
+        /*01b0*/               @P0 BRA `(.L_x_0) ;
+        /*01c0*/                   STL [R1], R0 ;
+        /*01d0*/                   UMOV UR4, 32@lo($str) ;
+        /*01e0*/                   IMAD.MOV.U32 R6, RZ, RZ, R16 ;
+        /*01f0*/                   UMOV UR5, 32@hi($str) ;
+        /*0200*/                   IMAD.MOV.U32 R7, RZ, RZ, R2 ;
+        /*0210*/                   MOV R4, UR4 ;
+        /*0220*/                   IMAD.U32 R5, RZ, RZ, UR5 ;
+        /*0230*/                   MOV R20, 32@lo((_Z15read_random_arrPii + .L_x_0@srel)) ;
+        /*0240*/                   MOV R21, 32@hi((_Z15read_random_arrPii + .L_x_0@srel)) ;
+        /*0250*/                   CALL.ABS.NOINC `(vprintf) ;
 .L_x_0:
-        /*0210*/                   ISETP.NE.AND P6, PT, R17, RZ, PT ;
-        /*0220*/                   BSSY B0, `(.L_x_6) ;
-        /*0230*/                   IMAD.MOV.U32 R0, RZ, RZ, R18 ;
-        /*0240*/               @P6 BRA `(.L_x_7) ;
-        /*0250*/                   IMAD.MOV.U32 R0, RZ, RZ, R18 ;
-.L_x_8:
-        /*0260*/                   IMAD.MOV.U32 R5, RZ, RZ, 0x4 ;
-        /*0270*/                   IMAD.WIDE R4, R0, R5, c[0x0][0x160] ;
-        /*0280*/                   LDG.E R4, [R4.64] ;
-        /*0290*/                   IADD3 R0, R4, 0x1f, RZ ;
-        /*02a0*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
-        /*02b0*/              @!P0 BRA `(.L_x_8) ;
-.L_x_7:
-        /*02c0*/                   BSYNC B0 ;
+        /*0260*/                   BSYNC B6 ;
 .L_x_6:
-        /*02d0*/                   STL [R1], R0 ;
-        /*02e0*/                   MOV R4, UR38 ;
-        /*02f0*/                   IMAD.U32 R5, RZ, RZ, UR39 ;
-        /*0300*/                   MOV R20, 32@lo((_Z15read_random_arrPii + .L_x_1@srel)) ;
-        /*0310*/                   IMAD.MOV.U32 R6, RZ, RZ, R16 ;
-        /*0320*/                   MOV R21, 32@hi((_Z15read_random_arrPii + .L_x_1@srel)) ;
-        /*0330*/                   IMAD.MOV.U32 R7, RZ, RZ, R2 ;
-        /*0340*/                   CALL.ABS.NOINC `(vprintf) ;
-.L_x_1:
-        /*0350*/                   ISETP.NE.AND P6, PT, R17, RZ, PT ;
-        /*0360*/                   BSSY B0, `(.L_x_9) ;
-        /*0370*/               @P6 BRA `(.L_x_10) ;
-.L_x_11:
-        /*0380*/                   MOV R5, 0x4 ;
-        /*0390*/                   IMAD.WIDE R4, R18, R5, c[0x0][0x160] ;
-        /*03a0*/                   LDG.E R4, [R4.64] ;
-        /*03b0*/                   IADD3 R18, R4, 0x1f, RZ ;
-        /*03c0*/                   ISETP.GE.AND P0, PT, R18, c[0x0][0x168], PT ;
-        /*03d0*/              @!P0 BRA `(.L_x_11) ;
-.L_x_10:
-        /*03e0*/                   BSYNC B0 ;
+        /*0270*/                   ISETP.NE.AND P6, PT, R19, RZ, PT ;
+        /*0280*/                   BSSY B0, `(.L_x_7) ;
+        /*0290*/                   IMAD.MOV.U32 R0, RZ, RZ, R18 ;
+        /*02a0*/               @P6 BRA `(.L_x_8) ;
+        /*02b0*/                   IMAD.MOV.U32 R0, RZ, RZ, R18 ;
 .L_x_9:
-        /*03f0*/                   STL [R1], R18 ;
-        /*0400*/                   IMAD.MOV.U32 R6, RZ, RZ, R16 ;
-        /*0410*/                   MOV R4, UR38 ;
-        /*0420*/                   IMAD.MOV.U32 R7, RZ, RZ, R2 ;
-        /*0430*/                   MOV R20, 32@lo((_Z15read_random_arrPii + .L_x_2@srel)) ;
-        /*0440*/                   IMAD.U32 R5, RZ, RZ, UR39 ;
-        /*0450*/                   MOV R21, 32@hi((_Z15read_random_arrPii + .L_x_2@srel)) ;
-        /*0460*/                   CALL.ABS.NOINC `(vprintf) ;
-.L_x_2:
-        /*0470*/                   EXIT ;
-.L_x_12:
-        /*0480*/                   BRA `(.L_x_12);
-        /*0490*/                   NOP;
-        /*04a0*/                   NOP;
-        /*04b0*/                   NOP;
-        /*04c0*/                   NOP;
-        /*04d0*/                   NOP;
-        /*04e0*/                   NOP;
-        /*04f0*/                   NOP;
-        /*0500*/                   NOP;
-        /*0510*/                   NOP;
-        /*0520*/                   NOP;
-        /*0530*/                   NOP;
-        /*0540*/                   NOP;
-        /*0550*/                   NOP;
-        /*0560*/                   NOP;
-        /*0570*/                   NOP;
+        /*02c0*/                   IMAD.MOV.U32 R5, RZ, RZ, 0x4 ;
+        /*02d0*/                   IMAD.WIDE R4, R0, R5, c[0x0][0x160] ;
+        /*02e0*/                   LDG.E R4, [R4.64] ;
+        /*02f0*/                   IADD3 R0, R4, 0x1f, RZ ;
+        /*0300*/                   ISETP.GE.AND P0, PT, R0, c[0x0][0x168], PT ;
+        /*0310*/              @!P0 BRA `(.L_x_9) ;
+.L_x_8:
+        /*0320*/                   BSYNC B0 ;
+.L_x_7:
+        /*0330*/                   ISETP.NE.AND P0, PT, R17, RZ, PT ;
+        /*0340*/                   BSSY B6, `(.L_x_10) ;
+        /*0350*/               @P0 BRA `(.L_x_1) ;
+        /*0360*/                   STL [R1], R0 ;
+        /*0370*/                   UMOV UR4, 32@lo($str) ;
+        /*0380*/                   MOV R6, R16 ;
+        /*0390*/                   UMOV UR5, 32@hi($str) ;
+        /*03a0*/                   IMAD.MOV.U32 R7, RZ, RZ, R2 ;
+        /*03b0*/                   MOV R20, 32@lo((_Z15read_random_arrPii + .L_x_1@srel)) ;
+        /*03c0*/                   IMAD.U32 R4, RZ, RZ, UR4 ;
+        /*03d0*/                   MOV R21, 32@hi((_Z15read_random_arrPii + .L_x_1@srel)) ;
+        /*03e0*/                   IMAD.U32 R5, RZ, RZ, UR5 ;
+        /*03f0*/                   CALL.ABS.NOINC `(vprintf) ;
+.L_x_1:
+        /*0400*/                   BSYNC B6 ;
+.L_x_10:
+        /*0410*/                   ISETP.NE.AND P6, PT, R19, RZ, PT ;
+        /*0420*/                   BSSY B0, `(.L_x_11) ;
+        /*0430*/               @P6 BRA `(.L_x_12) ;
 .L_x_13:
+        /*0440*/                   IMAD.MOV.U32 R5, RZ, RZ, 0x4 ;
+        /*0450*/                   IMAD.WIDE R4, R18, R5, c[0x0][0x160] ;
+        /*0460*/                   LDG.E R4, [R4.64] ;
+        /*0470*/                   IADD3 R18, R4, 0x1f, RZ ;
+        /*0480*/                   ISETP.GE.AND P0, PT, R18, c[0x0][0x168], PT ;
+        /*0490*/              @!P0 BRA `(.L_x_13) ;
+.L_x_12:
+        /*04a0*/                   BSYNC B0 ;
+.L_x_11:
+        /*04b0*/                   ISETP.NE.AND P0, PT, R17, RZ, PT ;
+        /*04c0*/               @P0 EXIT ;
+        /*04d0*/                   STL [R1], R18 ;
+        /*04e0*/                   UMOV UR4, 32@lo($str) ;
+        /*04f0*/                   MOV R6, R16 ;
+        /*0500*/                   UMOV UR5, 32@hi($str) ;
+        /*0510*/                   IMAD.MOV.U32 R7, RZ, RZ, R2 ;
+        /*0520*/                   MOV R20, 32@lo((_Z15read_random_arrPii + .L_x_2@srel)) ;
+        /*0530*/                   IMAD.U32 R4, RZ, RZ, UR4 ;
+        /*0540*/                   MOV R21, 32@hi((_Z15read_random_arrPii + .L_x_2@srel)) ;
+        /*0550*/                   IMAD.U32 R5, RZ, RZ, UR5 ;
+        /*0560*/                   CALL.ABS.NOINC `(vprintf) ;
+.L_x_2:
+        /*0570*/                   EXIT ;
+.L_x_14:
+        /*0580*/                   BRA `(.L_x_14);
+        /*0590*/                   NOP;
+        /*05a0*/                   NOP;
+        /*05b0*/                   NOP;
+        /*05c0*/                   NOP;
+        /*05d0*/                   NOP;
+        /*05e0*/                   NOP;
+        /*05f0*/                   NOP;
+        /*0600*/                   NOP;
+        /*0610*/                   NOP;
+        /*0620*/                   NOP;
+        /*0630*/                   NOP;
+        /*0640*/                   NOP;
+        /*0650*/                   NOP;
+        /*0660*/                   NOP;
+        /*0670*/                   NOP;
+.L_x_15:
 
 
 //--------------------- .nv.global.init           --------------------------
