@@ -112,7 +112,7 @@ cmake .. && make
 
 # 执行项目
 echo -e "\n\n\033[34mStart running the project for $time times......\033[0m"
-echo -e "Index\tExec_time  (ms)\tarr_addr        \tGPU_addr"
+echo -e "Index\tExec_time  (ms)   \tarr_addr        \tGPU_addr"
 if [ $mode = "1" ]
 then
 	./cu_ran $time $size
@@ -121,7 +121,7 @@ else
     # echo "filename_date is $filename_date"
     for ((i=1; i<=$time; i++))
     do
-        ./cu_ran_fork $i $time "$filename_date"
+        ./cu_ran_fork $i $time ${filename_date}
     done
 fi
 
