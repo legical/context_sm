@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# example: ./run.sh mode=2 EXEC_time=1000 ARR_size=1G
+# example: ./run.sh mode=2 EXEC_time=1004 ARR_size=102400
 # mode1:单个程序里有多个循环    mode2:多次运行一个程序
 script_dir=$(
     cd $(dirname $0)
