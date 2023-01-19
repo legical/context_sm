@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# example: ./run.sh mode=2 EXEC_time=1000 ARR_size=1G
+# example: ./run.sh mode=2 EXEC_time=1004 ARR_size=102400
 # mode1:单个程序里有多个循环    mode2:多次运行一个程序
 script_dir=$(
     cd $(dirname $0)
@@ -49,6 +49,7 @@ function del_extra_file() {
 
 # 获取参数
 time=1000
+inner=0
 size=1073741824
 # 1-单词程序多循环 2-多次程序
 mode=1
@@ -58,7 +59,8 @@ if [ $# ] >0; then
     mode=$1
 fi
 if [ $# ] >1; then
-    time=$2
+    inner=$(($2%20))
+    time=$(($2-$inner))
 fi
 if [ $# ] >2; then
     size=$3
@@ -110,7 +112,7 @@ cmake .. && make
 # isGoon
 
 # 执行项目
-echo -e "\n\n\033[34mStart running the project for $time times......\033[0m"
+echo -e "\n\n\033[34mStart running the project for $time times, inner cycle: $inner \033[0m"
 echo -e "Index\tExec_time(ms)\tarr_addr\tGPU_addr"
 if [ $mode = "1" ]; then
     ./cu_ran $time $size
@@ -118,7 +120,7 @@ else
     filename_date=$(date "+%d%H%M")
     # echo "filename_date is $filename_date"
     for ((i = 1; i <= $time; i++)); do
-        ./cu_ran_fork $i $time $filename_date
+        ./cu_ran_fork $i $2 $filename_date
     done
 fi
 

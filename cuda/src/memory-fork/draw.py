@@ -18,6 +18,18 @@ def readname():
     return csv
 
 
+def get_inner(filename):
+    i = filename.find('inner')
+    if i > 0:
+        tail = filename.find('-', i, i+9)
+        if tail > 0:
+            return int(filename[i+5:tail])
+        else:
+            tail = filename.find('.', i, i+9)
+            return int(filename[i+5:tail])
+    return 1
+
+
 # def get_data(filename, IDlist, EXEClist, minax, GPU_addr_list):
 #     IDlist, EXEClist = np.loadtxt(
 #         filename, dtype=float, delimiter=',', skiprows=1, usecols=(0, 1), unpack=True)
@@ -34,6 +46,8 @@ def readname():
 csvlist = readname()
 # print(csvlist)
 for file in csvlist:
+    # 内部循环次数
+    inner = get_inner(file)
     filename = './output/'+file
     # print("\n",filename)
     # 图片dpi=220，尺寸宽和高，单位为英寸
@@ -84,9 +98,9 @@ for file in csvlist:
 
     plt.tick_params(labelsize=32)  # 刻度字体大小
     # plt.title('执行时间折线图')  # 折线图标题
-    chart_title = 'min={}   max={}   avg={} mS   ||  times={}   addr_num={}   GPU_addr_num={}'
+    chart_title = 'min={}   max={}   avg={} mS   ||  times={}  inner_cycle={}  ||  addr_num={}   GPU_addr_num={}'
     plt.title(chart_title.format(
-        minax[0], minax[1], minax[2], int(IDlist[-1]), minax[3], minax[4]), fontsize=46)
+        minax[0], minax[1], minax[2], int(IDlist[-1]), inner, minax[3], minax[4]), fontsize=46)
     # plt.gcf().autofmt_xdate()
     filename = filename.replace("./output/", "./output/pic/", 1)
     pic_name = filename.replace("csv", "jpg", 1)
