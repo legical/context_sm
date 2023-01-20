@@ -83,7 +83,7 @@ for file in csvlist:
     ax1.set_xlabel('Index', fontsize=36)
     ax1.set_ylabel('EXEC_time', fontsize=36)
     # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
-    ax1.legend(loc=4, fontsize=32, scatterpoints=1)
+    ax1.legend(loc=2, fontsize=32, scatterpoints=1)
     # 设置 y 轴显示网格线
     ax1.grid(axis='y')
 
