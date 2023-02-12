@@ -10,7 +10,20 @@ void parametric_measure_global(int N, int iterations, int stride, char *filename
 
 void measure_global();
 
+void GetFilename(char *filename)
+{
+    time_t timep;
+    struct tm *p;
 
+    time(&timep);          // 获取从1970至今过了多少秒，存入time_t类型的timep
+    p = localtime(&timep); // 用localtime将秒数转化为struct tm结构体
+    // 把格式化的时间写入字符数组中
+    char path[96];
+    getcwd(path, sizeof(path));
+    // printf("2.2 dir__FILE__: %s\n", dirname(path));
+    sprintf(filename, "%s/src/dissect/reference/data/L2_cache_data-%d%d%d.csv",
+                dirname(path), p->tm_hour, p->tm_min, p->tm_sec);
+}
 int main(){
 
 	cudaSetDevice(0);
@@ -30,10 +43,7 @@ void measure_global() {
 
     char *filename;
     filename = (char *)malloc(sizeof(char) * 256);
-    char path[96];
-    getcwd(path, sizeof(path));
-    sprintf(filename, "%s/src/dissect/reference/data/L2cachedata.csv",
-                dirname(path));
+    GetFilename(filename);
 
 	N = 1024 * 1024* 1024/sizeof(unsigned int); //in element
 	for (stride = 1; stride <= N/2; stride*=2) {
@@ -110,7 +120,7 @@ void parametric_measure_global(int N, int iterations, int stride, char *filename
             exit(EXIT_FAILURE);
         }
         // 标题
-        fprintf(fp, "Index,Exec_time\n");
+        fprintf(fp, "Index,Exec_time,stride\n");
         fclose(fp);
     }
 
@@ -126,7 +136,7 @@ void parametric_measure_global(int N, int iterations, int stride, char *filename
     }
 
 	for(i=0;i<256;i++){
-        fprintf(fp, "%d,%d\n", h_index[i], h_timeinfo[i]);
+        fprintf(fp, "%d,%d,%d\n", h_index[i], h_timeinfo[i],stride);
         printf("%d\t %d\n", h_index[i], h_timeinfo[i]);
     }
 	fclose(fp);	
