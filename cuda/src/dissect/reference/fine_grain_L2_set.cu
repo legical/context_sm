@@ -3,12 +3,6 @@
 
 // compile nvcc *.cu -o test
 
-__global__ void global_latency(unsigned int *my_array, int array_length, int iterations, const int it, unsigned int *duration, unsigned int *index);
-
-void parametric_measure_global(int N, int iterations, int stride, char *filename);
-
-void measure_global(size_t L2size);
-
 void GetFilename(char *filename)
 {
     time_t timep;
@@ -23,56 +17,44 @@ void GetFilename(char *filename)
     sprintf(filename, "%s/src/dissect/reference/data/L2_cache_data-%d%d%d.csv",
             dirname(path), p->tm_hour, p->tm_min, p->tm_sec);
 }
-int main()
+
+__global__ void global_latency(unsigned int *my_array, int array_length, int iterations, unsigned int *duration, unsigned int *index)
 {
+    const int it = 4096;
+    unsigned int start_time, end_time;
+    unsigned int j = 0, k = 0;
+    // const int it = 4096;
 
-    cudaSetDevice(0);
-    // get GPU L2 cache size
-    int device_id = 0;
-    cudaDeviceProp prop;
-    cudaSetDevice(device_id);
-    gpuErrAssert(cudaGetDeviceProperties(&prop, device_id));
-    size_t L2size = prop.l2CacheSize;
+    __shared__ unsigned int s_tvalue[it];
+    __shared__ unsigned int s_index[it];
 
-    measure_global(L2size);
-
-    cudaDeviceReset();
-    return 0;
-}
-
-void measure_global(size_t L2size)
-{
-
-    int N, iterations, stride;
-    // stride in element
-    iterations = 1;
-
-    char *filename;
-    filename = (char *)malloc(sizeof(char) * 256);
-    GetFilename(filename);
-
-    N = L2size / sizeof(unsigned int); // in element
-    // for (stride = 1; stride <= N/2; stride*=2) {
-    // 	printf("\n=====%d GB array, cold cache miss, read 256 element====\n", N/1024/1024/1024);
-    // 	printf("Stride = %d element, %d bytes\n", stride, stride * sizeof(unsigned int));
-    // 	parametric_measure_global(N, iterations, stride ,filename);
-    // 	printf("===============================================\n\n");
-    // }
-
-    // stage1: overflow with 1 element
-    // stride = 1; // in element
-    // for (N = 3073; N <=3073; N += stride) {
-    // 	parametric_measure_global(N, iterations, stride ,filename);
-    // }
-
-    // stage2: overflow with cache lines
-    stride = 8; // in element
-    for (int size_N = N; size_N <= N + 128; size_N += stride)
+    for (k = 0; k < it; k++)
     {
-        parametric_measure_global(size_N, iterations, stride, filename);
+        s_index[k] = 0;
+        s_tvalue[k] = 0;
     }
 
-    free(filename);
+    /* for loop 4096 times */
+    for (k = 0; k < it; k++)
+    {
+        start_time = clock();
+
+        j = my_array[j];
+        s_index[k] = j;
+        end_time = clock();
+
+        /* record execution time */
+        s_tvalue[k] = end_time - start_time;
+    }
+
+    my_array[array_length] = j;
+    my_array[array_length + 1] = my_array[j];
+
+    for (k = 0; k < it; k++)
+    {
+        index[k] = s_index[k];
+        duration[k] = s_tvalue[k];
+    }
 }
 
 void parametric_measure_global(int N, int iterations, int stride, char *filename)
@@ -99,7 +81,7 @@ void parametric_measure_global(int N, int iterations, int stride, char *filename
     /* copy array elements from CPU to GPU */
     cudaMemcpy(d_a, h_a, sizeof(unsigned int) * N, cudaMemcpyHostToDevice);
 
-    const int it = 4096;  // 16*256
+    const int it = 4096; // 16*256
     unsigned int *h_index = (unsigned int *)malloc(sizeof(unsigned int) * it);
     unsigned int *h_timeinfo = (unsigned int *)malloc(sizeof(unsigned int) * it);
 
@@ -113,7 +95,7 @@ void parametric_measure_global(int N, int iterations, int stride, char *filename
     /* launch kernel*/
     dim3 Db = dim3(1);
     dim3 Dg = dim3(1, 1, 1);
-    global_latency<<<Dg, Db>>>(d_a, N, iterations, it, duration, d_index);
+    global_latency<<<Dg, Db>>>(d_a, N, iterations, duration, d_index);
     cudaThreadSynchronize();
 
     cudaError_t error_id = cudaGetLastError();
@@ -177,41 +159,55 @@ void parametric_measure_global(int N, int iterations, int stride, char *filename
     cudaDeviceReset();
 }
 
-__global__ void global_latency(unsigned int *my_array, int array_length, int iterations, const int it, unsigned int *duration, unsigned int *index)
+
+void measure_global(size_t L2size)
 {
 
-    unsigned int start_time, end_time;
-    unsigned int j = 0, k = 0;
-    // const int it = 4096;
+    int N, iterations, stride;
+    // stride in element
+    iterations = 1;
 
-    __shared__ unsigned int s_tvalue[it];
-    __shared__ unsigned int s_index[it];
+    char *filename;
+    filename = (char *)malloc(sizeof(char) * 256);
+    GetFilename(filename);
 
-    for (k = 0; k < it; k++)
+    N = L2size / sizeof(unsigned int); // in element
+    // for (stride = 1; stride <= N/2; stride*=2) {
+    // 	printf("\n=====%d GB array, cold cache miss, read 256 element====\n", N/1024/1024/1024);
+    // 	printf("Stride = %d element, %d bytes\n", stride, stride * sizeof(unsigned int));
+    // 	parametric_measure_global(N, iterations, stride ,filename);
+    // 	printf("===============================================\n\n");
+    // }
+
+    // stage1: overflow with 1 element
+    // stride = 1; // in element
+    // for (N = 3073; N <=3073; N += stride) {
+    // 	parametric_measure_global(N, iterations, stride ,filename);
+    // }
+
+    // stage2: overflow with cache lines
+    stride = 8; // in element
+    for (int size_N = N; size_N <= N + 128; size_N += stride)
     {
-        s_index[k] = 0;
-        s_tvalue[k] = 0;
+        parametric_measure_global(size_N, iterations, stride, filename);
     }
 
-    /* for loop 4096 times */
-    for (k = 0; k < it; k++)
-    {
-        start_time = clock();
+    free(filename);
+}
 
-        j = my_array[j];
-        s_index[k] = j;
-        end_time = clock();
+int main()
+{
 
-        /* record execution time */
-        s_tvalue[k] = end_time - start_time;
-    }
+    cudaSetDevice(0);
+    // get GPU L2 cache size
+    int device_id = 0;
+    cudaDeviceProp prop;
+    cudaSetDevice(device_id);
+    gpuErrAssert(cudaGetDeviceProperties(&prop, device_id));
+    size_t L2size = prop.l2CacheSize;
 
-    my_array[array_length] = j;
-    my_array[array_length + 1] = my_array[j];
+    measure_global(L2size);
 
-    for (k = 0; k < it; k++)
-    {
-        index[k] = s_index[k];
-        duration[k] = s_tvalue[k];
-    }
+    cudaDeviceReset();
+    return 0;
 }
