@@ -33,6 +33,7 @@ function(add_my_target target include_dir)
     target_include_directories(${target}  PUBLIC ${include_dir})
 endfunction(add_my_target)
 
+add_my_target(l2_set_test src/dissect/reference src/dissect/reference/fine_grain_L2_set.cu)
 add_my_target(l2_test src/dissect/reference src/dissect/reference/fine_grain_L2-cold_1GB.cu)
 # add_my_target(cu_ran src/memory src/memory/random.cu)
 # add_my_target(cu_ran_fork src/memory-fork src/memory-fork/random-fork.cu)
