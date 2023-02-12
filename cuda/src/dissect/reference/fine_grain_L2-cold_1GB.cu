@@ -27,7 +27,14 @@ void measure_global() {
 	int N, iterations, stride; 
 	//stride in element
 	iterations = 1;
-	char *filename = "L2cachedata.csv";
+
+    char *filename;
+    filename = (char *)malloc(sizeof(char) * 256);
+    char path[96];
+    getcwd(path, sizeof(path));
+    sprintf(filename, "%s/src/dissect/reference/data/L2cachedata.csv",
+                dirname(path));
+
 	N = 1024 * 1024* 1024/sizeof(unsigned int); //in element
 	for (stride = 1; stride <= N/2; stride*=2) {
 		printf("\n=====%d GB array, cold cache miss, read 256 element====\n", N/1024/1024/1024);
@@ -35,6 +42,8 @@ void measure_global() {
 		parametric_measure_global(N, iterations, stride ,filename);
 		printf("===============================================\n\n");
 	}
+    
+    free(filename);
 }
 
 
