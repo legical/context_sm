@@ -6,7 +6,7 @@
 __global__ void global_latency (unsigned int * my_array, int array_length, int iterations,  unsigned int * duration, unsigned int *index);
 
 
-void parametric_measure_global(int N, int iterations, int stride);
+void parametric_measure_global(int N, int iterations, int stride, char *filename);
 
 void measure_global();
 
