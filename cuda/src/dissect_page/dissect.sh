@@ -32,6 +32,8 @@ inner_cycle=448
 for ((j = 1; j <= 3; j++)); do
     # 480 512 544
     inner_cycle=$((inner_cycle + 32))
+    echo " Starting running kernel, $inner_cycle * 1024 times."
+    echo -e "Index \t Time"
     for ((i = 1; i <= 1024; i++)); do
         ./l2_dissect_test $inner_cycle $i
     done
