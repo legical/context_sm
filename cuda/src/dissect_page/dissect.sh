@@ -28,10 +28,11 @@ else
     echo -e "\033[34m.csv file output directory successfully created.\033[0m"
 fi
 
-inner_cycle=448
-for ((j = 1; j <= 3; j++)); do
-    # 480 512 544
-    inner_cycle=$((inner_cycle + 32))
+inner_cycle=426
+for ((j = 1; j <= 5; j++)); do
+    # 3060 L2 cache: 2359296B = 2.25MB = 576 * 4KB
+    # 476 526 576 626 676
+    inner_cycle=$((inner_cycle + 50))
     echo " Starting running kernel, $inner_cycle * 1024 times."
     echo -e "Index \t Time"
     for ((i = 1; i <= 1024; i++)); do
