@@ -107,9 +107,9 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     const int it = 100; // 512*100
     unsigned int *h_index = (unsigned int *)malloc(sizeof(unsigned int) * it);
 
-    long long int* h_duration;
+    long long int *h_duration;
     h_duration = (long long int *)malloc(sizeof(long long int) * 1);
-    long long int* duration;
+    long long int *duration;
     unsigned int *d_index;
     cudaMalloc((void **)&duration, sizeof(long long int) * 1);
     cudaMalloc((void **)&d_index, sizeof(unsigned int) * it);
@@ -134,7 +134,7 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     cudaMemcpy((void *)h_index, (void *)d_index, sizeof(unsigned int) * it, cudaMemcpyDeviceToHost);
     cudaMemcpy((void *)h_duration, (void *)duration, sizeof(long long int) * 1, cudaMemcpyDeviceToHost);
     cudaThreadSynchronize();
-    
+
     // printf("duration is %d. \n", h_duration[0]);
 
     // 如果输出文件不存在，则创建文件并写入标题
@@ -151,7 +151,7 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
             exit(EXIT_FAILURE);
         }
         // 标题
-        fprintf(fp, "Index,Exec_time,stride,inner_cycle\n");
+        fprintf(fp, "Index,Exec_time,stride,inner_cycle,out_cycle\n");
         fclose(fp);
     }
 
@@ -168,7 +168,7 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
 
     // for (i = 0; i < it; i++)
     // {
-    fprintf(fp, "%d,%lld,%d,%d\n", INDEX, h_duration[0], stride, inner_cycle);
+    fprintf(fp, "%d,%lld,%d,%d\n", INDEX, h_duration[0], stride, inner_cycle, it);
     printf("%d\t %lld\n", INDEX, h_duration[0]);
     // }
     fclose(fp);
