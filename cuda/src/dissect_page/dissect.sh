@@ -28,6 +28,17 @@ else
     echo -e "\033[34m.csv file output directory successfully created.\033[0m"
 fi
 
-for ((i = 1; i <= 1024; i++)); do
-    ./l2_dissect_test 512 $i
+inner_cycle=448
+for ((j = 1; j <= 3; j++)); do
+    # 480 512 544
+    inner_cycle=$((inner_cycle + 32))
+    for ((i = 1; i <= 1024; i++)); do
+        ./l2_dissect_test $inner_cycle $i
+    done
 done
+rm -rf ./*
+# git
+cd $proj_dir && cd ..
+git add .
+git commit -a -m "get data of l2_dissect_test"
+git push

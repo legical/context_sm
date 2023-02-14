@@ -57,7 +57,7 @@ __global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_
             j = my_array[j];
             s_index[k] += j & k;
         }
-        printf("%d over.\n", k);
+        // printf("%d over.\n", k);
     }
     end_time = clock64();
 
@@ -72,7 +72,7 @@ __global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_
         index[k] = s_index[k];
     }
     duration[0] = s_tvalue;
-    printf("s_tvalue is %d. \n", s_tvalue);
+    // printf("s_tvalue is %d. \n", s_tvalue);
 }
 
 void measure_cache(int inner_cycle, int INDEX, char *filename)
@@ -114,7 +114,7 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     cudaMalloc((void **)&duration, sizeof(long long int) * 1);
     cudaMalloc((void **)&d_index, sizeof(unsigned int) * it);
 
-    printf("Starting running kernel, inner cycles %d * 100\n", inner_cycle);
+    // printf("Starting running kernel, inner cycles %d * 100\n", inner_cycle);
 
     cudaThreadSynchronize();
     /* launch kernel*/
@@ -135,7 +135,7 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     cudaMemcpy((void *)h_duration, (void *)duration, sizeof(long long int) * 1, cudaMemcpyDeviceToHost);
     cudaThreadSynchronize();
     
-    printf("duration is %d. \n", h_duration[0]);
+    // printf("duration is %d. \n", h_duration[0]);
 
     // 如果输出文件不存在，则创建文件并写入标题
     if (!isFileExists(filename))
