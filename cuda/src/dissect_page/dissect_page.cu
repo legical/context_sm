@@ -30,7 +30,7 @@ void getopt(int argc, char *argv[], int &inner_cycle, int &INDEX, char *filename
             dirname(path), inner_cycle);
 }
 
-__global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_length, long long int &duration, unsigned int *index)
+__global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_length, long long int *duration, unsigned int *index)
 {
     // 2MB L2 cache : 512*32=16K
     const int it = 100;
@@ -71,7 +71,7 @@ __global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_
     {
         index[k] = s_index[k];
     }
-    duration = s_tvalue;
+    duration[0] = s_tvalue;
     printf("s_tvalue is %d. \n", s_tvalue);
 }
 
@@ -107,8 +107,11 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     const int it = 100; // 512*100
     unsigned int *h_index = (unsigned int *)malloc(sizeof(unsigned int) * it);
 
-    long long int duration = 0;
+    long long int* h_duration;
+    h_duration = (long long int *)malloc(sizeof(long long int) * 1);
+    long long int* duration;
     unsigned int *d_index;
+    cudaMalloc((void **)&duration, sizeof(long long int) * 1);
     cudaMalloc((void **)&d_index, sizeof(unsigned int) * it);
 
     printf("Starting running kernel, inner cycles %d * 100\n", inner_cycle);
@@ -119,7 +122,6 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     dim3 Dg = dim3(1, 1, 1);
     dissect_page<<<Dg, Db>>>(d_a, inner_cycle, N, duration, d_index);
     cudaThreadSynchronize();
-    printf("duration is %d. \n", duration);
 
     cudaError_t error_id = cudaGetLastError();
     if (error_id != cudaSuccess)
@@ -130,7 +132,10 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     /* copy results from GPU to CPU */
     cudaThreadSynchronize();
     cudaMemcpy((void *)h_index, (void *)d_index, sizeof(unsigned int) * it, cudaMemcpyDeviceToHost);
+    cudaMemcpy((void *)h_duration, (void *)duration, sizeof(long long int) * 1, cudaMemcpyDeviceToHost);
     cudaThreadSynchronize();
+    
+    printf("duration is %d. \n", h_duration[0]);
 
     // 如果输出文件不存在，则创建文件并写入标题
     if (!isFileExists(filename))
@@ -163,18 +168,20 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
 
     // for (i = 0; i < it; i++)
     // {
-    fprintf(fp, "%d,%lld,%d,%d\n", INDEX, duration, stride, inner_cycle);
-    printf("%d\t %lld\n", INDEX, duration);
+    fprintf(fp, "%d,%lld,%d,%d\n", INDEX, h_duration[0], stride, inner_cycle);
+    printf("%d\t %lld\n", INDEX, h_duration[0]);
     // }
     fclose(fp);
 
     /* free memory on GPU */
     cudaFree(d_a);
     cudaFree(d_index);
+    cudaFree(duration);
 
     /*free memory on CPU */
     free(h_a);
     free(h_index);
+    free(h_duration);
 
     cudaDeviceReset();
 }
