@@ -16,9 +16,7 @@ mkdir -m 754 $proj_dir/build
 # echo -e "\033[34m.csv build directory successfully created.\033[0m"
 
 cd $proj_dir/build
-# get sudo right
-echo "0923326" | sudo -S pwd
-echo -e "\n\033[34mStart compiling the project......\033[0m"
+echo -e "\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
 # 检查csv输出目录是否存在
@@ -37,9 +35,10 @@ for ((j = 1; j <= 3; j++)); do
     echo " Starting running kernel, $inner_cycle * 1024 times."
     echo -e "Index \t Time"
     for ((i = 1; i <= 1024; i++)); do
-        sudo /usr/local/cuda-11.7/bin/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee dis.log
+        # get sudo right
+        echo "0923326" | sudo -S /usr/local/cuda-11.7/bin/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee dis.log
         sudo chmod 777 $script_dir/data/Dissect-inner${inner_cycle}.csv
-        cat dis.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >> $script_dir/data/Dissect-inner${inner_cycle}.csv
+        cat dis.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >>$script_dir/data/Dissect-inner${inner_cycle}.csv
         # ./l2_dissect_test $inner_cycle $i
     done
 done
