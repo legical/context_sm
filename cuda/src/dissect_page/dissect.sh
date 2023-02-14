@@ -38,6 +38,7 @@ for ((j = 1; j <= 3; j++)); do
     echo -e "Index \t Time"
     for ((i = 1; i <= 1024; i++)); do
         sudo /usr/local/cuda-11.7/bin/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee dis.log
+        sudo chmod 777 $script_dir/data/Dissect-inner${inner_cycle}.csv
         cat dis.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >> $script_dir/data/Dissect-inner${inner_cycle}.csv
         # ./l2_dissect_test $inner_cycle $i
     done
