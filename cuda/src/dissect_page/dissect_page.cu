@@ -56,6 +56,7 @@ __global__ void dissect_page(unsigned int *my_array, int array_length, long long
             j = my_array[j];
             s_index[k] += j & k;
         }
+        printf("%d over.\n",k);
     }
     end_time = clock64();
 
