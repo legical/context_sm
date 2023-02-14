@@ -31,7 +31,8 @@ cmake .. && make
 
 # 检查csv输出目录是否存在
 rm -rf $script_dir/data
-mkdir -m 754 $script_dir/
+mkdir -m 754 $script_dir/data
+mkdir -m 754 $script_dir/data/log
 mkdir -m 754 $script_dir/data/pic
 echo -e "\033[34m.csv & pic file output directory successfully created.\033[0m"
 
@@ -44,9 +45,9 @@ for ((j = 1; j <= 5; j++)); do
     echo -e "Index \t Time"
     for ((i = 1; i <= 1024; i++)); do
         # get sudo right
-        echo "0923326" | sudo -S /usr/local/cuda-11.7/bin/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee dis.log
+        echo "0923326" | sudo -S /usr/local/cuda-11.7/bin/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data/log/dis-${inner_cycle}.log
         sudo chmod 777 $script_dir/data/Dissect-inner${inner_cycle}.csv
-        cat dis.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >>$script_dir/data/Dissect-inner${inner_cycle}.csv
+        tail -n 4 $script_dir/data/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >>$script_dir/data/Dissect-inner${inner_cycle}.csv
         # ./l2_dissect_test $inner_cycle $i
     done
 done
