@@ -65,7 +65,7 @@ __global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_
     s_tvalue = end_time - start_time;
 
     my_array[array_length] = j;
-    my_array[array_length + 1] = my_array[j];
+    // my_array[array_length + 1] = my_array[j];
 
     for (k = 0; k < it; k++)
     {
