@@ -27,6 +27,23 @@ def get_inner(filename):
     return 1
 
 
+def get_data(filename, EXEClist, hit_rate):
+    # '''get the highs and lows from a data file'''
+    with open(filename) as f:
+        reader = csv.reader(f)
+        header_row = next(reader)
+        for row in reader:
+            try:
+                time = float(row[1])
+                rate = float(row[5])
+                # 去除 cache hit rate > 100 的数据
+                if rate <= 100:
+                    EXEClist.append(time)
+                    hit_rate.append(rate)
+            except ValueError:
+                print(row[0], 'reading data error!\n')
+
+
 csvlist = readname()
 # 创建了一个空的7列的二维数组
 # inner time_min time_max time_avg hit_rate_min hit_rate_max hit_rate_avg
@@ -44,12 +61,12 @@ for file in csvlist:
     ax1 = fig.add_subplot(111)
 
     # skiprows=1 跳过标题行
-    IDlist, EXEClist, hit_rate = np.loadtxt(
-        filename, dtype=float, delimiter=',', skiprows=1, usecols=(0, 1, 5), unpack=True)
+    EXEClist, hit_rate = [], []
+    get_data(filename, EXEClist, hit_rate)
     # 添加当前inner的数据
     data_analysis = np.append(data_analysis, [[inner, EXEClist.min(), EXEClist.max(), np.mean(
         EXEClist), hit_rate.min(), hit_rate.max(), np.mean(hit_rate)]], axis=0)
-
+    IDlist = np.arange(1, len(EXEClist)+1)
     ax1.plot(IDlist, EXEClist, "g", marker='D',
              markersize=5, label="Execution time")
 
@@ -88,7 +105,7 @@ for file in csvlist:
     # plt.show()
 
 # 创建两个子图 -- 图3
-f, (time, hit) = plt.subplots(2, 1, sharex=True,figsize=(40, 34))
+f, (time, hit) = plt.subplots(2, 1, sharex=True, figsize=(40, 34))
 data_analysis = np.array(data_analysis)
 inner_list = data_analysis[:, 0]
 time_min = data_analysis[:, 1]
