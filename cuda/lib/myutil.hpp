@@ -40,6 +40,16 @@ inline int gpuAssert(cudaError_t code, const char *file, int line, bool abort = 
     return 0;
 }
 
+// get GPU L2 cache size
+inline size_t getL2CacheSize()
+{
+    int device_id = 0;
+    cudaDeviceProp prop;
+    cudaSetDevice(device_id);
+    gpuErrAssert(cudaGetDeviceProperties(&prop, device_id));
+    return prop.l2CacheSize;
+}
+
 #define LOG2(x)                                          \
     {                                                    \
         (uint32_t)(sizeof(x) * 8 - 1 - __builtin_clz(x)) \
