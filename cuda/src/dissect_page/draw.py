@@ -47,7 +47,7 @@ for file in csvlist:
     IDlist, EXEClist, hit_rate = np.loadtxt(
         filename, dtype=float, delimiter=',', skiprows=1, usecols=(0, 1, 5), unpack=True)
     # 添加当前inner的数据
-    data_analysis = np.append(data_analysis, [[EXEClist.min(), EXEClist.max(), np.mean(
+    data_analysis = np.append(data_analysis, [[inner, EXEClist.min(), EXEClist.max(), np.mean(
         EXEClist), hit_rate.min(), hit_rate.max(), np.mean(hit_rate)]], axis=0)
 
     ax1.plot(IDlist, EXEClist, "g", marker='D',
