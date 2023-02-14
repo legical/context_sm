@@ -88,7 +88,7 @@ for file in csvlist:
     # plt.show()
 
 # 创建两个子图 -- 图3
-f, (time, hit) = plt.subplots(2, 1, sharex=True)
+f, (time, hit) = plt.subplots(2, 1, sharex=True,figsize=(80, 64))
 data_analysis = np.array(data_analysis)
 inner_list = data_analysis[:, 0]
 time_min = data_analysis[:, 1]

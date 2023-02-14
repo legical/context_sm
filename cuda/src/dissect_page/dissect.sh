@@ -8,6 +8,16 @@ script_dir=$(
 proj_dir="$script_dir/../.."
 # /home/bric/Workspace/context_sm/cuda
 
+# 判断是否安装了 python 模块
+function python_model_check() {
+    if python3 -c "import $1" >/dev/null 2>&1; then
+        echo "$1 has been installed."
+    else
+        echo -e "\033[31mInstalling $1.\033[0m"
+        python3 -m pip install -U $1
+    fi
+}
+
 # 检查csv输出目录是否存在
 if [ -d $proj_dir/build ]; then
     rm -r $proj_dir/build
@@ -20,13 +30,10 @@ echo -e "\033[34mStart compiling the project......\033[0m"
 cmake .. && make
 
 # 检查csv输出目录是否存在
-if [ -d $script_dir/data ]; then
-    chmod 754 $script_dir/data
-    echo ".csv file output directory already exists."
-else
-    mkdir -m 754 $script_dir/data
-    echo -e "\033[34m.csv file output directory successfully created.\033[0m"
-fi
+rm -rf $script_dir/data
+mkdir -m 754 $script_dir/
+mkdir -m 754 $script_dir/data/pic
+echo -e "\033[34m.csv & pic file output directory successfully created.\033[0m"
 
 inner_cycle=426
 for ((j = 1; j <= 5; j++)); do
@@ -44,8 +51,21 @@ for ((j = 1; j <= 5; j++)); do
     done
 done
 rm -rf ./*
+
+# 根据数据画图
+echo -e "\n\033[34mDraw line charts according to the output data......\033[0m"
+cd $script_dir
+# 判断是否安装了 numpy matplotlib 模块
+python_model_check numpy
+python_model_check matplotlib
+
+python3 draw.py
+echo -e "\n\033[34m$script_dir/data\033[0m to see execution time data."
+echo -e "\033[34m$script_dir/data/pic\033[0m to see line charts."
+echo -e "\033[32mALL done."
+
 # git
 cd $proj_dir && cd ..
 git add .
-git commit -a -m "get data of l2_dissect_test"
+git commit -a -m "get data of l2_dissect_test in 3060"
 git push
