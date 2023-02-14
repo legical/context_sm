@@ -30,7 +30,7 @@ void getopt(int argc, char *argv[], int &inner_cycle, int &INDEX, char *filename
             dirname(path), inner_cycle);
 }
 
-__global__ void dissect_page(unsigned int *my_array, int array_length, long long int *duration, unsigned int *index)
+__global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_length, long long int *duration, unsigned int *index)
 {
     // 2MB L2 cache : 512*32=16K
     const int it = 100;
@@ -51,12 +51,13 @@ __global__ void dissect_page(unsigned int *my_array, int array_length, long long
     start_time = clock64();
     for (k = 0; k < it; k++)
     {
-        for (j = 0; j < array_length;)
+        j = 0;
+        for (int i = 0; i < inner_cycle; i++)
         {
             j = my_array[j];
             s_index[k] += j & k;
         }
-        printf("%d over.\n",k);
+        printf("%d over.\n", k);
     }
     end_time = clock64();
 
@@ -109,13 +110,13 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     unsigned int *d_index;
     cudaMalloc((void **)&d_index, sizeof(unsigned int) * it);
 
-    printf("Starting running kernel, inner cycles %d * 100\n",inner_cycle);
+    printf("Starting running kernel, inner cycles %d * 100\n", inner_cycle);
 
     cudaThreadSynchronize();
     /* launch kernel*/
     dim3 Db = dim3(1);
     dim3 Dg = dim3(1, 1, 1);
-    dissect_page<<<Dg, Db>>>(d_a, N, &duration, d_index);
+    dissect_page<<<Dg, Db>>>(d_a, inner_cycle, N, &duration, d_index);
     cudaThreadSynchronize();
 
     cudaError_t error_id = cudaGetLastError();
