@@ -30,7 +30,7 @@ void getopt(int argc, char *argv[], int &inner_cycle, int &INDEX, char *filename
             dirname(path), inner_cycle);
 }
 
-__global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_length, long long int *duration, unsigned int *index)
+__global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_length, long long int &duration, unsigned int *index)
 {
     // 2MB L2 cache : 512*32=16K
     const int it = 100;
@@ -65,14 +65,14 @@ __global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_
     s_tvalue = end_time - start_time;
 
     my_array[array_length] = j;
-    printf("my_array[array_length] is %d \n", my_array[array_length]);
-    // my_array[array_length + 1] = my_array[j];
+    my_array[array_length + 1] = my_array[j];
 
     for (k = 0; k < it; k++)
     {
         index[k] = s_index[k];
     }
-    *duration = s_tvalue;
+    duration = s_tvalue;
+    printf("s_tvalue is %d. \n", s_tvalue);
 }
 
 void measure_cache(int inner_cycle, int INDEX, char *filename)
@@ -117,8 +117,9 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     /* launch kernel*/
     dim3 Db = dim3(1);
     dim3 Dg = dim3(1, 1, 1);
-    dissect_page<<<Dg, Db>>>(d_a, inner_cycle, N, &duration, d_index);
+    dissect_page<<<Dg, Db>>>(d_a, inner_cycle, N, duration, d_index);
     cudaThreadSynchronize();
+    printf("duration is %d. \n", duration);
 
     cudaError_t error_id = cudaGetLastError();
     if (error_id != cudaSuccess)
