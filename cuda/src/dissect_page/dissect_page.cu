@@ -38,13 +38,14 @@ __global__ void dissect_page(unsigned int *my_array, int array_length, long long
     unsigned int j = 0, k = 0;
     // const int it = 4096;
 
-    __shared__ long long int s_tvalue = 0;
+    __shared__ long long int s_tvalue;
     __shared__ unsigned int s_index[it];
 
     for (k = 0; k < it; k++)
     {
         s_index[k] = 0;
     }
+    s_tvalue = 0;
 
     /* for loop inner_cycle times */
     start_time = clock64();
