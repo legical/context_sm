@@ -168,7 +168,7 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
 
     // for (i = 0; i < it; i++)
     // {
-    fprintf(fp, "%d,%lld,%d,%d\n", INDEX, h_duration[0], stride, inner_cycle, it);
+    fprintf(fp, "%d,%lld,%d,%d,%d\n", INDEX, h_duration[0], stride, inner_cycle, it);
     printf("%d\t %lld\n", INDEX, h_duration[0]);
     // }
     fclose(fp);
