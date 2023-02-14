@@ -132,7 +132,7 @@ plt.tick_params(labelsize=32)  # 刻度字体大小
 # 折线图标题
 plt.title('Data Analysis')
 # plt.gcf().autofmt_xdate()
-pic_name = "data_analysis.jpg"
+pic_name = "./data/pic/data_analysis.jpg"
 # 如果图片文件已存在，则删除
 if os.path.exists(pic_name):
     os.remove(pic_name)
