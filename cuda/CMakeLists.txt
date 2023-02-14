@@ -8,6 +8,8 @@ find_package(CUDA  REQUIRED)
 
 # 架构 3060
 set(TARGET sm_86)
+# 架构 1070
+# set(TARGET sm_61)
 # nvcc flags
 # set(CUDA_NVCC_FLAGS -gencode arch=compute_86,code=sm_86;-G;-g)
 # set(CMAKE_NVCC_FLAGS "CMAKE_NVCC_FLAGS -std=c++14")
