@@ -33,7 +33,7 @@ void getopt(int argc, char *argv[], int &inner_cycle, int &INDEX, char *filename
 __global__ void dissect_page(unsigned int *my_array, int array_length, long long int *duration, unsigned int *index)
 {
     // 2MB L2 cache : 512*32=16K
-    const int it = 128;
+    const int it = 100;
     long long int start_time, end_time;
     unsigned int j = 0, k = 0;
     // const int it = 4096;
@@ -101,12 +101,14 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
     /* copy array elements from CPU to GPU */
     cudaMemcpy(d_a, h_a, Array_Size, cudaMemcpyHostToDevice);
 
-    const int it = 128; // 512*128
+    const int it = 100; // 512*100
     unsigned int *h_index = (unsigned int *)malloc(sizeof(unsigned int) * it);
 
     long long int duration = 0;
     unsigned int *d_index;
     cudaMalloc((void **)&d_index, sizeof(unsigned int) * it);
+
+    printf("Starting running kernel, inner cycles %d * 100\n",inner_cycle);
 
     cudaThreadSynchronize();
     /* launch kernel*/
