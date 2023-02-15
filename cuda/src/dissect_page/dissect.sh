@@ -46,6 +46,7 @@ for ((j = 1; j <= 5; j++)); do
     inner_cycle=$((inner_cycle + 50))
     echo "Starting running kernel in GPU $GPU_name, $inner_cycle * 1024 times."
     echo -e "Index \t Time"
+    INNER_RUNNING=1024
     for ((i = 1; i <= 1024; i++)); do
         if [ $GPU_name -eq 3060 ]; then
             # get sudo right
@@ -63,6 +64,8 @@ for ((j = 1; j <= 5; j++)); do
         else
             echo "Sorry, not support for $GPU_name."
         fi
+        progress_bar $i $INNER_RUNNING $j
+        sleep 0.1
     done
 done
 rm -rf ./*
