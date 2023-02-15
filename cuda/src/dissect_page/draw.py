@@ -118,6 +118,8 @@ for file in csvlist:
 # 创建两个子图 -- 图3
 f, (time, hit) = plt.subplots(2, 1, figsize=(40, 34))
 data_analysis = np.array(data_analysis)
+# 所有数据的对比图，按照inner排序后再绘制
+data_analysis = data_analysis[data_analysis[:,0].argsort()]
 inner_list = data_analysis[:, 0]
 time_min = data_analysis[:, 1]
 time_max = data_analysis[:, 2]
