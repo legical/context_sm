@@ -29,10 +29,6 @@ fi
 mkdir -m 754 $proj_dir/build
 # echo -e "\033[34m.csv build directory successfully created.\033[0m"
 
-cd $proj_dir/build
-echo -e "\033[34mStart compiling the project......\033[0m"
-cmake .. && make
-
 # 检查csv输出目录是否存在
 rm -rf $script_dir/data-$GPU_name
 mkdir -m 754 $script_dir/data-$GPU_name
@@ -40,12 +36,22 @@ mkdir -m 754 $script_dir/data-$GPU_name/log
 mkdir -m 754 $script_dir/data-$GPU_name/pic
 echo -e "\033[34m.csv & pic file output directory successfully created.\033[0m"
 
+cd $proj_dir/build
+echo -e "\033[34mStart compiling the project......\033[0m"
+
 # default : 3060
 inner_cycle=426
 CUDA_TOOL_DIR="/usr/local/cuda-11.7/bin"
+# if GPU name == 1070
 if [ $GPU_name -eq 1070 ]; then
     inner_cycle=362
     CUDA_TOOL_DIR="/usr/local/cuda-11.8/bin"
+    # contrl code data path = data-1070
+    cmake -DGPU_1070_IN=1 .. && make
+# else if GPU name == 3060
+elif [ $GPU_name -eq 3060 ]; then
+    # contrl code data path = data-3060
+    cmake -DGPU_1070_IN=0 .. && make
 fi
 
 for ((j = 1; j <= 5; j++)); do
@@ -57,13 +63,13 @@ for ((j = 1; j <= 5; j++)); do
     for ((i = 1; i <= 1024; i++)); do
         if [ $GPU_name -eq 3060 ]; then
             # get sudo right
-            echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i $GPU_name | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
+            echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             sudo chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
             tail -n 4 $script_dir/data/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
         elif [ $GPU_name -eq 1070 ]; then
             # temp log
-            /usr/bin/script -qf data-$GPU_name.log -c "echo 'neu' | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test $inner_cycle $i $GPU_name"
-            # save info line to true log 
+            /usr/bin/script -qf data-$GPU_name.log -c "echo 'neu' | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test $inner_cycle $i"
+            # save info line to true log
             cat data-$GPU_name.log | grep "l2_tex_hit_rate" | tail -n 1 >>$script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             echo "neu" | sudo -S chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
             # save hit rate info to csv file

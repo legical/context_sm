@@ -4,10 +4,14 @@ set(CMAKE_BUILD_TYPE Release)
 
 project(CUDArandom VERSION 1.0.0 LANGUAGES CXX CUDA DESCRIPTION "The Influence of Random Factors on the Running Time of GPU Programs")
 
-find_package(CUDA  REQUIRED)
+find_package(CUDA REQUIRED)
+
+# GPU choose
+option(GPU_1070_IN "running in 1070" OFF)
 
 # 架构 3060
-set(TARGET sm_86)
+# set(TARGET sm_86)
+
 # 架构 1070
 # set(TARGET sm_61)
 # nvcc flags -m 64 Specify 64 bit architecture.
@@ -28,15 +32,20 @@ include_directories(${PROJECT_SOURCE_DIR}/lib)
 # target_compile_features(cuda_utl PUBLIC cxx_std_11)
 # 将cuda等3个目标文件与 cuda_utl 库文件进行链接
 # target_link_libraries(cuda_utl cuda cudart nvidia-ml)
-
 function(add_my_target target include_dir)
     add_executable(${target} ${ARGN})
+
+    if(GPU_1070_IN)
+        add_definitions(-DGPU_1070_IN)
+    endif(GPU_1070_IN)
+
     target_compile_features(${target} PUBLIC cxx_std_11)
     target_link_libraries(${target} cuda cudart nvidia-ml)
-    target_include_directories(${target}  PUBLIC ${include_dir})
+    target_include_directories(${target} PUBLIC ${include_dir})
 endfunction(add_my_target)
 
 add_my_target(l2_dissect_test src/dissect_page src/dissect_page/dissect_page.cu)
+
 # add_my_target(l2_set_test src/dissect/reference src/dissect/reference/fine_grain_L2_set.cu)
 # add_my_target(l2_test src/dissect/reference src/dissect/reference/fine_grain_L2-cold_1GB.cu)
 # add_my_target(cu_ran src/memory src/memory/random.cu)

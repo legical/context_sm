@@ -22,17 +22,17 @@ void getopt(int argc, char *argv[], int &inner_cycle, int &INDEX, char *filename
     }
     char path[96];
     getcwd(path, sizeof(path));
-    /**
-     * dirname(path): project root path
-     * EXEC_TIMES: totally runing times 本次程序运行次数
-     */
-    if (argc > 3)
-    {
-        sprintf(filename, "%s/src/dissect_page/data-%s/Dissect-inner%d.csv",
-                dirname(path), inner_cycle, argv[3]);
-    }
+/**
+ * dirname(path): project root path
+ * EXEC_TIMES: totally runing times 本次程序运行次数
+ */
+#ifdef GPU_1070_IN
     sprintf(filename, "%s/src/dissect_page/data-1070/Dissect-inner%d.csv",
             dirname(path), inner_cycle);
+#else
+    sprintf(filename, "%s/src/dissect_page/data-3060/Dissect-inner%d.csv",
+            dirname(path), inner_cycle);
+#endif
 }
 
 __global__ void dissect_page(unsigned int *my_array, int inner_cycle, int array_length, long long int *duration, unsigned int *index)
