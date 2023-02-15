@@ -62,11 +62,7 @@ for ((j = 1; j <= 5; j++)); do
             tail -n 4 $script_dir/data/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
         elif [ $GPU_name -eq 1070 ]; then
             # temp log
-            echo "recording...."
-            /usr/bin/script -qf data-$GPU_name.log
-            echo "neu" | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test
-            exit
-            echo "recording over...."
+            /usr/bin/script -qf data-$GPU_name.log -c "echo 'neu' | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test $inner_cycle $i"
             # save info line to true log 
             cat data-$GPU_name.log | grep "l2_tex_hit_rate" | tail -n 1 >>$script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             echo "neu" | sudo -S chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
