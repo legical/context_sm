@@ -86,10 +86,10 @@ for file in csvlist:
     # y轴刻度值
     # plt.yticks(np.arange(min_y_lable, max_y_lable, 0.2))
     # ax1.set_ylim((np.floor(minax[0]), np.ceil(minax[1])))
-    ax1.set_xlabel('Index', fontsize=36)
+    ax1.set_xlabel('Data of GPU : '+GPU_name, fontsize=42)
     ax1.set_ylabel('EXEC_time', fontsize=36)
     # y轴刻度值 10^3
-    ax1.yaxis.Exponent = 3;
+    ax1.yaxis.Exponent = 3
     # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
     ax1.legend(loc=2, fontsize=32, scatterpoints=1)
     # 设置 y 轴显示网格线
@@ -148,9 +148,9 @@ time.legend(loc=2, fontsize=32, scatterpoints=1)
 # 设置 y 轴显示网格线
 time.grid(axis='y')
 # y轴刻度值 10^3
-time.yaxis.Exponent = 3;
+time.yaxis.Exponent = 3
 # 折线图标题
-time.set_title('Data Analysis', fontsize=40)
+time.set_title('Data Analysis of GPU : '+GPU_name, fontsize=42)
 plt.setp(time.get_xticklabels(), fontsize=32)
 plt.setp(time.get_yticklabels(), fontsize=32)
 # plt.tick_params(labelsize=32)  # 刻度字体大小
