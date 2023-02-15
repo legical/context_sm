@@ -64,8 +64,7 @@ for file in csvlist:
     EXEClist, hit_rate = [], []
     get_data(filename, EXEClist, hit_rate)
     # 添加当前inner的数据
-    data_analysis = np.append(data_analysis, [[inner, EXEClist.min(), EXEClist.max(), np.mean(
-        EXEClist), hit_rate.min(), hit_rate.max(), np.mean(hit_rate)]], axis=0)
+    data_analysis = np.append(data_analysis, [[inner, min(EXEClist), max(EXEClist), np.mean(EXEClist), min(hit_rate), max(hit_rate), np.mean(hit_rate)]], axis=0)
     IDlist = np.arange(1, len(EXEClist)+1)
     ax1.plot(IDlist, EXEClist, "g", marker='D',
              markersize=5, label="Execution time")
@@ -91,10 +90,9 @@ for file in csvlist:
 
     plt.tick_params(labelsize=32)  # 刻度字体大小
     # plt.title('执行时间折线图')  # 折线图标题
-    chart_title = 'inner={} Time||min={}   max={}   avg={}    ###  L2 Hit Rate%||min={}   max={}   avg={}'
+    chart_title = 'inner={} * 4KB = Data Size   ^v^    Time||min={}   max={}   avg={}    ###  L2 Hit Rate%||min={}   max={}   avg={}'
     plt.title(chart_title.format(
-        inner, EXEClist.min(), EXEClist.max(), np.mean(
-            EXEClist), hit_rate.min(), hit_rate.max(), np.mean(hit_rate)), fontsize=46)
+        inner, min(EXEClist), max(EXEClist), np.mean(EXEClist), min(hit_rate), max(hit_rate), np.mean(hit_rate)), fontsize=46)
     # plt.gcf().autofmt_xdate()
     filename = filename.replace("./data/", "./data/pic/", 1)
     pic_name = filename.replace("csv", "jpg", 1)
@@ -105,7 +103,7 @@ for file in csvlist:
     # plt.show()
 
 # 创建两个子图 -- 图3
-f, (time, hit) = plt.subplots(2, 1, sharex=True, figsize=(40, 34))
+f, (time, hit) = plt.subplots(2, 1, figsize=(40, 34))
 data_analysis = np.array(data_analysis)
 inner_list = data_analysis[:, 0]
 time_min = data_analysis[:, 1]
@@ -129,6 +127,7 @@ time.set_ylabel('EXEC_time', fontsize=36)
 time.legend(loc=2, fontsize=32, scatterpoints=1)
 # 设置 y 轴显示网格线
 time.grid(axis='y')
+plt.tick_params(labelsize=32)  # 刻度字体大小
 
 hit.plot(inner_list, hit_min, "g", marker='^',
          markersize=5, label="hit_rate_min")
