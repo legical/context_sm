@@ -10,10 +10,11 @@ find_package(CUDA  REQUIRED)
 set(TARGET sm_86)
 # 架构 1070
 # set(TARGET sm_61)
-# nvcc flags
+# nvcc flags -m 64 Specify 64 bit architecture.
 # set(CUDA_NVCC_FLAGS -gencode arch=compute_86,code=sm_86;-G;-g)
 # set(CMAKE_NVCC_FLAGS "CMAKE_NVCC_FLAGS -std=c++14")
-string(APPEND CMAKE_CUDA_FLAGS " -m 64 -arch=${TARGET}")
+# string(APPEND CMAKE_CUDA_FLAGS " -m 64 -arch=${TARGET}")
+string(APPEND CMAKE_CUDA_FLAGS " --generate-code arch=compute_86,code=sm_86 --generate-code arch=compute_61,code=sm_61")
 
 # add the binary tree to the search path for include files
 include_directories("${CUDA_INCLUDE_DIRS}")
