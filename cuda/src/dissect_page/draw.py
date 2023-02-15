@@ -3,6 +3,7 @@ from cProfile import label
 import os
 import sys
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 import numpy as np
 import csv
 # example: python3 draw.py 3060
@@ -54,7 +55,7 @@ if len(sys.argv) > 1:
 
 # default: ./data-3060/
 DATA_DIR = './data-'+GPU_name+'/'
-PIC_DIR='./data-'+GPU_name+'/pic/'
+PIC_DIR = './data-'+GPU_name+'/pic/'
 
 csvlist = readname(DATA_DIR)
 # 创建了一个空的7列的二维数组
@@ -87,6 +88,8 @@ for file in csvlist:
     # ax1.set_ylim((np.floor(minax[0]), np.ceil(minax[1])))
     ax1.set_xlabel('Index', fontsize=36)
     ax1.set_ylabel('EXEC_time', fontsize=36)
+    # y轴刻度值 10^3
+    ax1.yaxis.Exponent = 3;
     # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
     ax1.legend(loc=2, fontsize=32, scatterpoints=1)
     # 设置 y 轴显示网格线
@@ -101,7 +104,9 @@ for file in csvlist:
     ax2.legend(loc=1, fontsize=32, scatterpoints=1)
     ax2.grid(visible=False)
 
-    plt.tick_params(labelsize=32)  # 刻度字体大小
+    plt.tick_params(labelsize=34)  # 刻度字体大小
+    plt.setp(ax1.get_xticklabels(), fontsize=34)
+    plt.setp(ax1.get_yticklabels(), fontsize=34)
     # plt.title('执行时间折线图')  # 折线图标题
     chart_title = 'inner={} * 4KB = Data Size   ^v^    Time||min={}   max={}   avg={}    ###  L2 Hit Rate%||min={}   max={}   avg={}'
     plt.title(chart_title.format(
@@ -116,10 +121,10 @@ for file in csvlist:
     # plt.show()
 
 # 创建两个子图 -- 图3
-f, (time, hit) = plt.subplots(2, 1, figsize=(40, 34))
+f, (time, hit) = plt.subplots(2, 1, figsize=(40, 34), sharex=True)
 data_analysis = np.array(data_analysis)
 # 所有数据的对比图，按照inner排序后再绘制
-data_analysis = data_analysis[data_analysis[:,0].argsort()]
+data_analysis = data_analysis[data_analysis[:, 0].argsort()]
 inner_list = data_analysis[:, 0]
 time_min = data_analysis[:, 1]
 time_max = data_analysis[:, 2]
@@ -142,7 +147,13 @@ time.set_ylabel('EXEC_time', fontsize=36)
 time.legend(loc=2, fontsize=32, scatterpoints=1)
 # 设置 y 轴显示网格线
 time.grid(axis='y')
-plt.tick_params(labelsize=32)  # 刻度字体大小
+# y轴刻度值 10^3
+time.yaxis.Exponent = 3;
+# 折线图标题
+time.set_title('Data Analysis', fontsize=40)
+plt.setp(time.get_xticklabels(), fontsize=32)
+plt.setp(time.get_yticklabels(), fontsize=32)
+# plt.tick_params(labelsize=32)  # 刻度字体大小
 
 hit.plot(inner_list, hit_min, "g", marker='^',
          markersize=5, label="hit_rate_min")
@@ -153,15 +164,17 @@ hit.plot(inner_list, hit_avg, "y", marker='o',
 
 # x,y轴标签
 hit.set_xlabel('inner * 4KB = Data Array Size', fontsize=36)
-hit.set_ylabel('L2 Hit Rate%', fontsize=36)
+hit.set_ylabel('L2 Hit Rate %', fontsize=36)
 # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
 hit.legend(loc=2, fontsize=32, scatterpoints=1)
 # 设置 y 轴显示网格线
 hit.grid(axis='y')
+# inner_list_str as x轴刻度
+inner_list_str = [str(int(x)) for x in inner_list]
+plt.xticks(inner_list, inner_list_str)
 
 plt.tick_params(labelsize=32)  # 刻度字体大小
-# 折线图标题
-plt.title('Data Analysis')
+
 # plt.gcf().autofmt_xdate()
 pic_name = PIC_DIR + "data_analysis.jpg"
 # 如果图片文件已存在，则删除
