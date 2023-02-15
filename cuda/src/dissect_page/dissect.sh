@@ -1,33 +1,19 @@
 #!/bin/bash
-
+# /home/bric/Workspace/context_sm/cuda/src/dissect_page
 script_dir=$(
     cd $(dirname $0)
     pwd
 )
-# 3060 or 1070
-GPU_name=$(nvidia-smi -q | grep "Product Name" | awk -F ' ' '{print $NF}')
-echo "You are running in GPU $GPU_name."
 
-# /home/bric/Workspace/context_sm/cuda/src/dissect_page
 proj_dir="$script_dir/../.."
 # /home/bric/Workspace/context_sm/cuda
+source $proj_dir/lib/tool.sh
 
-# 判断是否安装了 python 模块
-function python_model_check() {
-    if python3 -c "import $1" >/dev/null 2>&1; then
-        echo "$1 has been installed."
-    else
-        echo -e "\033[31mInstalling $1.\033[0m"
-        python3 -m pip install -U $1
-    fi
-}
+# 3060 or 1070
+echo "You are running in GPU $GPU_name."
 
-# 检查csv输出目录是否存在
-if [ -d $proj_dir/build ]; then
-    rm -r $proj_dir/build
-fi
-mkdir -m 754 $proj_dir/build
-# echo -e "\033[34m.csv build directory successfully created.\033[0m"
+# delete & recreate build 目录
+recreate_build
 
 # 检查csv输出目录是否存在
 rm -rf $script_dir/data-$GPU_name
@@ -65,7 +51,7 @@ for ((j = 1; j <= 5; j++)); do
             # get sudo right
             echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             sudo chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
-            tail -n 4 $script_dir/data/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
+            tail -n 4 $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
         elif [ $GPU_name -eq 1070 ]; then
             # temp log
             /usr/bin/script -qf data-$GPU_name.log -c "echo 'neu' | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test $inner_cycle $i"
