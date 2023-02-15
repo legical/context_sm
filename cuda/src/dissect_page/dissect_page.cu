@@ -26,7 +26,12 @@ void getopt(int argc, char *argv[], int &inner_cycle, int &INDEX, char *filename
      * dirname(path): project root path
      * EXEC_TIMES: totally runing times 本次程序运行次数
      */
-    sprintf(filename, "%s/src/dissect_page/data/Dissect-inner%d.csv",
+    if (argc > 3)
+    {
+        sprintf(filename, "%s/src/dissect_page/data-%s/Dissect-inner%d.csv",
+                dirname(path), inner_cycle, argv[3]);
+    }
+    sprintf(filename, "%s/src/dissect_page/data-1070/Dissect-inner%d.csv",
             dirname(path), inner_cycle);
 }
 
