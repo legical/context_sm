@@ -67,7 +67,7 @@ for ((j = 1; j <= 5; j++)); do
             cat data-$GPU_name.log | grep "l2_tex_hit_rate" | tail -n 1 >>$script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             echo "neu" | sudo -S chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
             # save hit rate info to csv file
-            cat data-$GPU_name.log | grep "l2_tex_hit_rate" | awk -F ' ' '{print $NF}' | tail -n 1 | sed 's/%//g' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
+            # cat data-$GPU_name.log | grep "l2_tex_hit_rate" | awk -F ' ' '{print $NF}' | tail -n 1 | sed 's/%//g' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
         else
             echo "Sorry, not support for $GPU_name."
         fi
