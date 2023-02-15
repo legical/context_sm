@@ -11,6 +11,15 @@ PROJ_DIR="$LIB_DIR/.."
 # 3060 or 1070
 GPU_name=$(nvidia-smi -q | grep "Product Name" | awk -F ' ' '{print $NF}')
 
+trap 'onCtrlC' INT
+function onCtrlC () {
+        #捕获CTRL+C，当脚本被ctrl+c的形式终止时同时终止程序的后台进程
+        kill -9 ${do_sth_pid} ${progress_pid}
+        echo
+        echo 'Ctrl+C 中断进程'
+        exit 1
+}
+
 # 检查 build 目录是否存在, recreate build 目录
 function recreate_build {
     # 检查 build 目录是否存在
