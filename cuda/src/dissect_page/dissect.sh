@@ -10,11 +10,12 @@ proj_dir="$script_dir/../.."
 source $proj_dir/lib/tool.sh
 
 # 3060 or 1070
+GPU_name=$(nvidia-smi -q | grep "Product Name" | awk -F ' ' '{print $NF}')
 echo "You are running in GPU $GPU_name."
 
 # delete & recreate build 目录
 recreate_build
-
+isGoon
 # 检查csv输出目录是否存在
 rm -rf $script_dir/data-$GPU_name
 mkdir -m 754 $script_dir/data-$GPU_name
@@ -48,12 +49,12 @@ for ((j = 1; j <= 5; j++)); do
     echo -e "Index \t Time"
     INNER_RUNNING=1024
     for ((i = 1; i <= 1024; i++)); do
-        if [ $GPU_name -eq 3060 ]; then
+        if [ "$GPU_name" -eq 3060 ]; then
             # get sudo right
             echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             sudo chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
-            tail -n 4 $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
-        elif [ $GPU_name -eq 1070 ]; then
+            tail -n 4 $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' | sed 's/,//g' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
+        elif [ "$GPU_name" -eq 1070 ]; then
             # temp log
             /usr/bin/script -qf data-$GPU_name.log -c "echo 'neu' | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test $inner_cycle $i"
             # save info line to true log
