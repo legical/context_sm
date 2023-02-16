@@ -56,6 +56,25 @@ function recreate_build() {
     # echo -e "\033[34mbuild directory successfully created.\033[0m"
 }
 
+# parameter: line numbers want to delete
+function del_line() {
+    # if do not input parameter
+    if [ -z $1 ]; then
+        del_num=1
+    else
+        del_num=$1
+    fi
+    for ((j = 0; j < del_num; j++)); do
+        # \33[2K 删除光标当前所在的整行
+        # \033[A将光标上移一行，但移至同一列，即不移至该行的开头
+        # \r将光标移至行首(r用于快退)，但不删除任何内容
+        printf "\r \33[2K \033[A"
+    done
+}
+
+function del_this_line() {
+    printf "\33[2K"
+}
 # 命令行进度条，该函数接受3个参数，1-进度的整型数值，2-是总数的整型数值, 3-out running times
 function progress_bar {
     if [ -z $1 ] || [ -z $2 ]; then

@@ -44,19 +44,20 @@ fi
 
 OUT_RUNNING=${#inner_cycle_list[@]}
 INNER_RUNNING=1024
-for ((j = 1; j <= OUT_RUNNING; j++)); do
+for ((j = 1; j <= $OUT_RUNNING; j++)); do
     # 3060 L2 cache: 2359296B = 2.25MB = 576 * 4KB      476 526 576 626 676 864
     # 1070 L2 cache: 2097152B = 2MB    = 512 * 4KB      412 462 512 562 612 768
     inner_cycle=${inner_cycle_list[${j} - 1]}
     echo "Starting running kernel in GPU $GPU_name, $inner_cycle * 1024 times."
     # echo -e "Index \t Time"
-    for ((i = 1; i <= INNER_RUNNING; i++)); do
+    for ((i = 1; i <= $INNER_RUNNING; i++)); do
         if [ "$GPU_name" -eq 3060 ]; then
             # get sudo right
             # echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --metrics group:memory__l2_cache_table ./l2_dissect_test $inner_cycle $i >data-$GPU_name.log
             hit_line=$(cat data-$GPU_name.log | grep "lts__t_sectors_lookup_hit.sum" | sed 's/,//g')
             miss_line=$(cat data-$GPU_name.log | grep "lts__t_sectors_lookup_miss.sum" | sed 's/,//g')
+            del_this_line
             echo -e "No.$j/$OUT_RUNNING : $i \nhit_line: $hit_line\nmiss_line: $miss_line" | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             hit_num=$(echo $hit_line | awk -F ' ' '{print $NF}')
             miss_num=$(echo $miss_line | awk -F ' ' '{print $NF}')
@@ -68,6 +69,7 @@ for ((j = 1; j <= OUT_RUNNING; j++)); do
             /usr/bin/script -qf data-$GPU_name.log -c "echo 'neu' | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test $inner_cycle $i" >/dev/null 2>&1
             # save info line to true log
             hit_line=$(cat data-$GPU_name.log | grep "l2_tex_hit_rate" | tail -n 1 | sed 's/,//g')
+            del_this_line
             echo $hit_line | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             echo "neu" | sudo -S chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
             # save hit rate info to csv file
