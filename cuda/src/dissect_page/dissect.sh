@@ -68,7 +68,7 @@ for ((j = 1; j <= $OUT_RUNNING; j++)); do
             # temp log
             /usr/bin/script -qf data-$GPU_name.log -c "echo 'neu' | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test $inner_cycle $i" >/dev/null 2>&1
             # save info line to true log
-            hit_line=$(cat data-$GPU_name.log | grep "l2_tex_hit_rate" | tail -n 1 | sed 's/,//g' | sed 's/1 //')
+            hit_line=$(cat data-$GPU_name.log | grep "l2_tex_hit_rate" | tail -n 1 | sed 's/,//g' | sed 's/          1                          //' | sed 's/                        //')
             del_this_line
             echo "No.$j/$OUT_RUNNING | $i:  $hit_line" | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             echo "neu" | sudo -S chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
