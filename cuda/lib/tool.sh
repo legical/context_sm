@@ -8,8 +8,8 @@ LIB_DIR=$(
 # /home/bric/Workspace/context_sm/cuda
 PROJ_DIR="$LIB_DIR/.."
 
-# 3060 or 1070
-GPU_name=$(nvidia-smi -q | grep "Product Name" | awk -F ' ' '{print $NF}')
+# # 3060 or 1070
+# GPU_name=$(nvidia-smi -q | grep "Product Name" | awk -F ' ' '{print $NF}')
 
 trap 'onCtrlC' INT
 function onCtrlC () {
@@ -18,6 +18,23 @@ function onCtrlC () {
         echo
         echo 'Ctrl+C 中断进程'
         exit 1
+}
+
+# 是否继续执行脚本
+function isGoon() {
+    read -p "Do you want to continue? [y/n] " input
+
+    case $input in
+    [yY]*) ;;
+
+    [nN]*)
+        exit
+        ;;
+    *)
+        echo -e "\033[31mJust enter y or n, please.\033[0m\n"
+        exit
+        ;;
+    esac
 }
 
 # 检查 build 目录是否存在, recreate build 目录
