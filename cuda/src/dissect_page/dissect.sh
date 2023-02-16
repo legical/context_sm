@@ -15,7 +15,7 @@ echo "You are running in GPU $GPU_name."
 
 # delete & recreate build 目录
 recreate_build
-isGoon
+# isGoon
 # 检查csv输出目录是否存在
 rm -rf $script_dir/data-$GPU_name
 mkdir -m 754 $script_dir/data-$GPU_name
