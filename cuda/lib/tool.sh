@@ -62,8 +62,10 @@ function progress_bar {
         return
     fi
 
-    pro=$1   # 进度的整型数值
-    total=$2 # 总数的整型数值
+    pro=$1                     # 进度的整型数值
+    total=$2                   # 总数的整型数值
+    GREEN_SHAN='\E[5;32;49;1m' # 亮绿色闪动
+    RES='\E[0m'                # 清除颜色
     if [ $pro -gt $total ]; then
         echo "[E]>>>It's impossible that 'pro($pro) > total($total)'."
         return
@@ -75,11 +77,11 @@ function progress_bar {
     let index=pro%4
     # if $3 not exist
     if [ -z $3 ]; then
-        printf "[%-100s] [%d%%] [%c]\r" "$str" "$percent" "${arr[$index]}"
+        printf "${GREEN_SHAN}[%-100s] [%d%%] [%c]${RES}\r" "$str" "$percent" "${arr[$index]}"
     elif [ -z $4 ]; then
-        printf "[%-100s] [%d%%] [%c] [No.%d]\r" "$str" "$percent" "${arr[$index]}" "$3"
+        printf "${GREEN_SHAN}[%-100s] [%d%%] [%c] [No.%d]${RES}\r" "$str" "$percent" "${arr[$index]}" "$3"
     else
-        printf "[%-100s] [%d%%] [%c] [No.%d/%d]\r" "$str" "$percent" "${arr[$index]}" "$3" "$4"
+        printf "${GREEN_SHAN}[%-100s] [%d%%] [%c] [No.%d/%d]${RES}\r" "$str" "$percent" "${arr[$index]}" "$3" "$4"
     fi
     if [ $percent -eq 100 ]; then
         echo
