@@ -14,7 +14,7 @@ check_GPU_Driver
 echo "You are running in GPU $GPU_name."
 
 # delete & recreate build 目录
-recreate_build
+recreate_build $proj_dir
 # isGoon
 # 检查csv输出目录是否存在
 rm -rf $script_dir/data-$GPU_name

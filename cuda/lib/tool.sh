@@ -6,7 +6,7 @@ LIB_DIR=$(
 )
 
 # /home/bric/Workspace/context_sm/cuda
-PROJ_DIR="$LIB_DIR/.."
+# PROJ_DIR="$LIB_DIR/.."
 
 trap 'onCtrlC' INT
 function onCtrlC() {
@@ -46,8 +46,9 @@ function check_GPU_Driver {
 }
 
 # 检查 build 目录是否存在, recreate build 目录
-function recreate_build {
+function recreate_build() {
     # 检查 build 目录是否存在
+    PROJ_DIR=$1
     if [ -d $PROJ_DIR/build ]; then
         rm -r $PROJ_DIR/build
     fi
