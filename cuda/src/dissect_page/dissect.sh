@@ -41,12 +41,13 @@ elif [ $GPU_name -eq 3060 ]; then
     cmake -DGPU_1070_IN=0 .. && make
 fi
 
-OUT_RUNNING=5
+OUT_RUNNING=1
 INNER_RUNNING=1024
 for ((j = 1; j <= OUT_RUNNING; j++)); do
-    # 3060 L2 cache: 2359296B = 2.25MB = 576 * 4KB      476 526 576 626 676
-    # 1070 L2 cache: 2097152B = 2MB    = 512 * 4KB      412 462 512 562 612
-    inner_cycle=$((inner_cycle + 50))
+    # 3060 L2 cache: 2359296B = 2.25MB = 576 * 4KB      476 526 576 626 676 864
+    # 1070 L2 cache: 2097152B = 2MB    = 512 * 4KB      412 462 512 562 612 768
+    # inner_cycle=$((inner_cycle + 50))
+    inner_cycle=864
     echo "Starting running kernel in GPU $GPU_name, $inner_cycle * 1024 times."
     echo -e "Index \t Time"    
     for ((i = 1; i <= INNER_RUNNING; i++)); do
