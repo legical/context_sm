@@ -76,10 +76,11 @@ function progress_bar {
     # if $3 not exist
     if [ -z $3 ]; then
         printf "[%-100s] [%d%%] [%c]\r" "$str" "$percent" "${arr[$index]}"
+    elif [ -z $4 ]; then
+        printf "[%-100s] [%d%%] [%c] [No.%d]\r" "$str" "$percent" "${arr[$index]}" "$3"
     else
-        printf "[%-100s] [%d%%] [%c] No.$3\r" "$str" "$percent" "${arr[$index]}"
+        printf "[%-100s] [%d%%] [%c] [No.%d/%d]\r" "$str" "$percent" "${arr[$index]}" "$3" "$4"
     fi
-    printf "[%-100s] [%d%%] [%c]\r" "$str" "$percent" "${arr[$index]}"
     if [ $percent -eq 100 ]; then
         echo
     fi

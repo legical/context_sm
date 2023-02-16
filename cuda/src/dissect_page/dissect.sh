@@ -41,19 +41,27 @@ elif [ $GPU_name -eq 3060 ]; then
     cmake -DGPU_1070_IN=0 .. && make
 fi
 
-for ((j = 1; j <= 5; j++)); do
+OUT_RUNNING=5
+INNER_RUNNING=1024
+for ((j = 1; j <= OUT_RUNNING; j++)); do
     # 3060 L2 cache: 2359296B = 2.25MB = 576 * 4KB      476 526 576 626 676
     # 1070 L2 cache: 2097152B = 2MB    = 512 * 4KB      412 462 512 562 612
     inner_cycle=$((inner_cycle + 50))
     echo "Starting running kernel in GPU $GPU_name, $inner_cycle * 1024 times."
-    echo -e "Index \t Time"
-    INNER_RUNNING=1024
-    for ((i = 1; i <= 1024; i++)); do
+    echo -e "Index \t Time"    
+    for ((i = 1; i <= INNER_RUNNING; i++)); do
         if [ "$GPU_name" -eq 3060 ]; then
             # get sudo right
-            echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
+            # echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
+            echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --metrics group:memory__l2_cache_table ./l2_dissect_test $inner_cycle $i >data-$GPU_name.log
+            hit_line=$(cat data-$GPU_name.log | grep "lts__t_sectors_lookup_hit.sum" | sed 's/,//g')
+            miss_line=$(cat data-$GPU_name.log | grep "lts__t_sectors_lookup_miss.sum" | sed 's/,//g')
+            echo -e "No.$j/$OUT_RUNNING : $i \nhit_line: $hit_line\nmiss_line: $miss_line" >>$script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
+            hit_num=$(echo $hit_line | awk -F ' ' '{print $NF}')
+            miss_num=$(echo $miss_line | awk -F ' ' '{print $NF}')
             sudo chmod 777 $script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
-            tail -n 4 $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' | sed 's/,//g' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
+            # tail -n 4 $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log | grep "L2 Hit Rate" | awk -F ' ' '{print $NF}' | sed 's/,//g' >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
+            echo "$hit_num,$miss_num" >>$script_dir/data-$GPU_name/Dissect-inner${inner_cycle}.csv
         elif [ "$GPU_name" -eq 1070 ]; then
             # temp log
             /usr/bin/script -qf data-$GPU_name.log -c "echo 'neu' | sudo -S /usr/local/cuda-11.8/bin/nvprof --metrics l2_tex_hit_rate ./l2_dissect_test $inner_cycle $i"
@@ -65,7 +73,7 @@ for ((j = 1; j <= 5; j++)); do
         else
             echo "Sorry, not support for $GPU_name."
         fi
-        progress_bar $i $INNER_RUNNING $j
+        progress_bar $i $INNER_RUNNING $j $OUT_RUNNING
         sleep 0.1
     done
 done

@@ -38,7 +38,9 @@ def get_data(filename, EXEClist, hit_rate):
         for row in reader:
             try:
                 time = float(row[1])
-                rate = float(row[5])
+                hit_num = float(row[5])
+                miss_num = float(row[6])
+                rate = 100*hit_num/(hit_num+miss_num)
                 # 去除 cache hit rate > 100 的数据
                 if rate <= 100:
                     EXEClist.append(time)

@@ -156,7 +156,7 @@ void measure_cache(int inner_cycle, int INDEX, char *filename)
             exit(EXIT_FAILURE);
         }
         // 标题
-        fprintf(fp, "Index,Exec_time,stride,inner_cycle,out_cycle,hit_rate\n");
+        fprintf(fp, "Index,Exec_time,stride,inner_cycle,out_cycle,hit_num,miss_num\n");
         fclose(fp);
     }
 
