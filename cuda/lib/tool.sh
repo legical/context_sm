@@ -8,16 +8,13 @@ LIB_DIR=$(
 # /home/bric/Workspace/context_sm/cuda
 PROJ_DIR="$LIB_DIR/.."
 
-# # 3060 or 1070
-# GPU_name=$(nvidia-smi -q | grep "Product Name" | awk -F ' ' '{print $NF}')
-
 trap 'onCtrlC' INT
-function onCtrlC () {
-        #捕获CTRL+C，当脚本被ctrl+c的形式终止时同时终止程序的后台进程
-        kill -9 ${do_sth_pid} ${progress_pid}
-        echo
-        echo 'Ctrl+C 中断进程'
-        exit 1
+function onCtrlC() {
+    #捕获CTRL+C，当脚本被ctrl+c的形式终止时同时终止程序的后台进程
+    kill -9 ${do_sth_pid} ${progress_pid}
+    echo
+    echo 'Ctrl+C 中断进程'
+    exit 1
 }
 
 # 是否继续执行脚本
@@ -35,6 +32,17 @@ function isGoon() {
         exit
         ;;
     esac
+}
+
+function check_GPU_Driver {
+    # 3060 or 1070
+    GPU_name_line=$(nvidia-smi -q | grep "Product Name")
+    if [ $? -ne 0 ]; then
+        # nvidia-smi 无输出，证明未安装NVIDIA Driver
+        echo -e "***** \033[34mPlease install NVIDIA Driver first !!!\033[0m *****"
+    else
+        GPU_name=$(echo $GPU_name_line | awk -F ' ' '{print $NF}')
+    fi
 }
 
 # 检查 build 目录是否存在, recreate build 目录

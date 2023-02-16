@@ -10,7 +10,7 @@ proj_dir="$script_dir/../.."
 source $proj_dir/lib/tool.sh
 
 # 3060 or 1070
-GPU_name=$(nvidia-smi -q | grep "Product Name" | awk -F ' ' '{print $NF}')
+check_GPU_Driver
 echo "You are running in GPU $GPU_name."
 
 # delete & recreate build 目录
