@@ -21,7 +21,7 @@
 
 const int WIDTH = 1024;    // 图像的宽度
 const int HEIGHT = 1024;   // 图像的高度
-const int NUM_POINTS = 50; // 随机点的个数
+const int NUM_POINTS = 512; // 随机点的个数
 
 // CUDA 核函数，计算每个像素点的颜色
 __global__ void calculate_pixel_colors(int *pixels, int width, int height, int *x, int *y, int num_points)
@@ -153,7 +153,7 @@ int main()
     cudaFree(dev_pixels);
 
     // 保存图像
-    save_jpeg_image(pixels, WIDTH, HEIGHT, "voronoi.jpg");
+    save_jpeg_image(pixels, WIDTH, HEIGHT, "../src/voronoi/voronoi.jpg");
 
     // 释放主机内存空间
     delete[] pixels;
