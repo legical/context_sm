@@ -1,206 +1,136 @@
-#include <iostream>
-#include <cstdlib>
-#include <ctime>
-#include <cmath>
-#include <algorithm>
-#include <chrono>
-
-#ifdef _WIN32 // 判断操作系统是否为 Windows
-#include <windows.h>
-#include <wingdi.h>
-#include <csetjmp>
-#include <jpeglib.h>
-#else
-#include <jpeglib.h>
-#include <sys/time.h>
-#endif
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <cuda_runtime.h>
-#include <device_launch_parameters.h>
+#include <curand_kernel.h>
+#include <time.h>
+#include "jpeglib.h"
 
-// 定义宏，用于检查 CUDA 函数是否出错
-#define CHECK_CUDA_ERROR(call)                                                                                \
-    {                                                                                                         \
-        cudaError_t error = call;                                                                             \
-        if (error != cudaSuccess)                                                                             \
-        {                                                                                                     \
-            std::cerr << "CUDA error: " << cudaGetErrorString(error) << " at line " << __LINE__ << std::endl; \
-            exit(1);                                                                                          \
-        }                                                                                                     \
-    }
+#define WIDTH 1024
+#define HEIGHT 1024
+#define NUM_POINTS 1024
+#define BLOCK_SIZE 16
 
-// 定义宏，用于计算 CUDA 核函数的线程块数量
-#define CALCULATE_NUM_BLOCKS(num_threads, threads_per_block) ( \
-    (num_threads + threads_per_block - 1) / threads_per_block)
-
-// 定义结构体，用于表示 2D 向量
-struct Vector2D
+// 定义点结构体
+typedef struct
 {
     float x, y;
+    int index;
+} Point;
 
-    __host__ __device__ Vector2D() {}
-
-    __host__ __device__ Vector2D(float x, float y)
-    {
-        this->x = x;
-        this->y = y;
-    }
-
-    // 计算两个向量的距离
-    __host__ __device__ float distance(const Vector2D &other) const
-    {
-        float dx = x - other.x;
-        float dy = y - other.y;
-        return std::sqrt(dx * dx + dy * dy);
-    }
-};
-
-// CUDA 核函数，用于生成 Voronoi 图
-__global__ void generate_voronoi_map(const Vector2D *points, int num_points,
-                                     int width, int height, int *output)
+// 定义颜色结构体
+typedef struct
 {
-    // 计算像素的 x 和 y 坐标
+    int r, g, b;
+} Color;
+
+// 定义生成Voronoi图的CUDA内核
+__global__ void voronoi(Point *points, Color *colors, unsigned char *image)
+{
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
-
-    // 检查坐标是否在图像范围内
-    if (x >= width || y >= height)
+    int minIndex = 0;
+    float minDistance = sqrtf(WIDTH * WIDTH + HEIGHT * HEIGHT);
+    for (int i = 0; i < NUM_POINTS; i++)
     {
-        return;
-    }
-
-    // 将像素坐标转换为向量坐标
-    Vector2D pixel(static_cast<float>(x), static_cast<float>(y));
-
-    // 找到距离当前像素最近的种子点
-    float min_distance = std::numeric_limits<float>::max();
-    int closest_point = -1;
-    for (int i = 0; i < num_points; i++)
-    {
-        float distance = points[i].distance(pixel);
-        if (distance < min_distance)
+        float dx = points[i].x - x;
+        float dy = points[i].y - y;
+        float distance = sqrtf(dx * dx + dy * dy);
+        if (distance < minDistance)
         {
-            min_distance = distance;
-            closest_point = i;
+            minDistance = distance;
+            minIndex = i;
         }
     }
-
-    // 将像素的颜色设置为最近种子点的颜色
-    output[y * width + x] = closest_point;
+    Color color = colors[minIndex];
+    int index = (y * WIDTH + x) * 3;
+    image[index] = color.r;
+    image[index + 1] = color.g;
+    image[index + 2] = color.b;
 }
 
-// 保存 Voronoi 图为 JPEG 图像
-void save_jpeg_image(int *pixels, int width, int height, const char *filename)
+int main()
 {
-    struct jpeg_compress_struct cinfo;
-    // 分配内存
-    JSAMPROW row_pointer[1];
-    unsigned char *row_buffer = new unsigned char[width * 3];
-    cinfo.image_width = width;
-    cinfo.image_height = height;
-    cinfo.input_components = 3;
-    cinfo.in_color_space = JCS_RGB;
-    jpeg_set_defaults(&cinfo);
-    jpeg_set_quality(&cinfo, 75, TRUE);
-    FILE *outfile = fopen(filename, "wb");
-    if (outfile == NULL)
+    // 初始化CUDA设备
+    cudaDeviceProp deviceProp;
+    cudaGetDeviceProperties(&deviceProp, 0);
+    printf("Using device %s\n", deviceProp.name);
+    cudaSetDevice(0);
+
+    // 分配设备内存
+    Point *d_points;
+    Color *d_colors;
+    unsigned char *d_image;
+    cudaMalloc(&d_points, sizeof(Point) * NUM_POINTS);
+    cudaMalloc(&d_colors, sizeof(Color) * NUM_POINTS);
+    cudaMalloc(&d_image, sizeof(unsigned char) * WIDTH * HEIGHT * 3);
+
+    // 初始化随机数生成器
+    curandState *d_state;
+    cudaMalloc(&d_state, sizeof(curandState) * NUM_POINTS);
+    srand(time(NULL));
+    initCurand<<<NUM_POINTS / BLOCK_SIZE, BLOCK_SIZE>>>(d_state, time(NULL));
+
+    // 初始化点和颜色
+    Point *points = (Point *)malloc(sizeof(Point) * NUM_POINTS);
+    Color *colors = (Color *)malloc(sizeof(Color) * NUM_POINTS);
+    for (int i = 0; i < NUM_POINTS; i++)
     {
-        std::cerr << "Error: Failed to open file " << filename << " for writing." << std::endl;
+        points[i].x = curand_uniform(&d_state[i]) * WIDTH;
+        points[i].y = curand_uniform(&d_state[i]) * HEIGHT;
+        points[i].index = i;
+        colors[i].r = rand() % 256;
+        colors[i].g = rand() % 256;
+        colors[i].b = rand() % 256;
+    }
+
+    // 将点和颜色拷贝到设备
+    cudaMemcpy(d_points, points, sizeof(Point) * NUM_POINTS, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_colors, colors, sizeof(Color) * NUM_POINTS, cudaMemcpyHostToDevice);
+
+    // 调用CUDA内核生成Voronoi图
+    dim3 blocks(WIDTH / BLOCK_SIZE, HEIGHT / BLOCK_SIZE);
+    dim3 threads(BLOCK_SIZE, BLOCK_SIZE);
+    voronoi<<<blocks, threads>>>(d_points, d_colors, d_image);
+    cudaDeviceSynchronize();
+    // 将结果拷贝回主机
+    unsigned char *image = (unsigned char *)malloc(sizeof(unsigned char) * WIDTH * HEIGHT * 3);
+    cudaMemcpy(image, d_image, sizeof(unsigned char) * WIDTH * HEIGHT * 3, cudaMemcpyDeviceToHost);
+
+    // 保存Voronoi图为JPG文件
+    struct jpeg_compress_struct cinfo;
+    struct jpeg_error_mgr jerr;
+    FILE *outfile;
+    JSAMPROW row_pointer[1];
+    cinfo.err = jpeg_std_error(&jerr);
+    jpeg_create_compress(&cinfo);
+    if ((outfile = fopen("../src/voronoi/voronoi2.jpg", "wb")) == NULL)
+    {
+        fprintf(stderr, "Can't open output file\n");
         exit(1);
     }
     jpeg_stdio_dest(&cinfo, outfile);
+    cinfo.image_width = WIDTH;
+    cinfo.image_height = HEIGHT;
+    cinfo.input_components = 3;
+    cinfo.in_color_space = JCS_RGB;
+    jpeg_set_defaults(&cinfo);
     jpeg_start_compress(&cinfo, TRUE);
-
-    // 写入像素数据
     while (cinfo.next_scanline < cinfo.image_height)
     {
-        int y = cinfo.next_scanline;
-        for (int x = 0; x < cinfo.image_width; x++)
-        {
-            int index = y * width + x;
-            row_buffer[x * 3] = static_cast<unsigned char>(pixels[index] % 256);
-            row_buffer[x * 3 + 1] = static_cast<unsigned char>(pixels[index] % 256);
-            row_buffer[x * 3 + 2] = static_cast<unsigned char>(pixels[index] % 256);
-        }
-        row_pointer[0] = row_buffer;
+        row_pointer[0] = &image[cinfo.next_scanline * cinfo.image_width * 3];
         jpeg_write_scanlines(&cinfo, row_pointer, 1);
     }
-
-    // 完成保存操作
     jpeg_finish_compress(&cinfo);
     fclose(outfile);
-    delete[] row_buffer;
-    jpeg_destroy_compress(&cinfo);
-}
-
-int main(int argc, char *argv[])
-{
-    // 检查输入参数是否正确
-    // if (argc != 4)
-    // {
-    //     std::cerr << "Usage: " << argv[0] << " <num_points> <width> <height>" << std::endl;
-    //     exit(1);
-    // }
-
-    // 读取输入参数
-    // int num_points = std::atoi(argv[1]);
-    // int width = std::atoi(argv[2]);
-    // int height = std::atoi(argv[3]);
-    int num_points = 512;
-    int width = 1024;
-    int height = 1024;
-
-    // 分配内存并生成随机种子点
-    Vector2D *points = new Vector2D[num_points];
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
-    for (int i = 0; i < num_points; i++)
-    {
-        points[i].x = static_cast<float>(std::rand() % width);
-        points[i].y = static_cast<float>(std::rand() % height);
-    }
-
-    // 分配内存并生成 Voronoi 图
-    int *output = new int[width * height];
-    int *dev_output = nullptr;
-    Vector2D *dev_points = nullptr;
-    CHECK_CUDA_ERROR(cudaMalloc(&dev_output, sizeof(int) * width * height));
-    CHECK_CUDA_ERROR(cudaMalloc(&dev_points, sizeof(Vector2D) * num_points));
-    CHECK_CUDA_ERROR(cudaMemcpy(dev_points, points, sizeof(Vector2D) * num_points, cudaMemcpyHostToDevice));
-    dim3 threads_per_block(16, 16);
-    dim3 num_blocks(CALCULATE_NUM_BLOCKS(width, threads_per_block.x), CALCULATE_NUM_BLOCKS(height, threads_per_block.y));
-    auto start_time = std::chrono::high_resolution_clock::now();
-    generate_voronoi_map<<<num_blocks, threads_per_block>>>(dev_points, num_points, width, height, dev_output);
-    // CHECK_CUDA_ERROR(cudaMemcpy(dev_points, points, sizeof(Vector2D) * num_points, cudaMemcpyHostToDevice));
-    // 将生成的 Voronoi 图复制回主机端
-    CHECK_CUDA_ERROR(cudaMemcpy(output, dev_output, sizeof(int) * width * height, cudaMemcpyDeviceToHost));
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    std::cout << "Elapsed time for generating: " << elapsed_time.count() << " ms" << std::endl;
-
-    // 随机上色并保存为 JPG 文件
-    unsigned int *colors = new unsigned int[num_points];
-    for (int i = 0; i < num_points; i++)
-    {
-        colors[i] = static_cast<unsigned int>(std::rand() % (1 << 24)); // 生成随机颜色
-    }
-    unsigned int *dev_colors = nullptr;
-    CHECK_CUDA_ERROR(cudaMalloc(&dev_colors, sizeof(unsigned int) * num_points));
-    CHECK_CUDA_ERROR(cudaMemcpy(dev_colors, colors, sizeof(unsigned int) * num_points, cudaMemcpyHostToDevice));
-    start_time = std::chrono::high_resolution_clock::now();
-    // 调用 colorize_voronoi_map 函数对 Voronoi 图进行上色
-    colorize_voronoi_map<<<num_blocks, threads_per_block>>>(dev_output, dev_colors, num_points, width, height);
-    CHECK_CUDA_ERROR(cudaMemcpy(output, dev_output, sizeof(int) * width * height, cudaMemcpyDeviceToHost));
-    end_time = std::chrono::high_resolution_clock::now();
-    elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-    std::cout << "Elapsed time for coloring: " << elapsed_time.count() << " ms" << std::endl;
-    save_jpeg_image(output, width, height, "../src/voronoi/voronoi2d.jpg");
 
     // 释放内存
-    delete[] points;
-    delete[] output;
-    delete[] colors;
-    CHECK_CUDA_ERROR(cudaFree(dev_points));
-    CHECK_CUDA_ERROR(cudaFree(dev_output));
-    CHECK_CUDA_ERROR(cudaFree(dev_colors));
+    free(points);
+    free(colors);
+    free(image);
+    cudaFree(d_points);
+    cudaFree(d_colors);
+    cudaFree(d_image);
+    cudaFree(d_state);
+
     return 0;
 }
