@@ -3,6 +3,9 @@
 #include <cmath>
 #include <ctime>
 
+// 这个代码生成了一个随机着色的Voronoi图，并将其保存为JPG文件
+// 在此代码中，我们使用了CUDA中的curand库来生成随机颜色，并使用了libjpeg库来保存图像文件
+
 #ifdef _WIN32 // 判断操作系统是否为 Windows
 #include <windows.h>
 #else
@@ -12,6 +15,8 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
+// 在 Ubuntu 上：
+// 打开终端并运行以下命令以安装 libjpeg 库：sudo apt-get install libjpeg-dev
 #include "jpeglib.h"
 
 const int WIDTH = 1024;    // 图像的宽度

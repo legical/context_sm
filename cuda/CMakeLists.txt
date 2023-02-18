@@ -6,6 +6,10 @@ project(CUDArandom VERSION 1.0.0 LANGUAGES CXX CUDA DESCRIPTION "The Influence o
 
 find_package(CUDA REQUIRED)
 
+# 查找 libjpeg 库
+find_package(JPEG REQUIRED)
+include_directories(${JPEG_INCLUDE_DIR})
+
 # GPU choose
 option(GPU_1070_IN "running in 1070" OFF)
 
@@ -40,7 +44,7 @@ function(add_my_target target include_dir)
     endif(GPU_1070_IN)
 
     target_compile_features(${target} PUBLIC cxx_std_11)
-    target_link_libraries(${target} cuda cudart nvidia-ml)
+    target_link_libraries(${target} cuda cudart nvidia-ml jpeg)
     target_include_directories(${target} PUBLIC ${include_dir})
 endfunction(add_my_target)
 
