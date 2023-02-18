@@ -44,12 +44,12 @@ function(add_my_target target include_dir)
     endif(GPU_1070_IN)
 
     target_compile_features(${target} PUBLIC cxx_std_11)
-    target_link_libraries(${target} cuda cudart nvidia-ml jpeg curand)
+    target_link_libraries(${target} cuda cudart nvidia-ml jpeg)
     target_include_directories(${target} PUBLIC ${include_dir})
 endfunction(add_my_target)
 
 # add_my_target(l2_dissect_test src/dissect_page src/dissect_page/dissect_page.cu)
-add_my_target(voronoi src/voronoi src/voronoi/voronoi.cu)
+# add_my_target(voronoi src/voronoi src/voronoi/voronoi.cu)
 add_my_target(voronoi2 src/voronoi src/voronoi/voronoi-2.cu)
 
 # add_my_target(l2_set_test src/dissect/reference src/dissect/reference/fine_grain_L2_set.cu)
