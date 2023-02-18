@@ -44,7 +44,7 @@ function(add_my_target target include_dir)
     endif(GPU_1070_IN)
 
     target_compile_features(${target} PUBLIC cxx_std_11)
-    target_link_libraries(${target} cuda cudart nvidia-ml jpeg)
+    target_link_libraries(${target} cuda cudart nvidia-ml jpeg curand)
     target_include_directories(${target} PUBLIC ${include_dir})
 endfunction(add_my_target)
 
