@@ -78,7 +78,7 @@ __device__ void loadPointsToSharedMemory(SharedMemory *shared_memory, Point *poi
     }
 }
 
-int main
+int main()
 {
     // 随机生成Voronoi图中的点
     int num_points = 100;
