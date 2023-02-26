@@ -32,13 +32,13 @@ CUDA_TOOL_DIR="/usr/local/cuda-11.8/bin"
 # if GPU name == 1070
 if [ $GPU_name -eq 1070 ]; then
     inner_cycle_list=(412 462 512 562 612 768)
-    CUDA_TOOL_DIR="/usr/local/cuda-11.8/bin"
+    # CUDA_TOOL_DIR="/usr/local/cuda-11.8/bin"
     # contrl code data path = data-1070
     cmake -DGPU_1070_IN=1 .. && make
 # else if GPU name == 3060
 elif [ $GPU_name -eq 3060 ]; then
     # contrl code data path = data-3060
-    inner_cycle_list=(476 526 576 626 676 726 776 826 864 926)
+    inner_cycle_list=(476 526 576 634 691 749 806 864 922 979 1037 1094 1152)
     cmake -DGPU_1070_IN=0 .. && make
 fi
 
