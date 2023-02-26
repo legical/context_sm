@@ -28,7 +28,7 @@ echo -e "\033[34mStart compiling the project......\033[0m"
 
 # default : 3060
 
-CUDA_TOOL_DIR="/usr/local/cuda-11.7/bin"
+CUDA_TOOL_DIR="/usr/local/cuda-11.8/bin"
 # if GPU name == 1070
 if [ $GPU_name -eq 1070 ]; then
     inner_cycle_list=(412 462 512 562 612 768)
@@ -38,7 +38,7 @@ if [ $GPU_name -eq 1070 ]; then
 # else if GPU name == 3060
 elif [ $GPU_name -eq 3060 ]; then
     # contrl code data path = data-3060
-    inner_cycle_list=(476 526 576 626 676 864)
+    inner_cycle_list=(476 526 576 626 676 726 776 826 864 926)
     cmake -DGPU_1070_IN=0 .. && make
 fi
 
@@ -54,7 +54,7 @@ for ((j = 1; j <= $OUT_RUNNING; j++)); do
         if [ "$GPU_name" -eq 3060 ]; then
             # get sudo right
             # echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
-            echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --metrics group:memory__l2_cache_table ./l2_dissect_test $inner_cycle $i >data-$GPU_name.log
+            echo "neu" | sudo -S $CUDA_TOOL_DIR/ncu --metrics group:memory__l2_cache_table ./l2_dissect_test $inner_cycle $i >data-$GPU_name.log
             hit_line=$(cat data-$GPU_name.log | grep "lts__t_sectors_lookup_hit.sum" | sed 's/,//g')
             miss_line=$(cat data-$GPU_name.log | grep "lts__t_sectors_lookup_miss.sum" | sed 's/,//g')
             del_this_line

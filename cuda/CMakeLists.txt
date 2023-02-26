@@ -48,9 +48,9 @@ function(add_my_target target include_dir)
     target_include_directories(${target} PUBLIC ${include_dir})
 endfunction(add_my_target)
 
-# add_my_target(l2_dissect_test src/dissect_page src/dissect_page/dissect_page.cu)
+add_my_target(l2_dissect_test src/dissect_page src/dissect_page/dissect_page.cu)
 # add_my_target(voronoi src/voronoi src/voronoi/voronoi.cu)
-add_my_target(voronoi-sm src/voronoi src/voronoi/voronoi-sm.cu)
+# add_my_target(voronoi-sm src/voronoi src/voronoi/voronoi-sm.cu)
 
 # add_my_target(l2_set_test src/dissect/reference src/dissect/reference/fine_grain_L2_set.cu)
 # add_my_target(l2_test src/dissect/reference src/dissect/reference/fine_grain_L2-cold_1GB.cu)
