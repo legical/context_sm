@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 import numpy as np
 import csv
+from matplotlib.ticker import ScalarFormatter
 # example: python3 draw.py 3060
 
 
@@ -25,7 +26,7 @@ def readname(filePath):
 def get_inner(filename):
     i = filename.find('inner')
     if i > 0:
-        tail = filename.find('.', i, i+9)
+        tail = filename.find('.', i, len(filename))
         return int(filename[i+5:tail])
     return 1
 
@@ -93,8 +94,11 @@ for file in csvlist:
     # ax1.set_ylim((np.floor(minax[0]), np.ceil(minax[1])))
     ax1.set_xlabel('Data of GPU : '+GPU_name, fontsize=42)
     ax1.set_ylabel('EXEC_time', fontsize=36)
-    # y轴刻度值 10^3
-    ax1.yaxis.Exponent = 3
+    # 设置子图1的y轴刻度值用科学计数法表示
+    ax1.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
+    ax1.yaxis.offsetText.set_fontsize(28)
+    # 设置指数为4
+    ax1.ticklabel_format(axis='y', style='sci', scilimits=(4, 4))
     # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
     ax1.legend(loc=2, fontsize=32, scatterpoints=1)
     # 设置 y 轴显示网格线
@@ -125,8 +129,10 @@ for file in csvlist:
     plt.savefig(pic_name)
     # plt.show()
 
-# 创建两个子图 -- 图3
-f, (time, hit) = plt.subplots(2, 1, figsize=(40, 34), sharex=True)
+# 创建3个子图 -- data_analysis
+# axs[0]:time axs[1]:hit_rate axs[2]:origin data
+fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(80, 58))
+# f, (time, hit) = plt.subplots(2, 1, figsize=(40, 34), sharex=True)
 data_analysis = np.array(data_analysis)
 # 所有数据的对比图，按照inner排序后再绘制
 data_analysis = data_analysis[data_analysis[:, 0].argsort()]
@@ -138,47 +144,72 @@ hit_min = data_analysis[:, 4]
 hit_max = data_analysis[:, 5]
 hit_avg = data_analysis[:, 6]
 
-time.plot(inner_list, time_min, "g", marker='^',
-          markersize=5, label="time_min")
-time.plot(inner_list, time_max, "r", marker='v',
-          markersize=5, label="time_max")
-time.plot(inner_list, time_avg, "y", marker='o',
-          markersize=5, label="time_avg")
+axs[0].plot(inner_list, time_min, "g", marker='^',
+            linewidth=3, markersize=15, label="time_min")
+axs[0].plot(inner_list, time_max, "r", marker='v',
+            linewidth=3, markersize=15, label="time_max")
+axs[0].plot(inner_list, time_avg, "y", marker='o',
+            linewidth=3, markersize=15, label="time_avg")
 
 # x,y轴标签
-time.set_xlabel('inner * 4KB = Data Array Size', fontsize=36)
-time.set_ylabel('EXEC_time', fontsize=36)
+# axs[0].set_xlabel('inner * 4KB = Data Array Size', fontsize=36)
+axs[0].set_ylabel('EXEC_time', fontsize=52)
 # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
-time.legend(loc=2, fontsize=32, scatterpoints=1)
+axs[0].legend(loc=2, fontsize=40, scatterpoints=1)
 # 设置 y 轴显示网格线
-time.grid(axis='y')
-# y轴刻度值 10^3
-time.yaxis.Exponent = 3
-# 折线图标题
-time.set_title('Data Analysis of GPU : '+GPU_name, fontsize=42)
-plt.setp(time.get_xticklabels(), fontsize=32)
-plt.setp(time.get_yticklabels(), fontsize=32)
+axs[0].grid(axis='y')
+axs[0].set_xticks(inner_list)
+axs[0].set_xticklabels(['{:g}'.format(x) for x in inner_list])
+# 设置x轴和y轴刻度值的字体大小
+axs[0].tick_params(axis='x', labelsize=46)
+axs[0].tick_params(axis='y', labelsize=46)
+# 设置子图1的y轴刻度值用科学计数法表示
+axs[0].yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
+axs[0].yaxis.offsetText.set_fontsize(42)
+# 设置指数为4
+axs[0].ticklabel_format(axis='y', style='sci', scilimits=(4, 4))
+# 子图1标题
+axs[0].set_title('\n\n\n\n\nExection Time Trends\n', fontsize=58)
+
 # plt.tick_params(labelsize=32)  # 刻度字体大小
 
-hit.plot(inner_list, hit_min, "g", marker='^',
-         markersize=5, label="hit_rate_min")
-hit.plot(inner_list, hit_max, "r", marker='v',
-         markersize=5, label="hit_rate_max")
-hit.plot(inner_list, hit_avg, "y", marker='o',
-         markersize=5, label="hit_rate_avg")
+axs[1].plot(inner_list, hit_min, "g", marker='^',
+            linewidth=3, markersize=15, label="hit_rate_min")
+axs[1].plot(inner_list, hit_max, "r", marker='v',
+            linewidth=3, markersize=15, label="hit_rate_max")
+axs[1].plot(inner_list, hit_avg, "y", marker='o',
+            linewidth=3, markersize=15, label="hit_rate_avg")
 
 # x,y轴标签
-hit.set_xlabel('inner * 4KB = Data Array Size', fontsize=36)
-hit.set_ylabel('L2 Hit Rate %', fontsize=36)
+axs[1].set_ylabel('L2 Hit Rate %', fontsize=52)
 # 控制图例的形状大小：fontsize控制图例字体大小，markerscale控制scatters形状大小，scatterpoints控制scatters的数量
-hit.legend(loc=2, fontsize=32, scatterpoints=1)
+axs[1].legend(loc=6, fontsize=40, scatterpoints=1)
 # 设置 y 轴显示网格线
-hit.grid(axis='y')
+axs[1].grid(axis='y')
 # inner_list_str as x轴刻度
-inner_list_str = [str(int(x)) for x in inner_list]
-plt.xticks(inner_list, inner_list_str)
+axs[1].set_xticks(inner_list)
+axs[1].set_xticklabels(['{:g}'.format(x) for x in inner_list])
+# 设置x轴和y轴刻度值的字体大小
+axs[1].tick_params(axis='x', labelsize=46)
+axs[1].tick_params(axis='y', labelsize=46)
+axs[1].set_title('Hit Rate Trends\n', fontsize=58)
 
-plt.tick_params(labelsize=32)  # 刻度字体大小
+# 子图3：显示原始数据，保留8位小数
+cellT = np.around(np.vstack((time_max/10000, time_avg/10000,
+                  time_min/10000, inner_list, hit_max, hit_avg, hit_min)), 8)
+table = axs[2].table(cellText=cellT,
+                     rowLabels=['time_max', 'time_avg', 'time_min', ' ',
+                                'hit_max', 'hit_avg', 'hit_min'],  # 行标题
+                     loc='center')
+table.set_fontsize(44)
+table.scale(1, 10)
+axs[2].axis('off')  # 隐藏坐标轴和网格线
+axs[2].set_title('\n\nRaw Data Table', fontsize=60)
+# 将绘图区域与图片边缘的距离都设置为0.02
+plt.subplots_adjust(left=0.05, right=0.98, bottom=0.02, top=0.95)
+# 添加总标题
+plt.suptitle('Data Analysis of GPU : '+GPU_name +
+             '                                                                  inner * 4KB = Data Array Size', fontsize=64, y=0.97)
 
 # plt.gcf().autofmt_xdate()
 pic_name = PIC_DIR + "data_analysis.jpg"
