@@ -117,9 +117,11 @@ for file in csvlist:
     plt.setp(ax1.get_xticklabels(), fontsize=34)
     plt.setp(ax1.get_yticklabels(), fontsize=34)
     # plt.title('执行时间折线图')  # 折线图标题
-    chart_title = 'inner={} * 4KB = Data Size   ^v^    Time||min={}   max={}   avg={}    ###  L2 Hit Rate%||min={}   max={}   avg={}'
+    chart_title = 'inner={} * 4KB = Data Size   ^v^    Time||min={}   max={}   avg={}    ###  L2 Hit Rate%||min={}   max={}   avg={}\n'
     plt.title(chart_title.format(
         inner, min(EXEClist), max(EXEClist), np.mean(EXEClist), min(hit_rate), max(hit_rate), np.mean(hit_rate)), fontsize=46)
+    # 将绘图区域与图片边缘的距离都设置为0.02
+    plt.subplots_adjust(left=0.05, right=0.95, top=0.95)
     # plt.gcf().autofmt_xdate()
     filename = filename.replace(DATA_DIR, PIC_DIR, 1)
     pic_name = filename.replace("csv", "jpg", 1)
@@ -194,9 +196,9 @@ axs[1].tick_params(axis='x', labelsize=46)
 axs[1].tick_params(axis='y', labelsize=46)
 axs[1].set_title('Hit Rate Trends\n', fontsize=58)
 
-# 子图3：显示原始数据，保留8位小数
+# 子图3：显示原始数据，保留6位小数
 cellT = np.around(np.vstack((time_max/10000, time_avg/10000,
-                  time_min/10000, inner_list, hit_max, hit_avg, hit_min)), 8)
+                  time_min/10000, inner_list, hit_max, hit_avg, hit_min)), 6)
 table = axs[2].table(cellText=cellT,
                      rowLabels=['time_max', 'time_avg', 'time_min', ' ',
                                 'hit_max', 'hit_avg', 'hit_min'],  # 行标题
