@@ -8,6 +8,11 @@ LIB_DIR=$(
 # /home/bric/Workspace/context_sm/cuda
 # PROJ_DIR="$LIB_DIR/.."
 
+COLOR_FG="\e[30m"
+COLOR_BG="\e[42m"
+RESTORE_FG="\e[39m"
+RESTORE_BG="\e[49m"
+
 trap 'onCtrlC' INT
 function onCtrlC() {
     #捕获CTRL+C，当脚本被ctrl+c的形式终止时同时终止程序的后台进程
@@ -75,6 +80,15 @@ function del_line() {
 function del_this_line() {
     printf "\33[2K"
 }
+# 打印一个重复 $1字符串 $2次 的新字符串
+# printf_new '-' 10 输出一个长度为10的-字符字符串
+function printf_new() {
+    str=$1
+    num=$2
+    v=$(printf "%-${num}s" "$str")
+    echo -ne "${v// /$str}"
+}
+
 # 命令行进度条，该函数接受3个参数，1-进度的整型数值，2-是总数的整型数值, 3-out running times
 function progress_bar {
     if [ -z $1 ] || [ -z $2 ]; then
@@ -84,26 +98,40 @@ function progress_bar {
 
     pro=$1                     # 进度的整型数值
     total=$2                   # 总数的整型数值
-    GREEN_SHAN='\E[5;32;49;1m' # 亮绿色闪动
-    RES='\E[0m'                # 清除颜色
     if [ $pro -gt $total ]; then
         echo "[E]>>>It's impossible that 'pro($pro) > total($total)'."
         return
     fi
+
+    GREEN_SHAN='\E[5;32;49;1m' # 亮绿色闪动
+    RES='\E[0m'                # 清除颜色
+    local cols=$(tput cols)    # 获取列长度
+    local color="${COLOR_FG}${COLOR_BG}"
     arr=('|' '/' '-' '\\')
-    local percent=$(($pro * 100 / $total))
-    #echo "pro=$pro, percent=$percent"
-    local str=$(for i in $(seq 1 $percent); do printf '='; done)
     let index=pro%4
-    # if $3 not exist
-    if [ -z $3 ]; then
-        printf "[%-100s] [%d%%] ${GREEN_SHAN}[%c]${RES}\r" "$str" "$percent" "${arr[$index]}"
-    elif [ -z $4 ]; then
-        printf "[%-100s] [%d%%] ${GREEN_SHAN}[%c]${RES} [No.%d]\r" "$str" "$percent" "${arr[$index]}" "$3"
-    else
-        printf "[%-100s] [%d%%] ${GREEN_SHAN}[%c]${RES} [No.%d/%d]\r" "$str" "$percent" "${arr[$index]}" "$3" "$4"
+    if [ $cols -le 30 ]; then
+        printf "Testing... ${GREEN_SHAN}[%c]${RES}\r" "${arr[$index]}"
+        return
     fi
-    if [ $percent -eq 100 ]; then
+
+    if [ -z $3 ] || [ -z $4 ]; then
+        PRE_STR=$(echo -ne "Test No.${1}/${2}")
+    else
+        PRE_STR=$(echo -ne "Test ${3}/${4} No.${1}")
+    fi
+
+    let bar_size=$cols-27
+    let complete_size=$(($pro * $bar_size / $total))
+    let remainder_size=$bar_size-$complete_size
+
+    progress_bar=$(echo -ne "["; echo -en "${color}"; printf_new "#" $complete_size; echo -en "${RESTORE_FG}${RESTORE_BG}"; printf_new "." $remainder_size; echo -ne "]");
+    #echo "pro=$pro, percent=$percent"
+
+    # Print progress bar
+    printf "${PRE_STR}${progress_bar}"
+    # printf "\33[2K"
+
+    if [ $pro -eq $total ]; then
         echo
     fi
 }
