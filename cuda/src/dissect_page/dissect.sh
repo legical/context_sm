@@ -28,7 +28,7 @@ echo -e "\033[34mStart compiling the project......\033[0m"
 
 # if GPU name == 1070
 if [ $GPU_name -eq 1070 ]; then
-    inner_cycle_list=(412 462 512 562 612 768)
+    inner_cycle_list=(412 462 512 563 614 666 717 768 819 870 922 973 1024)
     # CUDA_TOOL_DIR="/usr/local/cuda-11.8/bin"
     CUDA_PREF_TOOL=$(whereis nvprof | awk -F ' ' '{print $NF}')
     # contrl code data path = data-1070

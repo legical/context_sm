@@ -103,28 +103,29 @@ function progress_bar {
         return
     fi
 
-    GREEN_SHAN='\E[5;32;49;1m' # 亮绿色闪动
-    RES='\E[0m'                # 清除颜色
+    # GREEN_SHAN='\E[5;32;49;1m' # 亮绿色闪动
+    # RES='\E[0m'                # 清除颜色
     local cols=$(tput cols)    # 获取列长度
     local color="${COLOR_FG}${COLOR_BG}"
-    arr=('|' '/' '-' '\\')
-    let index=pro%4
+    # arr=('|' '/' '-' '\\')
+    # let index=pro%4
     if [ $cols -le 30 ]; then
-        printf "Testing... ${GREEN_SHAN}[%c]${RES}\r" "${arr[$index]}"
+        printf "Testing... No.${1}/${2}"
         return
     fi
 
+    percentage=$(($pro * 100 / $total))
     if [ -z $3 ] || [ -z $4 ]; then
-        PRE_STR=$(echo -ne "Test No.${1}/${2}")
+        PRE_STR=$(echo -ne "Test Process:${percentage}")
     else
-        PRE_STR=$(echo -ne "Test ${3}/${4} No.${1}")
+        PRE_STR=$(echo -ne "Test ${3}/${4} Process:${percentage}")
     fi
 
     let bar_size=$cols-27
     let complete_size=$(($pro * $bar_size / $total))
     let remainder_size=$bar_size-$complete_size
 
-    progress_bar=$(echo -ne "["; echo -en "${color}"; printf_new "#" $complete_size; echo -en "${RESTORE_FG}${RESTORE_BG}"; printf_new "." $remainder_size; echo -ne "]");
+    progress_bar=$(echo -ne "%% ["; echo -en "${color}"; printf_new "#" $complete_size; echo -en "${RESTORE_FG}${RESTORE_BG}"; printf_new "." $remainder_size; echo -ne "]");
     #echo "pro=$pro, percent=$percent"
 
     # Print progress bar
