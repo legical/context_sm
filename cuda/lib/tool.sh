@@ -128,7 +128,7 @@ function progress_bar {
     #echo "pro=$pro, percent=$percent"
 
     # Print progress bar
-    printf "${PRE_STR}${progress_bar}"
+    printf "${PRE_STR}${progress_bar}\r"
     # printf "\33[2K"
 
     if [ $pro -eq $total ]; then
