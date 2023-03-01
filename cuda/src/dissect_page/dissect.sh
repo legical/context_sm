@@ -30,14 +30,14 @@ echo -e "\033[34mStart compiling the project......\033[0m"
 if [ $GPU_name -eq 1070 ]; then
     inner_cycle_list=(412 462 512 563 614 666 717 768 819 870 922 973 1024)
     # CUDA_TOOL_DIR="/usr/local/cuda-11.8/bin"
-    CUDA_PREF_TOOL=$(whereis nvprof | awk -F ' ' '{print $NF}')
+    CUDA_PREF_TOOL=$(whereis nvprof | awk -F ' ' '{print $2}')
     # contrl code data path = data-1070
     cmake -DGPU_1070_IN=1 .. && make
 # else if GPU name == 3060
 elif [ $GPU_name -eq 3060 ]; then
     # contrl code data path = data-3060
     inner_cycle_list=(476 526 576 634 691 749 806 864 922 979 1037 1094 1152)
-    CUDA_PREF_TOOL=$(whereis ncu | awk -F ' ' '{print $NF}')
+    CUDA_PREF_TOOL=$(whereis ncu | awk -F ' ' '{print $2}')
     cmake -DGPU_1070_IN=0 .. && make
 fi
 
@@ -53,7 +53,6 @@ for ((j = 1; j <= $OUT_RUNNING; j++)); do
     for ((i = 1; i <= $INNER_RUNNING; i++)); do
         if [ "$GPU_name" -eq 3060 ]; then
             # get sudo right
-            # echo "0923326" | sudo -S $CUDA_TOOL_DIR/ncu --section MemoryWorkloadAnalysis ./l2_dissect_test $inner_cycle $i | tee -a $script_dir/data-$GPU_name/log/dis-${inner_cycle}.log
             echo $USR_PASSWD | sudo -S $CUDA_PREF_TOOL --metrics group:memory__l2_cache_table ./l2_dissect_test $inner_cycle $i >data-$GPU_name.log
             hit_line=$(cat data-$GPU_name.log | grep "lts__t_sectors_lookup_hit.sum" | sed 's/,//g')
             miss_line=$(cat data-$GPU_name.log | grep "lts__t_sectors_lookup_miss.sum" | sed 's/,//g')
@@ -90,8 +89,9 @@ cd $script_dir
 # 判断是否安装了 numpy matplotlib 模块
 python_model_check numpy
 python_model_check matplotlib
+py3=$(whereis python3 | awk -F ' ' '{print $2}')
 
-python3 draw.py $GPU_name
+$py3 draw.py $GPU_name
 echo -e "\n\033[34m$script_dir/data-$GPU_name\033[0m to see execution time data."
 echo -e "\033[34m$script_dir/data-$GPU_name/pic\033[0m to see line charts."
 
