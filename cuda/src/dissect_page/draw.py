@@ -37,6 +37,9 @@ def get_data(filename, EXEClist, hit_rate):
         reader = csv.reader(f)
         header_row = next(reader)
         for row in reader:
+            if not row:
+                continue  # 如果为空白行则跳过
+            # 处理每行数据
             try:
                 time = float(row[1])
                 if int(sys.argv[1]) == 3060:
@@ -46,7 +49,7 @@ def get_data(filename, EXEClist, hit_rate):
                 else:
                     rate = float(row[5])
                 # 去除 cache hit rate > 100 的数据
-                if rate <= 100:
+                if rate <= 100.00:
                     EXEClist.append(time)
                     hit_rate.append(rate)
             except ValueError:
